@@ -1,0 +1,979 @@
+{
+  "name": "NOC AI - Smart Alerts & Anti-Flapping Pipeline",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "zabbix-alert",
+        "options": {}
+      },
+      "id": "c3f9e27d-f004-4fa0-a841-16ae94e8d869",
+      "name": "WebhookZ",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        7456,
+        2992
+      ],
+      "webhookId": "69e69dbb-a4cc-4b50-b7cf-77daef0761ad"
+    },
+    {
+      "parameters": {
+        "jsCode": "const staticData = $getWorkflowStaticData('global');\nif (!staticData.zabbix_incidents) staticData.zabbix_incidents = {};\n\nconst input = $input.first().json.body || $input.first().json;\nconst rawHost = input.host || input.hostname || input.device || 'Desconocido';\nconst eventStatus = String(input.status || input.event_status || input.value || 'PROBLEM').toUpperCase();\nconst severity = input.severity || input.trigger_severity || 'High';\nconst problemName = input.event_name || input.trigger_name || input.problem || input.message || 'Sin descripción';\nconst eventDate = input.event_date || input.eventDate || new Date().toISOString().split('T')[0];\nconst eventTime = input.event_time || input.eventTime || new Date().toISOString().split('T')[1].substring(0,8);\nconst source = input.source || input.origen || 'Zabbix35';\n\n// Normalización para deduplicación cruzada Zabbix 35 / Zabbix 20\nfunction normalizeHost(h) {\n  if (!h) return 'unknown';\n  let s = String(h).toLowerCase().trim();\n  s = s.replace(/\\.(noc-admin|local|lan|internal).*$/, '');\n  s = s.replace(/[-_]+/g, '_');\n  return s;\n}\n\nfunction normalizeProblem(p) {\n  if (!p) return 'general';\n  let s = String(p).toLowerCase().trim();\n  if (s.includes('icmp') || s.includes('ping')) return 'icmp_ping';\n  if (s.includes('link down') || s.includes('interface down') || s.includes('operstatus down')) return 'link_down';\n  if (s.includes('bgp') || s.includes('peer')) return 'bgp_down';\n  if (s.includes('high memory') || s.includes('memoria')) return 'high_memory';\n  if (s.includes('high cpu') || s.includes('cpu')) return 'high_cpu';\n  if (s.includes('power') || s.includes('fuente')) return 'power_issue';\n  return s.replace(/[^a-z0-9]/g, '_').substring(0, 40);\n}\n\nconst normHost = normalizeHost(rawHost);\nconst normProb = normalizeProblem(problemName);\nconst dedupKey = `${normHost}::${normProb}`;\n\nconst isProblem = ['PROBLEM', 'DOWN', 'FALLA', '1'].includes(eventStatus);\nconst normStatus = isProblem ? 'PROBLEM' : 'RESOLVED';\n\nconst prev = staticData.zabbix_incidents[dedupKey] || {};\n\n// Si es un PROBLEM repetido mientras ya está activo el episodio, actualizar fuentes y descartar duplicado\nif (isProblem && prev.status === 'PROBLEM') {\n  let sources = Array.isArray(prev.sources) ? [...prev.sources] : [prev.source || 'Zabbix35'];\n  if (!sources.includes(source)) sources.push(source);\n  staticData.zabbix_incidents[dedupKey] = {\n    ...prev,\n    sources,\n    updated_at: new Date().toISOString()\n  };\n  return []; // Descarte silencioso de duplicado\n}\n\n// Si es una recuperación repetida cuando ya está marcado como RESOLVED, descartar duplicado\nif (!isProblem && (prev.status === 'RESOLVED' || !prev.status)) {\n  return [];\n}\n\nlet downSeq = prev.down_seq || 0;\nlet alertSent = prev.alert_sent || false;\nlet sources = Array.isArray(prev.sources) ? [...prev.sources] : [];\nif (!sources.includes(source)) sources.push(source);\n\nif (isProblem) {\n  downSeq += 1;\n  alertSent = false;\n  sources = [source];\n}\n\nstaticData.zabbix_incidents[dedupKey] = {\n  ...prev,\n  host: rawHost,\n  dedup_key: dedupKey,\n  status: normStatus,\n  severity,\n  problem: problemName,\n  sources,\n  down_seq: downSeq,\n  alert_sent: alertSent,\n  updated_at: new Date().toISOString(),\n  event_date: eventDate,\n  event_time: eventTime\n};\n\ntry {\n  await this.helpers.httpRequest({\n    method: 'POST',\n    url: 'http://host.docker.internal:11440/alerts/record',\n    body: {\n      source: source || 'Zabbix',\n      host: rawHost,\n      problem: problemName,\n      status: normStatus,\n      severity: severity\n    },\n    json: true\n  });\n} catch(e) {}\n\nif (!staticData.zabbix_devices) staticData.zabbix_devices = {};\nstaticData.zabbix_devices[rawHost] = {\n  host: rawHost,\n  status: normStatus,\n  severity,\n  problem: problemName,\n  last_updated: new Date().toISOString()\n};\n\nreturn [{\n  json: {\n    host: rawHost,\n    status: normStatus,\n    is_problem: isProblem,\n    severity,\n    problem: problemName,\n    eventDate,\n    eventTime,\n    source,\n    sources: sources.join(', '),\n    dedup_key: dedupKey,\n    down_seq: downSeq\n  }\n}];"
+      },
+      "id": "e4964672-533b-42aa-9219-6037fbbdb60c",
+      "name": "Registrar Zabbix",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        7680,
+        2992
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\nconst host = input.host || 'Desconocido';\nconst problem = input.problem || 'Sin descripción';\nconst severity = input.severity || 'No clasificada';\nconst status = input.status || (input.send_alert ? 'PROBLEM' : 'RESOLVED');\nconst sources = input.sources || input.source || 'Zabbix';\nconst eventDate = input.eventDate || new Date().toISOString().split('T')[0];\nconst eventTime = input.eventTime || new Date().toISOString().split('T')[1].substring(0,8);\n\nlet prompt = '';\nif (status === 'PROBLEM') {\n  prompt = `Eres OpenClaw, analista experto de operaciones de red (NOC) de noc-admin.\nAlerta sostenida de Zabbix confirmada tras 5 minutos sin recuperación:\n- Equipo: ${host}\n- Problema: ${problem}\n- Severidad: ${severity}\n- Sistema(s) de detección: ${sources}\n- Hora inicio: ${eventDate} ${eventTime}\n\nProporciona un diagnóstico técnico y conciso en español (máximo 4 líneas):\n1. Diagnóstico e impacto real en la red o servicio.\n2. Causa probable.\n3. Acción inmediata recomendada para el operador.\nSé profesional, técnico y directo.`;\n} else {\n  prompt = `Eres OpenClaw, analista experto de operaciones de red (NOC) de noc-admin.\nEl siguiente equipo/servicio de Zabbix se ha RECUPERADO y restablecido:\n- Equipo: ${host}\n- Problema resuelto: ${problem}\n- Severidad previa: ${severity}\n- Sistema(s): ${sources}\n- Hora recuperación: ${input.recovered_at || eventTime}\n\nProporciona una confirmación de recuperación breve en español (máximo 2 líneas):\n1. Confirmación de restablecimiento del servicio.\n2. Recomendación de verificación final.`;\n}\n\nreturn [{\n  json: {\n    ...input,\n    host,\n    severity,\n    sources,\n    status,\n    eventDate,\n    eventTime,\n    ollama_payload: {\n      model: \"agent.fast\",\n      messages: [\n        {\n          role: \"system\",\n          content: \"Eres OpenClaw, analista experto del NOC noc-admin. Respondes en español, conciso y técnico. Máximo 4 líneas.\"\n        },\n        {\n          role: \"user\",\n          content: prompt\n        }\n      ],\n      stream: false\n    }\n  }\n}];"
+      },
+      "id": "7d3f6b62-b28b-488c-a6b0-27715caab987",
+      "name": "Construir Prompt Zabbix",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        8784,
+        2992
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:11440/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_AI_GATEWAY_TOKEN"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.ollama_payload }}",
+        "options": {}
+      },
+      "id": "baaf239c-032a-4436-9abc-62886f591f69",
+      "name": "OpenClaw Zabbix AI",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        9008,
+        2992
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.target_chat_id }}",
+        "text": "=🔴 <b>ALERTA ZABBIX: {{ $('Construir Prompt Zabbix').item.json.host }}</b>\n\n{{ $json.choices[0].message.content }}\n\n<i>Severidad: {{ $('Construir Prompt Zabbix').item.json.severity }} | Sistema: {{ $('Construir Prompt Zabbix').item.json.sources }} | {{ $('Construir Prompt Zabbix').item.json.eventDate }} {{ $('Construir Prompt Zabbix').item.json.eventTime }}</i>",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "2f961d07-894c-4239-bba2-312299505d10",
+      "name": "Telegram Zabbix Alerta",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        9440,
+        2880
+      ],
+      "retryOnFail": true,
+      "webhookId": "d86d64f0-088a-4ee0-a27f-8326d699c50f",
+      "credentials": {
+        "telegramApi": {
+          "id": "HrvMC9vWwrso6aX0",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "dude-alert",
+        "options": {}
+      },
+      "id": "d112aaa0-dadd-4c15-afd9-3e56a0f30723",
+      "name": "WebhookD",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        7456,
+        3504
+      ],
+      "webhookId": "69e69dbb-a4cc-4b50-b7cf-77daef0761ad"
+    },
+    {
+      "parameters": {
+        "jsCode": "const staticData = $getWorkflowStaticData('global');\nif (!staticData.devices) staticData.devices = {};\nconst input = $input.first().json.body || $input.first().json;\nconst deviceName = input.device || input.name || input.hostname || 'Desconocido';\nconst currentStatus = input.status || input.event_status || 'DOWN';\nconst upperName = deviceName.toUpperCase();\nconst isSwitch = upperName.startsWith('SW_');\nconst isMikrotik = upperName.startsWith('MK_');\nconst isCriticalWord = ['BEQUANT', 'OLT', 'CORE', 'BACKBONE'].some(w => upperName.includes(w));\nconst isImportant = isSwitch || isMikrotik || isCriticalWord;\n\nconst prev = staticData.devices[deviceName] || {};\nlet downSeq = prev.down_seq || 0;\nlet alertSent = prev.alert_sent;\nif (String(currentStatus).toUpperCase() === 'DOWN' && String(prev.status || '').toUpperCase() !== 'DOWN') {\n  downSeq += 1;\n  alertSent = false;\n}\n\nstaticData.devices[deviceName] = { ...prev, name: deviceName, status: currentStatus, is_important: isImportant, updated_at: new Date().toISOString(), down_seq: downSeq, alert_sent: alertSent };\n\ntry {\n  await this.helpers.httpRequest({\n    method: 'POST',\n    url: 'http://host.docker.internal:11440/alerts/record',\n    body: {\n      source: 'TheDude',\n      host: deviceName,\n      problem: input.problem || input.service || 'Dispositivo o servicio caído',\n      status: currentStatus,\n      severity: isImportant ? 'Alta' : 'Advertencia'\n    },\n    json: true\n  });\n} catch(e) {}\n\nreturn [{ json: { ...input, device: deviceName, status: currentStatus, is_important: isImportant, down_seq: downSeq } }];"
+      },
+      "id": "bf8b0ad3-e7a3-4806-a739-ec552546f4ca",
+      "name": "Registrar",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        7680,
+        3504
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "DOWN",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "c2",
+              "leftValue": "={{ $json.is_important }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a68be3f3-5645-4496-bf07-d9ab8adbbcb7",
+      "name": "¿Estado es DOWN?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        7904,
+        3504
+      ]
+    },
+    {
+      "parameters": {
+        "amount": 5,
+        "unit": "minutes"
+      },
+      "id": "d9a91dac-553e-42e0-b4aa-38ecc8778b53",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        8128,
+        3392
+      ],
+      "webhookId": "4742dd08-6291-4a85-940f-90d6f3054823"
+    },
+    {
+      "parameters": {
+        "jsCode": "const staticData = $getWorkflowStaticData('global');\nif (!staticData.devices) staticData.devices = {};\nconst inputData = $input.first().json;\nconst deviceName = inputData.device || inputData.host || 'UNKNOWN';\nconst deviceRecord = staticData.devices[deviceName] || {};\nconst currentStatus = String(deviceRecord.status || inputData.status || '').toUpperCase();\nconst isImportant = deviceRecord.is_important !== undefined ? deviceRecord.is_important : true;\n\nconst seqOk = inputData.down_seq === undefined || deviceRecord.down_seq === inputData.down_seq;\nconst notYetAlerted = deviceRecord.alert_sent !== true;\nconst sendAlert = (currentStatus === 'DOWN') && isImportant && seqOk && notYetAlerted;\n\nif (sendAlert) {\n  staticData.devices[deviceName] = { ...deviceRecord, alert_sent: true };\n  try {\n    await this.helpers.httpRequest({\n      method: 'POST',\n      url: 'http://host.docker.internal:11440/alerts/voice',\n      body: {\n        host: deviceName,\n        problem: inputData.problem || 'Caída de equipo',\n        severity: 'Alta',\n        source: 'TheDude'\n      },\n      json: true\n    });\n  } catch(e) {}\n}\nreturn [{ json: { send_alert: sendAlert, device: deviceName, status: currentStatus, is_important: isImportant, details: staticData.devices[deviceName] || deviceRecord } }];"
+      },
+      "id": "b09746b7-b79d-4988-8174-b30801001417",
+      "name": "Comprobar",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        8336,
+        3392
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c3",
+              "leftValue": "={{ $json.send_alert }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "db75dca7-586f-4e51-983a-f8ef48ff294e",
+      "name": "¿Enviar Alerta?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        8560,
+        3392
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const staticData = $getWorkflowStaticData('global');\nif (!staticData.devices) staticData.devices = {};\nconst inputData = $input.first().json;\nconst deviceName = inputData.device || inputData.host || 'UNKNOWN';\n\n// NUEVO: a esta rama también llegan caídas de equipos NO importantes (salida falsa del IF).\n// Eso no es una recuperación: se descarta sin tocar el estado.\nif (String(inputData.status || '').toUpperCase() === 'DOWN') return [];\n\nconst deviceRecord = staticData.devices[deviceName] || {};\nconst isImportant = deviceRecord.is_important !== undefined ? deviceRecord.is_important : true;\n// NUEVO: solo se avisa de la recuperación si se avisó de la caída.\n// (alert_sent indefinido = estado anterior a este cambio: se trata como avisado)\nconst alertWasSent = deviceRecord.alert_sent === true;\nstaticData.devices[deviceName] = { ...deviceRecord, status: 'UP', last_up: new Date().toISOString(), alert_sent: false };\nreturn [{ json: { send_recovery: isImportant && alertWasSent, device: deviceName, status: 'UP', is_important: isImportant, details: staticData.devices[deviceName] } }];"
+      },
+      "id": "4ab68a14-ec6d-4972-b937-4d42515775e1",
+      "name": "Recuperación",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        8128,
+        3600
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c4",
+              "leftValue": "={{ $json.send_recovery }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "id": "35ef77ef-994b-4a84-83dc-c53ed67f9397",
+      "name": "¿Enviar Recuperación?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        8336,
+        3600
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\nconst device = input.device || input.details?.device || 'UNKNOWN';\nconst status = input.status || (input.send_alert ? 'DOWN' : 'UP');\nconst upperName = device.toUpperCase();\nlet deviceType = 'equipo de red';\nif (upperName.startsWith('SW_')) deviceType = 'switch de red';\nelse if (upperName.startsWith('MK_')) deviceType = 'router MikroTik';\nelse if (upperName.includes('OLT')) deviceType = 'OLT (fibra óptica)';\nelse if (upperName.includes('CORE') || upperName.includes('BACKBONE')) deviceType = 'equipo core/backbone (crítico)';\nelse if (upperName.includes('BEQUANT')) deviceType = 'dispositivo Bequant';\n\nconst prompt = `Eres OpenClaw, el analista de NOC. El ${deviceType} llamado ${device} acaba de pasar a estado ${status}. Proporciona un diagnóstico conciso en español con: 1) impacto probable en la red, 2) posible causa según el tipo de equipo, 3) acción recomendada inmediata. Máximo 4 líneas.`;\n\nreturn [{\n  json: {\n    ...input,\n    device,\n    status,\n    deviceType,\n    ollama_payload: {\n      model: \"agent.fast\",\n      messages: [\n        {\n          role: \"system\",\n          content: \"Eres OpenClaw, analista experto del NOC. Respondes en español, de forma concisa. Máximo 4 líneas por respuesta.\"\n        },\n        {\n          role: \"user\",\n          content: prompt\n        }\n      ],\n      stream: false\n    }\n  }\n}];"
+      },
+      "id": "c58e14eb-d845-491f-8446-ffc8f6327f27",
+      "name": "Construir Prompt Dude",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        8784,
+        3504
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:11440/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_AI_GATEWAY_TOKEN"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.ollama_payload }}",
+        "options": {}
+      },
+      "id": "d94f3d21-2b0e-45ae-a436-1e2a381868d1",
+      "name": "OpenClaw Dude AI",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        9008,
+        3504
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c5",
+              "leftValue": "={{ $('Construir Prompt Dude').item.json.status }}",
+              "rightValue": "DOWN",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "8691395b-a004-4e41-87f7-31e76ebdc4fd",
+      "name": "¿Es CAÍDO o RECUPERADO?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        9216,
+        3504
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.target_chat_id }}",
+        "text": "=🔴 <b>THE DUDE: {{ $('Construir Prompt Dude').item.json.device }} CAÍDO</b>\n\n{{ $json.choices[0].message.content }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "61729c85-ae4b-4ccb-869a-9930f4407670",
+      "name": "Telegram Dude Caído",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        9440,
+        3392
+      ],
+      "retryOnFail": true,
+      "webhookId": "3302a547-3b9d-455f-985b-93b5c6e1a4b8",
+      "credentials": {
+        "telegramApi": {
+          "id": "HrvMC9vWwrso6aX0",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.target_chat_id }}",
+        "text": "=🟢 <b>THE DUDE: {{ $('Construir Prompt Dude').item.json.device }} RECUPERADO</b>\n\n{{ $json.choices[0].message.content }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "6686f073-4182-4783-b720-8f50a7cb82ac",
+      "name": "Telegram Dude Recuperado",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        9440,
+        3600
+      ],
+      "retryOnFail": true,
+      "webhookId": "f4730b6c-13c5-4eb1-b72c-d787593bc81a",
+      "credentials": {
+        "telegramApi": {
+          "id": "HrvMC9vWwrso6aX0",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "network-status",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "61b2d3a5-a213-4793-9a0f-b9b82495d294",
+      "name": "Webhook Status",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        7456,
+        3792
+      ],
+      "webhookId": "2d7f1645-4e3b-4de5-a6a2-359b1f933264"
+    },
+    {
+      "parameters": {
+        "jsCode": "const staticData = $getWorkflowStaticData('global');\nreturn [{ json: { timestamp: new Date().toISOString(), the_dude: staticData.devices || {}, zabbix: staticData.zabbix_devices || {} } }];"
+      },
+      "id": "5464b74c-aaf5-46bd-984d-823510291f5c",
+      "name": "Obtener Estado Global",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        7680,
+        3792
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "let subs = [];\ntry {\n  const subsRes = await this.helpers.httpRequest({\n    method: \"GET\",\n    url: \"http://host.docker.internal:11440/subscribers\",\n    json: true\n  });\n  subs = Array.isArray(subsRes) ? subsRes : [];\n} catch (e) {\n  subs = [{ chat_id: \"1558973693\" }];\n}\n\nconst inputItem = $input.first().json;\nreturn subs.map(s => ({\n  json: {\n    ...inputItem,\n    target_chat_id: String(s.chat_id)\n  }\n}));"
+      },
+      "id": "18c38e89-b393-4160-b7a0-f05efa82d103",
+      "name": "Despachar Suscriptores Zabbix",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        9120,
+        2992
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "let subs = [];\ntry {\n  const subsRes = await this.helpers.httpRequest({\n    method: \"GET\",\n    url: \"http://host.docker.internal:11440/subscribers\",\n    json: true\n  });\n  subs = Array.isArray(subsRes) ? subsRes : [];\n} catch (e) {\n  subs = [{ chat_id: \"1558973693\" }];\n}\n\nconst inputItem = $input.first().json;\nreturn subs.map(s => ({\n  json: {\n    ...inputItem,\n    target_chat_id: String(s.chat_id)\n  }\n}));"
+      },
+      "id": "13ef9ac9-5f79-48ff-815d-458bd9972ea1",
+      "name": "Despachar Suscriptores Dude",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        9120,
+        3504
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c_zb_prob",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "PROBLEM",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "zb-if-estado-problem",
+      "name": "¿Estado es PROBLEM Zabbix?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        7904,
+        2992
+      ]
+    },
+    {
+      "parameters": {
+        "amount": 5,
+        "unit": "minutes"
+      },
+      "id": "zb-wait-5min",
+      "name": "Wait Zabbix",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        8128,
+        2880
+      ],
+      "webhookId": "cc06248a-a731-4487-abe4-0f040d115506"
+    },
+    {
+      "parameters": {
+        "jsCode": "const staticData = $getWorkflowStaticData('global');\nif (!staticData.zabbix_incidents) staticData.zabbix_incidents = {};\n\nconst inputData = $input.first().json;\nconst dedupKey = inputData.dedup_key;\nconst inc = staticData.zabbix_incidents[dedupKey] || {};\n\nconst currentStatus = String(inc.status || inputData.status || '').toUpperCase();\nconst seqOk = (inputData.down_seq === undefined) || (inc.down_seq === inputData.down_seq);\nconst notYetAlerted = (inc.alert_sent !== true);\n\n// Filtro inteligente de relevancia/severidad:\nconst sevStr = String(inc.severity || inputData.severity || '').toLowerCase();\nconst probStr = String(inc.problem || inputData.problem || '').toLowerCase();\nconst hostStr = String(inc.host || inputData.host || '').toLowerCase();\n\nconst isDisasterOrHigh = sevStr.includes('disaster') || sevStr.includes('high') || sevStr.includes('desastre') || sevStr.includes('alta') || sevStr === '4' || sevStr === '5';\nconst isCriticalKeyword = ['olt', 'core', 'mikrotik', 'mk_', 'sw_', 'switch', 'bgp', 'uplink', 'caida', 'offline', 'unavailable', 'ping', 'down'].some(k => hostStr.includes(k) || probStr.includes(k));\nconst isLowNoise = (sevStr.includes('information') || sevStr.includes('info') || sevStr.includes('warning') || sevStr === '1' || sevStr === '2') && !isCriticalKeyword;\n\nconst isWorthSending = (isDisasterOrHigh || isCriticalKeyword) && !isLowNoise;\n\n// Solo avisa si sigue caído tras los 5 minutos, pertenece al mismo episodio, no fue alertado antes y vale la pena enviar\nconst sendAlert = (currentStatus === 'PROBLEM') && seqOk && notYetAlerted && isWorthSending;\n\nif (sendAlert) {\n  staticData.zabbix_incidents[dedupKey] = { ...inc, alert_sent: true };\n  try {\n    await this.helpers.httpRequest({\n      method: 'POST',\n      url: 'http://host.docker.internal:11440/alerts/voice',\n      body: {\n        host: inc.host || inputData.host,\n        problem: inc.problem || inputData.problem,\n        severity: inc.severity || inputData.severity,\n        source: 'Zabbix'\n      },\n      json: true\n    });\n  } catch(e) {}\n}\n\nreturn [{\n  json: {\n    ...inputData,\n    send_alert: sendAlert,\n    host: inc.host || inputData.host,\n    severity: inc.severity || inputData.severity,\n    problem: inc.problem || inputData.problem,\n    sources: inc.sources ? inc.sources.join(', ') : (inputData.sources || 'Zabbix'),\n    details: staticData.zabbix_incidents[dedupKey] || inc\n  }\n}];"
+      },
+      "id": "zb-code-comprobar",
+      "name": "Comprobar Zabbix",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        8336,
+        2880
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c_zb_send_alert",
+              "leftValue": "={{ $json.send_alert }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "zb-if-enviar-alerta",
+      "name": "¿Enviar Alerta Zabbix?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        8544,
+        2880
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const staticData = $getWorkflowStaticData('global');\nif (!staticData.zabbix_incidents) staticData.zabbix_incidents = {};\n\nconst inputData = $input.first().json;\nconst dedupKey = inputData.dedup_key;\nconst inc = staticData.zabbix_incidents[dedupKey] || {};\n\nif (inputData.is_problem === true) return [];\n\n// SOLO se avisa de la recuperación si previamente se envió la alerta de caída tras los 5 min\nconst alertWasSent = (inc.alert_sent === true);\n\nstaticData.zabbix_incidents[dedupKey] = {\n  ...inc,\n  status: 'RESOLVED',\n  last_recovery: new Date().toISOString(),\n  alert_sent: false\n};\n\nif (!staticData.zabbix_devices) staticData.zabbix_devices = {};\nstaticData.zabbix_devices[inputData.host] = {\n  host: inputData.host,\n  status: 'RESOLVED',\n  severity: inc.severity || inputData.severity,\n  problem: inc.problem || inputData.problem,\n  last_updated: new Date().toISOString()\n};\n\nreturn [{\n  json: {\n    ...inputData,\n    send_recovery: alertWasSent,\n    status: 'RESOLVED',\n    host: inc.host || inputData.host,\n    severity: inc.severity || inputData.severity,\n    problem: inc.problem || inputData.problem,\n    sources: inc.sources ? inc.sources.join(', ') : (inputData.sources || 'Zabbix'),\n    recovered_at: new Date().toLocaleTimeString('es-VE')\n  }\n}];"
+      },
+      "id": "zb-code-recuperacion",
+      "name": "Recuperación Zabbix",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        8128,
+        3104
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c_zb_send_recovery",
+              "leftValue": "={{ $json.send_recovery }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "id": "zb-if-enviar-recuperacion",
+      "name": "¿Enviar Recuperación Zabbix?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        8336,
+        3104
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c_zb_es_prob_o_res",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "PROBLEM",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "zb-if-es-prob-res",
+      "name": "¿Es PROBLEM o RESOLVED Zabbix?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        9240,
+        2992
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.target_chat_id }}",
+        "text": "=🟢 <b>RECUPERADO ZABBIX: {{ $('Construir Prompt Zabbix').item.json.host }}</b>\n\n{{ $json.choices[0].message.content }}\n\n<i>Incidente restablecido: {{ $('Construir Prompt Zabbix').item.json.problem }} | Sistema: {{ $('Construir Prompt Zabbix').item.json.sources }}</i>",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "zb-telegram-recuperado",
+      "name": "Telegram Zabbix Recuperado",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        9440,
+        3104
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "HrvMC9vWwrso6aX0",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "WebhookZ": {
+      "main": [
+        [
+          {
+            "node": "Registrar Zabbix",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Registrar Zabbix": {
+      "main": [
+        [
+          {
+            "node": "¿Estado es PROBLEM Zabbix?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Construir Prompt Zabbix": {
+      "main": [
+        [
+          {
+            "node": "OpenClaw Zabbix AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenClaw Zabbix AI": {
+      "main": [
+        [
+          {
+            "node": "Despachar Suscriptores Zabbix",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WebhookD": {
+      "main": [
+        [
+          {
+            "node": "Registrar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Registrar": {
+      "main": [
+        [
+          {
+            "node": "¿Estado es DOWN?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Estado es DOWN?": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Recuperación",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Comprobar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Comprobar": {
+      "main": [
+        [
+          {
+            "node": "¿Enviar Alerta?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Enviar Alerta?": {
+      "main": [
+        [
+          {
+            "node": "Construir Prompt Dude",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recuperación": {
+      "main": [
+        [
+          {
+            "node": "¿Enviar Recuperación?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Enviar Recuperación?": {
+      "main": [
+        [
+          {
+            "node": "Construir Prompt Dude",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Construir Prompt Dude": {
+      "main": [
+        [
+          {
+            "node": "OpenClaw Dude AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenClaw Dude AI": {
+      "main": [
+        [
+          {
+            "node": "Despachar Suscriptores Dude",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Es CAÍDO o RECUPERADO?": {
+      "main": [
+        [
+          {
+            "node": "Telegram Dude Caído",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram Dude Recuperado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook Status": {
+      "main": [
+        [
+          {
+            "node": "Obtener Estado Global",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Despachar Suscriptores Zabbix": {
+      "main": [
+        [
+          {
+            "node": "¿Es PROBLEM o RESOLVED Zabbix?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Despachar Suscriptores Dude": {
+      "main": [
+        [
+          {
+            "node": "¿Es CAÍDO o RECUPERADO?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Estado es PROBLEM Zabbix?": {
+      "main": [
+        [
+          {
+            "node": "Wait Zabbix",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Recuperación Zabbix",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait Zabbix": {
+      "main": [
+        [
+          {
+            "node": "Comprobar Zabbix",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Comprobar Zabbix": {
+      "main": [
+        [
+          {
+            "node": "¿Enviar Alerta Zabbix?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Enviar Alerta Zabbix?": {
+      "main": [
+        [
+          {
+            "node": "Construir Prompt Zabbix",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recuperación Zabbix": {
+      "main": [
+        [
+          {
+            "node": "¿Enviar Recuperación Zabbix?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Enviar Recuperación Zabbix?": {
+      "main": [
+        [
+          {
+            "node": "Construir Prompt Zabbix",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Es PROBLEM o RESOLVED Zabbix?": {
+      "main": [
+        [
+          {
+            "node": "Telegram Zabbix Alerta",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram Zabbix Recuperado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  }
+}
