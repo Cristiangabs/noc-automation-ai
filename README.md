@@ -11,7 +11,7 @@ Plataforma integral de **automatización, correlación inteligente de alertas y 
 
 ---
 
-## 📌 Arquitectura del Sistema
+##  Arquitectura del Sistema
 
 ```mermaid
 flowchart TD
@@ -50,7 +50,7 @@ flowchart TD
 
 ---
 
-## 🌟 Características Principales
+##  Características Principales
 
 ### 1. Pipeline Inteligente Anti-Flapping (n8n Workflow 1)
 * **Ventana de Gracia de 5 Minutos:** Retiene alertas de acceso (CPEs y routers perimetrales) para evitar spam masivo de microcortes.
@@ -75,7 +75,7 @@ flowchart TD
 
 ---
 
-## 📂 Estructura del Repositorio
+##  Estructura del Repositorio
 
 ```text
 ├── dashboard/
@@ -93,7 +93,7 @@ flowchart TD
 
 ---
 
-## 🚀 Despliegue Rápido
+##  Despliegue Rápido
 
 ### Prerrequisitos
 * Docker y Docker Compose
@@ -131,7 +131,7 @@ flowchart TD
 
 ---
 
-## 👤 Autor
+##  Autor
 
 **Cristian Gabriel Salinas Velasquez**  
 *Administrador de Infraestructura TI & Redes | Soporte y Telecomunicaciones*  
