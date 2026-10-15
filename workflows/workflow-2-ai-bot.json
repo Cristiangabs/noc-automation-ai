@@ -1,0 +1,412 @@
+{
+  "name": "NOC AI - Telegram Conversational Operations Bot",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "1fc6e7b5-0aad-44ba-a39f-ee2cf967de00",
+      "name": "Recibir de Workflow 1",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        2096,
+        4048
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Recibir de Workflow 1').item.json.text }}",
+        "options": {
+          "systemMessage": "Eres Sentry, analista técnico del NOC de noc-admin. Respondes basándote en los datos devueltos por las herramientas de Zabbix, Proxmox y de red. NUNCA inventes datos.\n\nHerramientas disponibles:\n- ver_problemas_zabbix → alertas activas en tiempo real\n- ver_historial_alertas_zabbix → eventos e incidentes pasados\n- buscar_equipo_zabbix → buscar equipo por nombre o IP en Zabbix\n- ver_topologia_zabbix → lista de equipos en la red\n- hacer_ping_zabbix → ping en vivo a CUALQUIER equipo o IP (esté o no en Zabbix)\n- consultar_trafico_zabbix → consultar ancho de banda / tráfico (Mbps in/out) de un equipo o IP\n- listar_interfaces_zabbix → lista TODAS las interfaces de red de un equipo (ej. MKcompany) con su tráfico actual en Mbps\n- diagnosticar_salud_equipo → diagnóstico profundo de salud de máquinas virtuales (VMs de Proxmox como VM 175, etc.), hipervisores Proxmox (PMX10) o servidores y routers de red.\n- consultar_accion_vm_proxmox → consulta y pre-valida en Proxmox cualquier acción operativa: levantar (start), apagar seguro (shutdown), detener forzado (stop), reiniciar (reboot), reinicio forzado (reset), pausar (pause), hibernar (hibernate), reanudar (resume), migrar (migrate), clonar (clone), consola (console).\n- ejecutar_accion_vm_proxmox → ejecuta físicamente la acción en Proxmox cuando el usuario confirma.\n\n═══════════════════════════════════════════════════════════════\nPROTOCOLO OBLIGATORIO DE GESTIÓN DE MÁQUINAS VIRTUALES (PROXMOX)\n═══════════════════════════════════════════════════════════════\nAcciones soportadas:\n• start / encender / levantar\n• shutdown / apagar (apagado ordenado ACPI)\n• stop / detener / parar (detención definitiva)\n• reboot / reiniciar (reinicio suave del sistema)\n• reset / reinicio forzado (hard reset)\n• pause / pausar (suspender temporalmente)\n• hibernate / hibernar (guardar estado a disco)\n• resume / reanudar (continuar ejecución)\n• migrate / migrar (mover VM a otro nodo del clúster: PMX10, pmx11, PMX12)\n• clone / clonar (crear copia con nuevo VMID)\n• console / consola (enlace directo a consola web NoVNC)\n\nREGLAS DE INTERACCIÓN:\n1. Si el usuario solicita CONSOLA (\"consola de la vm 112\", \"entrar a la consola\"):\n   Llama a consultar_accion_vm_proxmox con accion=\"console\".\n   Proporciona el enlace de acceso directo NoVNC indicando que para ingresar debe autenticarse en Proxmox con sus credenciales de operador.\n   NO requiere confirmaciones dobles porque es una acción de solo lectura y acceso interactivo.\n\n2. Para cualquier acción que modifique el estado de la máquina (start, shutdown, stop, reboot, reset, pause, hibernate, resume, migrate, clone):\n   DEBES SEGUIR RIGUROSAMENTE ESTE PROTOCOLO DE DOS CONFIRMACIONES:\n\n   PASO 1 (Petición inicial del usuario):\n   - Llama a consultar_accion_vm_proxmox con el identificador de la VM y la acción solicitada.\n   - Si la herramienta devuelve un error (ej. la VM ya está encendida o ya está apagada), explícalo de manera clara y no continúes.\n   - Si la acción es viable, NO EJECUTES NADA EN PROXMOX. Presenta al usuario la información técnica encontrada (VMID, Nombre, Nodo, Estado actual, Acción) y solicita educadamente la PRIMERA CONFIRMACIÓN:\n     \"¿Deseas proceder con la solicitud de esta acción sobre la máquina virtual? Responde <b>Sí</b> para continuar o <b>Cancelar</b> para anular.\"\n   - TIENES PROHIBIDO llamar a ejecutar_accion_vm_proxmox en este paso.\n\n   PASO 2 (Primera confirmación recibida):\n   - Si el usuario dice \"Sí\", \"Adelante\", \"Continúa\", \"Procede\":\n     AÚN NO EJECUTES LA ACCIÓN. Pide educadamente una SEGUNDA Y ÚLTIMA CONFIRMACIÓN recordando la máquina, el nodo y la acción:\n     \"⚠️ <b>Confirmación Final Requerida</b>\nPor protocolos de seguridad operativa del NOC, se requiere una última confirmación antes de enviar la orden al hipervisor:\n\n¿Confirmas de forma definitiva que deseas <b>[ACCION]</b> la máquina <b>[NOMBRE]</b> (VMID: <code>[VMID]</code> en nodo <code>[NODO]</code>)?\n\nPor favor responde <b>Confirmar definitivamente</b> o <b>Cancelar</b>.\"\n   - Si el usuario dice \"No\", \"Cancelar\", o cambia de tema:\n     Informa que la operación fue cancelada y no hagas nada.\n   - TIENES PROHIBIDO llamar a ejecutar_accion_vm_proxmox en este paso.\n\n   PASO 3 (Segunda confirmación definitiva recibida):\n   - Si el usuario responde afirmativamente (\"Confirmar definitivamente\", \"Confirmo\", \"Sí, adelante\"):\n     TIENES PROHIBIDO inventar o simular que la acción ya ocurrió sin llamar a la herramienta.\n     DEBES OBLIGATORIAMENTE llamar a ejecutar_accion_vm_proxmox con la acción y el identificador.\n     Al recibir la respuesta de la herramienta, presenta el resultado real con el nuevo estado verificado.\n   - Si el usuario dice \"No\", \"Cancelar\", o rechaza:\n     Informa que la operación fue cancelada.\n\n═══════════════════════════════\n\n\n═══════════════════════════════════════════════════════════════\nCONSULTAS DE ESTADO, NOMBRE Y DETALLES DE VMs PROXMOX\n═══════════════════════════════════════════════════════════════\nCuando el usuario pregunte por el nombre, estado o métricas de una máquina virtual o contenedor (ej. \"¿Cómo se llama la vm139?\", \"Dime el estado de la VM139\", \"Dame los detalles de la VM 139\"):\n1. Consulta SIEMPRE en tiempo real la herramienta correspondiente (consultar_accion_vm_proxmox o diagnosticar_salud_equipo).\n2. NUNCA inventes nombres, estados ni consumos de memoria/CPU.\n3. Presenta la información de forma ordenada y limpia con su nombre exacto real devuelto por la herramienta, por ejemplo:\n   • <b>Nombre:</b> [nombre real devuelto por la herramienta]\n   • <b>VMID:</b> <code>[vmid]</code>\n   • <b>Nodo físico:</b> <code>[nodo]</code>\n   • <b>Estado:</b> <b>[ESTADO]</b>\n   • <b>Uso de CPU:</b> [cpu]\n   • <b>Memoria RAM:</b> [memoria]\n   • <b>Tiempo activo (Uptime):</b> [uptime]\n\nREGLAS DE FORMATO — OBLIGATORIAS\n═══════════════════════════════\n1. ABSOLUTAMENTE PROHIBIDO usar Markdown.\n2. Para negritas usa SOLO: <b>texto</b>\n3. Para cursivas usa SOLO: <i>texto</i>\n4. Para código o IDs usa SOLO: <code>texto</code>\n5. NUNCA uses <br>, <p>, <ul>, <li> — solo saltos de línea normales.\n\n═══════════════════════════════════════════════════════════════\nESTILO Y FORMATO OBLIGATORIO DE RESPUESTAS (TELEGRAM NOC)\n═══════════════════════════════════════════════════════════════\n1. ESPACIADO OBLIGATORIO: Deja SIEMPRE un salto de línea en blanco entre cada sección y entre cada equipo de una lista. La información NUNCA debe quedar pegada ni compacta.\n2. TOTALMENTE PROHIBIDO USAR TABLAS (| col | col |): En Telegram las tablas se descuadran por completo y son ilegibles. NUNCA generes tablas Markdown.\n3. FORMATO DE ALERTAS Y EVENTOS:\n   Presenta las alertas y estados en tarjetas o listas limpias y espaciosas con viñetas y emojis:\n\n   🔴 <b>[NOMBRE_DEL_EQUIPO]</b>\n   • <b>Problema:</b> [Descripción]\n   • <b>Severidad:</b> [Nivel]\n   • <b>Hora:</b> [HH:MM] (hace X tiempo)\n   • <b>Origen:</b> [Zabbix / The Dude]\n\n   (Línea en blanco)\n\n   🟢 <b>[NOMBRE_DEL_EQUIPO]</b>\n   • <b>Estado:</b> Recuperado / Arriba\n   • <b>Hora:</b> [HH:MM]\n\n4. ESTRUCTURA: Separa claramente con títulos en negrita (ej. «🚨 <b>Alertas Recientes (Últimos 6 min)</b>» y «⚠️ <b>Problemas Activos</b>»).\n"
+        }
+      },
+      "id": "c71972c3-92d5-4653-8938-ca4597be8f97",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        2400,
+        4048
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "agent.tools",
+          "mode": "id"
+        },
+        "options": {
+          "baseURL": "http://host.docker.internal:11440/v1",
+          "temperature": 0
+        }
+      },
+      "id": "304b9e90-d4fe-47e7-86b5-a7b347db79ed",
+      "name": "Facilitoya AI",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2256,
+        4288
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "MP18mL48vdKTT47X",
+          "name": "OpenAI account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "=noc_v2_{{ $('Recibir de Workflow 1').item.json.chat_id }}",
+        "contextWindowLength": 4
+      },
+      "id": "memoria-conversacional-clean-node",
+      "name": "Memoria Conversacional",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        2448,
+        4288
+      ]
+    },
+    {
+      "parameters": {
+        "name": "ver_problemas_zabbix",
+        "description": "Obtiene la lista de alertas recientes en los últimos 6 minutos (The Dude / Zabbix 20 / Zabbix 35) y problemas activos de red en Zabbix.",
+        "jsCode": "try {\n  let lim = 15;\n  if (typeof limit !== 'undefined' && limit) lim = parseInt(limit);\n  else if (typeof query !== 'undefined' && query && !isNaN(parseInt(query))) lim = parseInt(query);\n  if (isNaN(lim) || lim <= 0 || lim > 50) lim = 15;\n\n  // 1. Consultar memoria de alertas de los últimos 6 minutos (The Dude + Zabbix 20 + Zabbix 35)\n  let recentAlerts = [];\n  try {\n    const memRes = await this.helpers.httpRequest({\n      method: 'GET',\n      url: 'http://host.docker.internal:11440/alerts/recent?minutes=6',\n      json: true\n    });\n    if (memRes && memRes.alerts) {\n      recentAlerts = memRes.alerts;\n    }\n  } catch (e) {}\n\n  // 2. Consultar problemas activos en Zabbix 35\n  let zabbixProblems = [];\n  try {\n    const res = await this.helpers.httpRequest({\n      method: 'POST',\n      url: 'http://192.168.1.100/zabbix/api_jsonrpc.php',\n      headers: {\n        'Authorization': 'Bearer YOUR_ZABBIX_API_TOKEN',\n        'Content-Type': 'application/json'\n      },\n      body: {\n        jsonrpc: '2.0',\n        method: 'problem.get',\n        params: {\n          output: ['eventid', 'name', 'severity', 'clock', 'objectid'],\n          sortfield: ['eventid'],\n          sortorder: 'DESC',\n          limit: lim\n        },\n        id: 1\n      },\n      json: true\n    });\n\n    if (res && res.result && res.result.length > 0) {\n      const triggerIds = res.result.map(p => p.objectid).filter(id => id && id !== '0');\n      let hostMap = {};\n\n      if (triggerIds.length > 0) {\n        try {\n          const trigRes = await this.helpers.httpRequest({\n            method: 'POST',\n            url: 'http://192.168.1.100/zabbix/api_jsonrpc.php',\n            headers: {\n              'Authorization': 'Bearer YOUR_ZABBIX_API_TOKEN',\n              'Content-Type': 'application/json'\n            },\n            body: {\n              jsonrpc: '2.0',\n              method: 'trigger.get',\n              params: {\n                output: ['triggerid'],\n                selectHosts: ['hostid', 'host', 'name'],\n                triggerids: triggerIds\n              },\n              id: 2\n            },\n            json: true\n          });\n          if (trigRes && trigRes.result) {\n            trigRes.result.forEach(t => {\n              if (t.hosts && t.hosts[0]) {\n                hostMap[t.triggerid] = t.hosts[0].name || t.hosts[0].host;\n              }\n            });\n          }\n        } catch (e) {}\n      }\n\n      const sevMap = { '0': 'No clasificado', '1': 'Información', '2': 'Advertencia', '3': 'Promedio', '4': 'Alta', '5': 'Desastre' };\n      zabbixProblems = res.result.slice(0, lim).map(p => ({\n        origen: 'Zabbix35',\n        equipo: hostMap[p.objectid] || 'Equipo de Red',\n        problema: p.name,\n        severidad: sevMap[p.severity] || p.severity,\n        hora: new Date(parseInt(p.clock) * 1000).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })\n      }));\n    }\n  } catch (e) {}\n\n  if (recentAlerts.length === 0 && zabbixProblems.length === 0) {\n    return 'No hay problemas activos ni alertas registradas en los últimos 6 minutos. Toda la red opera con normalidad.';\n  }\n\n  return JSON.stringify({\n    alertas_recientes_ultimos_6_min: recentAlerts.map(a => ({\n      origen: a.source,\n      equipo: a.host,\n      problema: a.problem,\n      severidad: a.severity,\n      estado: a.status,\n      hora_evento: a.hora,\n      hace_segundos: a.hace_segundos\n    })),\n    problemas_activos_zabbix: zabbixProblems\n  });\n} catch (err) {\n  return 'Error al consultar alertas: ' + err.message;\n}"
+      },
+      "id": "7d2dee06-1b60-4e8e-89bf-6bf5b77307e6",
+      "name": "Ver Problemas Activos",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.1,
+      "position": [
+        2096,
+        4416
+      ]
+    },
+    {
+      "parameters": {
+        "name": "ver_historial_alertas_zabbix",
+        "description": "Obtiene el historial de eventos pasados, alertas reportadas antes y recuperaciones en Zabbix.",
+        "jsCode": "try {\n  let lim = 15;\n  if (typeof limit !== 'undefined' && limit) lim = parseInt(limit);\n  else if (typeof query !== 'undefined' && query && !isNaN(parseInt(query))) lim = parseInt(query);\n  if (isNaN(lim) || lim <= 0 || lim > 50) lim = 15;\n\n  const res = await this.helpers.httpRequest({\n    method: 'POST',\n    url: 'http://192.168.1.100/zabbix/api_jsonrpc.php',\n    headers: {\n      'Authorization': 'Bearer YOUR_ZABBIX_API_TOKEN',\n      'Content-Type': 'application/json'\n    },\n    body: {\n      jsonrpc: '2.0',\n      method: 'event.get',\n      params: {\n        output: ['eventid', 'name', 'severity', 'clock', 'value'],\n        selectHosts: ['hostid', 'host', 'name'],\n        source: 0,\n        object: 0,\n        sortfield: ['clock'],\n        sortorder: 'DESC',\n        limit: lim\n      },\n      id: 1\n    },\n    json: true\n  });\n\n  if (!res || !res.result || res.result.length === 0) {\n    return 'No se registran eventos previos en el historial de Zabbix.';\n  }\n\n  const sevMap = { '0': 'No clasificado', '1': 'Info', '2': 'Advertencia', '3': 'Promedio', '4': 'Alta', '5': 'Desastre' };\n  return JSON.stringify(res.result.slice(0, lim).map(e => ({\n    equipo: (e.hosts && e.hosts[0]) ? (e.hosts[0].name || e.hosts[0].host) : 'Desconocido',\n    evento: e.name,\n    estado: e.value === '1' ? 'GENERADO (Problema)' : 'RECUPERADO (OK)',\n    severidad: sevMap[e.severity] || e.severity,\n    hora: new Date(parseInt(e.clock) * 1000).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })\n  })));\n} catch (err) {\n  return 'Error al consultar historial en Zabbix: ' + err.message;\n}"
+      },
+      "id": "844d67e4-ad00-4fb4-a712-7ce217ef22fe",
+      "name": "Ver Historial Alertas",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.1,
+      "position": [
+        2272,
+        4416
+      ]
+    },
+    {
+      "parameters": {
+        "name": "buscar_equipo_zabbix",
+        "description": "Busca un equipo en Zabbix usando su NOMBRE o su DIRECCIÓN IP (ej. 10.168.x.x o 172.16.x.x) para conocer su estado e IP.",
+        "jsCode": "try {\n  const buscaTermino = (typeof query !== 'undefined' && query) ? String(query).trim() : ((typeof input !== 'undefined' && input) ? String(input).trim() : '');\n  \n  if (!buscaTermino) {\n    return 'Por favor, proporciona un nombre o una IP para realizar la búsqueda.';\n  }\n\n  const esIP = /^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}$/.test(buscaTermino);\n  let hostsFound = [];\n\n  if (esIP) {\n    const ifaceRes = await this.helpers.httpRequest({\n      method: 'POST',\n      url: 'http://192.168.1.100/zabbix/api_jsonrpc.php',\n      headers: {\n        'Authorization': 'Bearer YOUR_ZABBIX_API_TOKEN',\n        'Content-Type': 'application/json'\n      },\n      body: {\n        jsonrpc: '2.0',\n        method: 'hostinterface.get',\n        params: {\n          output: ['hostid', 'ip', 'port'],\n          filter: { ip: buscaTermino }\n        },\n        id: 1\n      },\n      json: true\n    });\n\n    const hostIds = ifaceRes?.result?.map(i => i.hostid) || [];\n    if (hostIds.length > 0) {\n      const hostRes = await this.helpers.httpRequest({\n        method: 'POST',\n        url: 'http://192.168.1.100/zabbix/api_jsonrpc.php',\n        headers: {\n          'Authorization': 'Bearer YOUR_ZABBIX_API_TOKEN',\n          'Content-Type': 'application/json'\n        },\n        body: {\n          jsonrpc: '2.0',\n          method: 'host.get',\n          params: {\n            output: ['hostid', 'host', 'name', 'status', 'available'],\n            selectInterfaces: ['ip'],\n            selectGroups: ['name'],\n            hostids: hostIds\n          },\n          id: 2\n        },\n        json: true\n      });\n      hostsFound = hostRes?.result || [];\n    }\n  } else {\n    const hostRes = await this.helpers.httpRequest({\n      method: 'POST',\n      url: 'http://192.168.1.100/zabbix/api_jsonrpc.php',\n      headers: {\n        'Authorization': 'Bearer YOUR_ZABBIX_API_TOKEN',\n        'Content-Type': 'application/json'\n      },\n      body: {\n        jsonrpc: '2.0',\n        method: 'host.get',\n        params: {\n          output: ['hostid', 'host', 'name', 'status', 'available'],\n          selectInterfaces: ['ip'],\n          selectGroups: ['name'],\n          search: { name: buscaTermino },\n          searchByAny: true,\n          limit: 15\n        },\n        id: 1\n      },\n      json: true\n    });\n    hostsFound = hostRes?.result || [];\n  }\n\n  if (!hostsFound || hostsFound.length === 0) {\n    return `ERROR_NOC: El equipo o IP '${buscaTermino}' no está registrado en la base de datos de Zabbix. Informa al usuario exactamente que no se encontró ningún registro para este criterio.`;\n  }\n\n  return JSON.stringify(hostsFound.map(h => ({\n    nombre: h.name || h.host,\n    ip: h.interfaces?.[0]?.ip || 'Sin IP',\n    estado: h.status === '0' ? (h.available === '1' ? 'OK (Online)' : (h.available === '2' ? 'FALLA (Offline)' : 'Monitoreado')) : 'Deshabilitado',\n    grupos: h.groups?.map(g => g.name).slice(0, 2).join(', ')\n  })));\n} catch (err) {\n  return 'Error al buscar equipo en Zabbix: ' + err.message;\n}"
+      },
+      "id": "c3c5808f-df99-4b3c-9baa-cd71a037f605",
+      "name": "Buscar Equipo",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.1,
+      "position": [
+        2448,
+        4416
+      ]
+    },
+    {
+      "parameters": {
+        "name": "ver_topologia_zabbix",
+        "description": "Obtiene la lista general de switches, routers y servidores registrados en Zabbix con sus IPs.",
+        "jsCode": "try {\n  const res = await this.helpers.httpRequest({\n    method: 'POST',\n    url: 'http://192.168.1.100/zabbix/api_jsonrpc.php',\n    headers: {\n      'Authorization': 'Bearer YOUR_ZABBIX_API_TOKEN',\n      'Content-Type': 'application/json'\n    },\n    body: {\n      jsonrpc: '2.0',\n      method: 'host.get',\n      params: {\n        output: ['hostid', 'host', 'name', 'status', 'available'],\n        selectInterfaces: ['ip'],\n        selectGroups: ['name'],\n        limit: 100\n      },\n      id: 1\n    },\n    json: true\n  });\n\n  if (!res || !res.result || res.result.length === 0) {\n    return 'No hay equipos registrados en Zabbix.';\n  }\n\n  return JSON.stringify(res.result.map(h => ({\n    equipo: h.name || h.host,\n    ip: h.interfaces?.[0]?.ip || 'Sin IP',\n    grupo: h.groups?.[0]?.name || 'General'\n  })));\n} catch (err) {\n  return 'Error al obtener topología de Zabbix: ' + err.message;\n}"
+      },
+      "id": "49648fc2-5da4-4ea2-8af6-da1b0c37d7a5",
+      "name": "Ver Topologia Red",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.1,
+      "position": [
+        2624,
+        4416
+      ]
+    },
+    {
+      "parameters": {
+        "name": "hacer_ping_zabbix",
+        "description": "Lanza un ping a CUALQUIER IP o equipo de la red (estén o no en Zabbix). Si el equipo está en Zabbix usa el script de Zabbix; si no, hace ping directo desde el servidor Linux. Funciona con IPs internas, externas (8.8.8.8) y nombres de host.",
+        "jsCode": "try {\n  const buscaTermino = (typeof query !== 'undefined' && query) ? String(query).trim() : ((typeof input !== 'undefined' && input) ? String(input).trim() : '');\n  if (!buscaTermino) return 'Proporciona una IP o nombre de equipo para hacer ping.';\n\n  const esIP = /^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}$/.test(buscaTermino);\n  let hostIdTarget = null;\n  let hostNameZabbix = null;\n\n  // 1. Intentar encontrar el equipo en Zabbix\n  if (esIP) {\n    const ifaceRes = await this.helpers.httpRequest({\n      method: 'POST', url: 'http://192.168.1.100/zabbix/api_jsonrpc.php',\n      headers: { 'Authorization': 'Bearer YOUR_ZABBIX_API_TOKEN', 'Content-Type': 'application/json' },\n      body: { jsonrpc: '2.0', method: 'hostinterface.get', params: { output: ['hostid'], filter: { ip: buscaTermino } }, id: 1 }, json: true\n    });\n    if (ifaceRes?.result?.length > 0) hostIdTarget = ifaceRes.result[0].hostid;\n  }\n\n  if (!hostIdTarget) {\n    const hostRes = await this.helpers.httpRequest({\n      method: 'POST', url: 'http://192.168.1.100/zabbix/api_jsonrpc.php',\n      headers: { 'Authorization': 'Bearer YOUR_ZABBIX_API_TOKEN', 'Content-Type': 'application/json' },\n      body: { jsonrpc: '2.0', method: 'host.get', params: { output: ['hostid', 'name'], search: { name: buscaTermino }, searchByAny: true, limit: 1 }, id: 1 }, json: true\n    });\n    if (hostRes?.result?.length > 0) {\n      hostIdTarget = hostRes.result[0].hostid;\n      hostNameZabbix = hostRes.result[0].name;\n    }\n  }\n\n  // 2a. Si está en Zabbix: usar script nativo de Zabbix\n  if (hostIdTarget) {\n    const pingRes = await this.helpers.httpRequest({\n      method: 'POST', url: 'http://192.168.1.100/zabbix/api_jsonrpc.php',\n      headers: { 'Authorization': 'Bearer YOUR_ZABBIX_API_TOKEN', 'Content-Type': 'application/json' },\n      body: { jsonrpc: '2.0', method: 'script.execute', params: { scriptid: '1', hostid: hostIdTarget }, id: 2 }, json: true\n    });\n    const nombre = hostNameZabbix || buscaTermino;\n    if (pingRes?.result?.response === 'success') {\n      return JSON.stringify({ objetivo: nombre, en_zabbix: 'Sí', resultado: pingRes.result.value, estado: 'RESPONDE' });\n    }\n    // Si Zabbix falla, continúa al fallback\n  }\n\n  // 2b. Fallback: ping nativo Linux desde el servidor (para IPs no en Zabbix)\n  const target = esIP ? buscaTermino : buscaTermino;\n  const nativeRes = await this.helpers.httpRequest({\n    method: 'GET',\n    url: `http://host.docker.internal:11440/ping?target=${encodeURIComponent(target)}`,\n    json: true\n  });\n\n  const inZabbix = hostIdTarget ? 'registrado en Zabbix' : 'NO registrado en Zabbix';\n\n  if (nativeRes.error && !nativeRes.alive) {\n    return `Ping a ${target} (${inZabbix}):\\nERROR: ${nativeRes.error}`;\n  }\n\n  const alive = nativeRes.alive;\n  const estado = alive ? 'RESPONDE (Online)' : 'NO RESPONDE (Offline/Caído)';\n  const loss = nativeRes.packet_loss_pct ?? 100;\n  const avg = nativeRes.rtt_avg_ms ? `${nativeRes.rtt_avg_ms} ms` : 'N/D';\n  const minR = nativeRes.rtt_min_ms ? `${nativeRes.rtt_min_ms} ms` : 'N/D';\n  const maxR = nativeRes.rtt_max_ms ? `${nativeRes.rtt_max_ms} ms` : 'N/D';\n\n  return JSON.stringify({\n    objetivo: target,\n    en_zabbix: hostIdTarget ? 'Sí' : 'No',\n    estado: estado,\n    paquetes_enviados: nativeRes.packets_sent || 4,\n    paquetes_recibidos: nativeRes.packets_received || 0,\n    perdida_pct: `${loss}%`,\n    latencia_min: minR,\n    latencia_promedio: avg,\n    latencia_max: maxR\n  });\n} catch (err) {\n  return 'Error al ejecutar ping: ' + err.message;\n}"
+      },
+      "id": "ping-tool-1234",
+      "name": "Hacer Ping",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.1,
+      "position": [
+        2800,
+        4416
+      ]
+    },
+    {
+      "parameters": {
+        "name": "consultar_trafico_zabbix",
+        "description": "Consulta el tráfico de red, velocidad y consumo en Mbps (Inbound/Outbound) de un equipo o IP.",
+        "jsCode": "try {\n  const buscaTermino = (typeof query !== 'undefined' && query) ? String(query).trim() : ((typeof input !== 'undefined' && input) ? String(input).trim() : '');\n  if (!buscaTermino) return 'Proporciona una IP o nombre de equipo para consultar su tráfico.';\n  \n  const esIP = /^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}$/.test(buscaTermino);\n  let hostIdTarget = null;\n  let hostName = buscaTermino;\n\n  if (esIP) {\n    const ifaceRes = await this.helpers.httpRequest({\n      method: 'POST', url: 'http://192.168.1.100/zabbix/api_jsonrpc.php',\n      headers: { 'Authorization': 'Bearer YOUR_ZABBIX_API_TOKEN', 'Content-Type': 'application/json' },\n      body: { jsonrpc: '2.0', method: 'hostinterface.get', params: { output: ['hostid'], filter: { ip: buscaTermino } }, id: 1 }, json: true\n    });\n    if (ifaceRes?.result?.length > 0) hostIdTarget = ifaceRes.result[0].hostid;\n  }\n  \n  if (!hostIdTarget) {\n    const hostRes = await this.helpers.httpRequest({\n      method: 'POST', url: 'http://192.168.1.100/zabbix/api_jsonrpc.php',\n      headers: { 'Authorization': 'Bearer YOUR_ZABBIX_API_TOKEN', 'Content-Type': 'application/json' },\n      body: { jsonrpc: '2.0', method: 'host.get', params: { output: ['hostid', 'name'], search: { name: buscaTermino }, searchByAny: true, limit: 1 }, id: 1 }, json: true\n    });\n    if (hostRes?.result?.length > 0) {\n      hostIdTarget = hostRes.result[0].hostid;\n      hostName = hostRes.result[0].name;\n    }\n  }\n\n  if (!hostIdTarget) return `ERROR_NOC: El equipo o IP '${buscaTermino}' no existe en Zabbix.`;\n\n  const itemsRes = await this.helpers.httpRequest({\n    method: 'POST', url: 'http://192.168.1.100/zabbix/api_jsonrpc.php',\n    headers: { 'Authorization': 'Bearer YOUR_ZABBIX_API_TOKEN', 'Content-Type': 'application/json' },\n    body: { jsonrpc: '2.0', method: 'item.get', params: { hostids: [hostIdTarget], output: ['name', 'key_', 'lastvalue'], search: { key_: 'net.if' }, limit: 20 }, id: 2 }, json: true\n  });\n\n  const items = itemsRes?.result || [];\n  if (items.length === 0) return `El equipo '${hostName}' no tiene interfaces de tráfico SNMP registradas en Zabbix.`;\n\n  const resultLines = items.map(it => {\n    const valMbps = (parseFloat(it.lastvalue || 0) / 1000000.0).toFixed(2);\n    return { interfaz: it.name, velocidad: `${valMbps} Mbps` };\n  });\n\n  return JSON.stringify({\n    equipo: hostName,\n    consumo_actual: resultLines.slice(0, 8),\n    nota: \"Si deseas ver la gráfica visual en imagen, escribe: /trafico \" + buscaTermino\n  });\n} catch (err) {\n  return 'Error al consultar tráfico en Zabbix: ' + err.message;\n}"
+      },
+      "id": "traffic-tool-5678",
+      "name": "Consultar Trafico",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.1,
+      "position": [
+        2980,
+        4416
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Recibir de Workflow 1').item.json.chat_id }}",
+        "text": "={{\n  (() => {\n    let raw = $json.output || '';\n    if (!raw) return '';\n\n    // Convert markdown tables to clean card lists if any exist\n    let lines = raw.split('\\n');\n    let newLines = [];\n    let inTable = false;\n    let headers = [];\n\n    for (let line of lines) {\n      let trimmed = line.trim();\n      if (trimmed.startsWith('|') && trimmed.endsWith('|')) {\n        let cells = trimmed.split('|').slice(1, -1).map(c => c.trim());\n        // Check if header separator (e.g. |---|---|)\n        if (cells.every(c => /^[:\\-\\s]+$/.test(c))) {\n          continue;\n        }\n        if (!inTable) {\n          headers = cells;\n          inTable = true;\n          newLines.push('');\n          continue;\n        } else {\n          let itemStr = '';\n          if (headers.length === cells.length && headers.length > 1) {\n            let details = [];\n            for (let i = 1; i < headers.length; i++) {\n              if (cells[i]) details.push(`${headers[i]}: ${cells[i]}`);\n            }\n            itemStr = `• <b>${cells[0]}</b>\\n  ${details.join(' | ')}\\n`;\n          } else {\n            itemStr = `• ${cells.join(' — ')}\\n`;\n          }\n          newLines.push(itemStr);\n          continue;\n        }\n      } else {\n        inTable = false;\n        headers = [];\n        newLines.push(line);\n      }\n    }\n\n    let t = newLines.join('\\n');\n\n    // Escape raw HTML entities\n    t = t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');\n\n    // Restore safe telegram tags if already generated\n    t = t.replace(/&lt;b&gt;/g, '<b>').replace(/&lt;\\/b&gt;/g, '</b>');\n    t = t.replace(/&lt;i&gt;/g, '<i>').replace(/&lt;\\/i&gt;/g, '</i>');\n    t = t.replace(/&lt;code&gt;/g, '<code>').replace(/&lt;\\/code&gt;/g, '</code>');\n    t = t.replace(/&lt;pre&gt;/g, '<pre>').replace(/&lt;\\/pre&gt;/g, '</pre>');\n\n    // Convert Markdown bold, italic, code\n    t = t.replace(/```([\\s\\S]*?)```/g, '<pre>$1</pre>');\n    t = t.replace(/`([^`\\n]+)`/g, '<code>$1</code>');\n    t = t.replace(/\\*\\*([^*]+)\\*\\*/g, '<b>$1</b>');\n    t = t.replace(/\\*([^*\\n]+)\\*/g, '<i>$1</i>');\n    t = t.replace(/^#{1,6}\\s+/gm, '');\n\n    // Normalize multiple blank lines to double newlines (generous spacing)\n    t = t.replace(/\\n{3,}/g, '\\n\\n');\n\n    return t.slice(0, 4000).trim();\n  })()\n}}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "c5b607e0-fec4-4e1e-9182-0c8410691dc6",
+      "name": "Responder en Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2656,
+        4048
+      ],
+      "webhookId": "609d045c-ce85-4b1d-8256-3ca44c2fe83e",
+      "credentials": {
+        "telegramApi": {
+          "id": "HrvMC9vWwrso6aX0",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "diagnosticar_salud_equipo",
+        "description": "Realiza un diagnóstico profundo de salud en tiempo real de máquinas virtuales (VMs de Proxmox como VM 175, etc.), hipervisores Proxmox (PMX10) o servidores y routers de red. Obtiene CPU, memoria RAM consumida vs total, estado (running/stopped), uptime, nodo donde corre y diagnóstico operativo.",
+        "jsCode": "try {\n  let buscaTermino = (typeof query !== 'undefined' && query) ? String(query).trim() : ((typeof input !== 'undefined' && input) ? String(input).trim() : '');\n\n  if (buscaTermino.startsWith('{') && buscaTermino.endsWith('}')) {\n    try {\n      const p = JSON.parse(buscaTermino);\n      buscaTermino = String(p.target || p.vm_id || p.vmid || p.id || p.vm || p.host || p.equipo || p.query || buscaTermino).trim();\n    } catch (e) {}\n  }\n\n  if (buscaTermino) {\n    const idMatch = buscaTermino.match(/(?:vm_?id|id|vm)?\\s*[:=]?\\s*(\\d+)/i);\n    if (idMatch && !buscaTermino.includes('.')) {\n      buscaTermino = idMatch[1];\n    }\n  }\n\n  if (!buscaTermino) return 'Proporciona el nombre o ID del equipo a diagnosticar (ej. 175, VM 175, PMX10, Proxmox, o IP).';\n\n  const targetUrl = 'http://host.docker.internal:11440/health-check?target=' + encodeURIComponent(buscaTermino);\n  const res = await this.helpers.httpRequest({\n    method: 'GET',\n    url: targetUrl,\n    json: true\n  });\n\n  return JSON.stringify(res);\n} catch (err) {\n  return 'Error al consultar diagnóstico de salud: ' + err.message;\n}"
+      },
+      "id": "health-check-tool-5678",
+      "name": "Diagnosticar Salud Equipo",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.1,
+      "position": [
+        2800,
+        4580
+      ]
+    },
+    {
+      "parameters": {
+        "name": "listar_interfaces_zabbix",
+        "description": "Obtiene la lista completa de interfaces de red de un equipo (ej. MKcompany) con su consumo actual en Mbps (Inbound/Outbound).",
+        "jsCode": "try {\n  const buscaTermino = (typeof query !== 'undefined' && query) ? String(query).trim() : ((typeof input !== 'undefined' && input) ? String(input).trim() : '');\n  if (!buscaTermino) return 'Proporciona el nombre o IP del equipo (ej. MKcompany).';\n\n  const res = await this.helpers.httpRequest({\n    method: 'GET',\n    url: 'http://host.docker.internal:11440/interfaces?target=' + encodeURIComponent(buscaTermino),\n    json: true\n  });\n\n  return JSON.stringify(res);\n} catch (err) {\n  return 'Error al consultar interfaces: ' + err.message;\n}"
+      },
+      "id": "interfaces-tool-7890",
+      "name": "Listar Interfaces Zabbix",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.1,
+      "position": [
+        2992,
+        4592
+      ]
+    },
+    {
+      "parameters": {
+        "name": "consultar_accion_vm_proxmox",
+        "description": "Consulta y pre-valida en tiempo real en Proxmox una acción sobre una VM o contenedor: levantar (start), apagar seguro (shutdown), detener (stop), reiniciar (reboot), reinicio forzado (reset), pausar (pause), hibernar (hibernate), reanudar (resume), migrar (migrate), clonar (clone), consola (console). Devuelve VMID, nombre, nodo físico, estado actual y viabilidad.",
+        "jsCode": "try {\n  let target = '';\n  let action = 'status';\n  let rawInput = (typeof input !== 'undefined' && input) ? String(input).trim() : ((typeof query !== 'undefined' && query) ? String(query).trim() : '');\n\n  if (rawInput.startsWith('{') && rawInput.endsWith('}')) {\n    try {\n      const parsedObj = JSON.parse(rawInput);\n      target = String(parsedObj.target || parsedObj.vm_id || parsedObj.vmid || parsedObj.id || parsedObj.vm || parsedObj.host || '').trim();\n      action = String(parsedObj.action || parsedObj.accion || action).trim();\n    } catch (e) {}\n  }\n\n  if (!target && rawInput) {\n    const idMatch = rawInput.match(/(?:vm_?id|id|vm)?\\s*[:=]?\\s*(\\d+)/i);\n    if (idMatch) {\n      target = idMatch[1];\n    } else {\n      const words = rawInput.replace(/[{}\\\"\\':,]/g, ' ').trim().split(/\\s+/);\n      const acts = ['start', 'levantar', 'encender', 'iniciar', 'stop', 'parar', 'apagar', 'detener', 'reboot', 'reiniciar', 'reset', 'pause', 'pausar', 'hibernate', 'hibernar', 'resume', 'reanudar', 'migrate', 'migrar', 'clone', 'clonar', 'console', 'consola', 'status', 'estado', 'info', 'detalles', 'consultar', 'ver'];\n      for (const w of words) {\n        if (acts.includes(w.toLowerCase())) action = w.toLowerCase();\n        else if (!target && !['action', 'vm', 'vmid', 'id', 'vm_id'].includes(w.toLowerCase())) target = w;\n      }\n      if (!target && words.length > 0) target = words[0];\n    }\n  }\n\n  if (!target) return JSON.stringify({ ok: false, error: 'Indica el nombre o VMID de la máquina virtual.' });\n\n  const targetUrl = 'http://host.docker.internal:11440/proxmox/vm-action';\n  const res = await this.helpers.httpRequest({\n    method: 'POST',\n    url: targetUrl,\n    body: {\n      target: target,\n      action: action,\n      phase: 'check'\n    },\n    json: true\n  });\n\n  return JSON.stringify(res);\n} catch (err) {\n  return JSON.stringify({ ok: false, error: 'Error al consultar VM en Proxmox: ' + err.message });\n}"
+      },
+      "id": "pmx-consultar-tool-001",
+      "name": "Consultar Accion VM Proxmox",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.1,
+      "position": [
+        3150,
+        4592
+      ]
+    },
+    {
+      "parameters": {
+        "name": "ejecutar_accion_vm_proxmox",
+        "description": "EJECUTA físicamente en el clúster Proxmox la orden solicitada (start, shutdown, stop, reboot, reset, pause, hibernate, resume, migrate, clone). REGLA CRÍTICA: Se debe invocar ÚNICAMENTE cuando el usuario haya confirmado dos veces.",
+        "jsCode": "try {\n  let target = '';\n  let action = 'start';\n  let rawInput = (typeof input !== 'undefined' && input) ? String(input).trim() : ((typeof query !== 'undefined' && query) ? String(query).trim() : '');\n\n  try {\n    if (rawInput.startsWith('{') && rawInput.endsWith('}')) {\n      const parsedObj = JSON.parse(rawInput);\n      target = parsedObj.target || parsedObj.vmid || parsedObj.vm || '';\n      action = parsedObj.action || parsedObj.accion || action;\n    }\n  } catch (e) {}\n\n  if (!target && rawInput) {\n    const parts = rawInput.split(/\\s+/);\n    const acts = ['start', 'levantar', 'encender', 'iniciar', 'stop', 'parar', 'apagar', 'detener', 'reboot', 'reiniciar', 'reset'];\n    for (const p of parts) {\n      if (acts.includes(p.toLowerCase())) {\n        action = p.toLowerCase();\n      } else if (!target) {\n        target = p;\n      }\n    }\n    if (!target) target = parts[0];\n  }\n\n  if (!target) return JSON.stringify({ ok: false, error: 'Indica el nombre o VMID de la máquina virtual a ejecutar.' });\n\n  const targetUrl = 'http://host.docker.internal:11440/proxmox/vm-action';\n  const res = await this.helpers.httpRequest({\n    method: 'POST',\n    url: targetUrl,\n    body: {\n      target: target,\n      action: action,\n      phase: 'execute'\n    },\n    json: true\n  });\n\n  return JSON.stringify(res);\n} catch (err) {\n  return JSON.stringify({ ok: false, error: 'Error al ejecutar acción en Proxmox: ' + err.message });\n}"
+      },
+      "id": "pmx-ejecutar-tool-002",
+      "name": "Ejecutar Accion VM Proxmox",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.1,
+      "position": [
+        3300,
+        4592
+      ]
+    }
+  ],
+  "connections": {
+    "Recibir de Workflow 1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Responder en Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Facilitoya AI": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memoria Conversacional": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ver Problemas Activos": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ver Historial Alertas": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar Equipo": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ver Topologia Red": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hacer Ping": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar Trafico": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Diagnosticar Salud Equipo": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Listar Interfaces Zabbix": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar Accion VM Proxmox": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ejecutar Accion VM Proxmox": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  }
+}
