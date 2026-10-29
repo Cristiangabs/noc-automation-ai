@@ -1,0 +1,6 @@
+edge-tts
+psycopg2-binary
+openpyxl
+matplotlib
+pillow
+requests

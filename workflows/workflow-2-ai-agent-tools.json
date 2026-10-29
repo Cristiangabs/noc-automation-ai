@@ -1,0 +1,440 @@
+{
+  "name": "Bot IA - Workflow 2 (Procesamiento + Zabbix)",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "1fc6e7b5-0aad-44ba-a39f-ee2cf967de00",
+      "name": "Recibir de Workflow 1",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        2096,
+        4048
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Recibir de Workflow 1').item.json.text }}",
+        "options": {
+          "systemMessage": "Eres Sentry, analista técnico del NOC de Tecnored. Respondes basándote en los datos devueltos por las herramientas de Zabbix, Proxmox y de red. NUNCA inventes datos.\n\nHerramientas disponibles:\n- Ver_Problemas_Activos → alertas activas en tiempo real\n- Ver_Historial_Alertas → eventos e incidentes pasados\n- Buscar_Equipo → buscar equipo por nombre o IP en Zabbix\n- Ver_Topologia_Red → lista de equipos en la red\n- Hacer_Ping → ping en vivo a CUALQUIER equipo o IP (esté o no en Zabbix)\n- Consultar_Trafico → consultar ancho de banda / tráfico (Mbps in/out) de un equipo o IP\n- Listar_Interfaces_Zabbix → lista TODAS las interfaces de red de un equipo (ej. MKMulticanal) con su tráfico actual en Mbps\n- Diagnosticar_Salud_Equipo → diagnóstico profundo de salud de máquinas virtuales (VMs de Proxmox como VM 175, etc.), hipervisores Proxmox (PMX10) o servidores y routers de red.\n- Consultar_Accion_VM_Proxmox → consulta y pre-valida en Proxmox cualquier acción operativa: levantar (start), apagar seguro (shutdown), detener forzado (stop), reiniciar (reboot), reinicio forzado (reset), pausar (pause), hibernar (hibernate), reanudar (resume), migrar (migrate), clonar (clone), consola (console).\n- Ejecutar_Accion_VM_Proxmox → ejecuta físicamente la acción en Proxmox cuando el usuario confirma.\n- Consultar_Datacenter_PDM → estado global de Proxmox Datacenter Manager (PDM), servidores de respaldo PBS, datastores y conteo unificado de VMs y contenedores.\n\n═══════════════════════════════════════════════════════════════\nPROTOCOLO OBLIGATORIO DE GESTIÓN DE MÁQUINAS VIRTUALES (PROXMOX)\n═══════════════════════════════════════════════════════════════\nAcciones soportadas:\n• start / encender / levantar\n• shutdown / apagar (apagado ordenado ACPI)\n• stop / detener / parar (detención definitiva)\n• reboot / reiniciar (reinicio suave del sistema)\n• reset / reinicio forzado (hard reset)\n• pause / pausar (suspender temporalmente)\n• hibernate / hibernar (guardar estado a disco)\n• resume / reanudar (continuar ejecución)\n• migrate / migrar (mover VM a otro nodo del clúster: PMX10, pmx11, PMX12)\n• clone / clonar (crear copia con nuevo VMID)\n• console / consola (enlace directo a consola web NoVNC)\n\nREGLAS DE INTERACCIÓN:\n1. Si el usuario solicita CONSOLA (\"consola de la vm 112\", \"entrar a la consola\"):\n   Llama a consultar_accion_vm_proxmox con accion=\"console\".\n   Proporciona el enlace de acceso directo NoVNC indicando que para ingresar debe autenticarse en Proxmox con sus credenciales de operador.\n   NO requiere confirmaciones dobles porque es una acción de solo lectura y acceso interactivo.\n\n2. Para cualquier acción que modifique el estado de la máquina (start, shutdown, stop, reboot, reset, pause, hibernate, resume, migrate, clone):\n   DEBES SEGUIR RIGUROSAMENTE ESTE PROTOCOLO DE DOS CONFIRMACIONES:\n\n   PASO 1 (Petición inicial del usuario):\n   - Llama a consultar_accion_vm_proxmox con el identificador de la VM y la acción solicitada.\n   - Si la herramienta devuelve un error (ej. la VM ya está encendida o ya está apagada), explícalo de manera clara y no continúes.\n   - Si la acción es viable, NO EJECUTES NADA EN PROXMOX. Presenta al usuario la información técnica encontrada (VMID, Nombre, Nodo, Estado actual, Acción) y solicita educadamente la PRIMERA CONFIRMACIÓN:\n     \"¿Deseas proceder con la solicitud de esta acción sobre la máquina virtual? Responde <b>Sí</b> para continuar o <b>Cancelar</b> para anular.\"\n   - TIENES PROHIBIDO llamar a ejecutar_accion_vm_proxmox en este paso.\n\n   PASO 2 (Primera confirmación recibida):\n   - Si el usuario dice \"Sí\", \"Adelante\", \"Continúa\", \"Procede\":\n     AÚN NO EJECUTES LA ACCIÓN. Pide educadamente una SEGUNDA Y ÚLTIMA CONFIRMACIÓN recordando la máquina, el nodo y la acción:\n     \"⚠️ <b>Confirmación Final Requerida</b>\nPor protocolos de seguridad operativa del NOC, se requiere una última confirmación antes de enviar la orden al hipervisor:\n\n¿Confirmas de forma definitiva que deseas <b>[ACCION]</b> la máquina <b>[NOMBRE]</b> (VMID: <code>[VMID]</code> en nodo <code>[NODO]</code>)?\n\nPor favor responde <b>Confirmar definitivamente</b> o <b>Cancelar</b>.\"\n   - Si el usuario dice \"No\", \"Cancelar\", o cambia de tema:\n     Informa que la operación fue cancelada y no hagas nada.\n   - TIENES PROHIBIDO llamar a ejecutar_accion_vm_proxmox en este paso.\n\n   PASO 3 (Segunda confirmación definitiva recibida):\n   - Si el usuario responde afirmativamente (\"Confirmar definitivamente\", \"Confirmo\", \"Sí, adelante\"):\n     TIENES PROHIBIDO inventar o simular que la acción ya ocurrió sin llamar a la herramienta.\n     DEBES OBLIGATORIAMENTE llamar a ejecutar_accion_vm_proxmox con la acción y el identificador.\n     Al recibir la respuesta de la herramienta, presenta el resultado real con el nuevo estado verificado.\n   - Si el usuario dice \"No\", \"Cancelar\", o rechaza:\n     Informa que la operación fue cancelada.\n\n═══════════════════════════════\n\n\n═══════════════════════════════════════════════════════════════\nCONSULTAS DE ESTADO, NOMBRE Y DETALLES DE VMs PROXMOX\n═══════════════════════════════════════════════════════════════\nCuando el usuario pregunte por el nombre, estado o métricas de una máquina virtual o contenedor (ej. \"¿Cómo se llama la vm139?\", \"Dime el estado de la VM139\", \"Dame los detalles de la VM 139\"):\n1. Consulta SIEMPRE en tiempo real la herramienta correspondiente (consultar_accion_vm_proxmox o diagnosticar_salud_equipo).\n2. NUNCA inventes nombres, estados ni consumos de memoria/CPU.\n3. Presenta la información de forma ordenada y limpia con su nombre exacto real devuelto por la herramienta, por ejemplo:\n   • <b>Nombre:</b> [nombre real devuelto por la herramienta]\n   • <b>VMID:</b> <code>[vmid]</code>\n   • <b>Nodo físico:</b> <code>[nodo]</code>\n   • <b>Estado:</b> <b>[ESTADO]</b>\n   • <b>Uso de CPU:</b> [cpu]\n   • <b>Memoria RAM:</b> [memoria]\n   • <b>Tiempo activo (Uptime):</b> [uptime]\n\nREGLAS DE FORMATO — OBLIGATORIAS\n═══════════════════════════════\n1. ABSOLUTAMENTE PROHIBIDO usar Markdown.\n2. Para negritas usa SOLO: <b>texto</b>\n3. Para cursivas usa SOLO: <i>texto</i>\n4. Para código o IDs usa SOLO: <code>texto</code>\n5. NUNCA uses <br>, <p>, <ul>, <li> — solo saltos de línea normales.\n\n═══════════════════════════════════════════════════════════════\nESTILO Y FORMATO OBLIGATORIO DE RESPUESTAS (TELEGRAM NOC)\n═══════════════════════════════════════════════════════════════\n1. ESPACIADO OBLIGATORIO: Deja SIEMPRE un salto de línea en blanco entre cada sección y entre cada equipo de una lista. La información NUNCA debe quedar pegada ni compacta.\n2. TOTALMENTE PROHIBIDO USAR TABLAS (| col | col |): En Telegram las tablas se descuadran por completo y son ilegibles. NUNCA generes tablas Markdown.\n3. FORMATO DE ALERTAS Y EVENTOS:\n   Presenta las alertas y estados en tarjetas o listas limpias y espaciosas con viñetas y emojis:\n\n   🔴 <b>[NOMBRE_DEL_EQUIPO]</b>\n   • <b>Problema:</b> [Descripción]\n   • <b>Severidad:</b> [Nivel]\n   • <b>Hora:</b> [HH:MM] (hace X tiempo)\n   • <b>Origen:</b> [Zabbix / The Dude]\n\n   (Línea en blanco)\n\n   🟢 <b>[NOMBRE_DEL_EQUIPO]</b>\n   • <b>Estado:</b> Recuperado / Arriba\n   • <b>Hora:</b> [HH:MM]\n\n4. ESTRUCTURA: Separa claramente con títulos en negrita (ej. «🚨 <b>Alertas Recientes (Últimos 6 min)</b>» y «⚠️ <b>Problemas Activos</b>»).\n\n\n═══════════════════════════════════════════════════════════════\nREGLAS ESTRICTAS DE ENRUTAMIENTO DE HERRAMIENTAS\n═══════════════════════════════════════════════════════════════\n0. CONSULTA DE ALERTAS, PROBLEMAS, CAÍDAS O INCIDENTES EN LA RED:\n   - Si el usuario pregunta por alertas, problemas, caídas, fallas, incidentes o el estado general de la red (ej. \"¿hay problemas en la red?\", \"¿hay caídas?\", \"¿qué alertas hay?\", \"incidentes activos\"):\n     DEBES llamar OBLIGATORIAMENTE a `ver_problemas_zabbix` (o `ver_historial_alertas_zabbix` si pide historial pasado).\n     TIENES TERMINANTEMENTE PROHIBIDO llamar a herramientas de Proxmox (como `consultar_accion_vm_proxmox`) a menos que el usuario mencione explícitamente una VM, ID de máquina o nodo hipervisor.\n\n1. PING Y CONECTIVIDAD:\n   - Si el usuario dice \"ping\", \"hazle ping\", \"probar respuesta\", \"verificar alcance\", \"latencia\" o da una dirección IP suelta (ej. \"ping a 10.168.90.110\", \"10.168.90.110\", \"ping 8.8.8.8\"):\n     DEBES llamar OBLIGATORIAMENTE a `hacer_ping_zabbix`.\n     TIENES TERMINANTEMENTE PROHIBIDO llamar a `consultar_trafico_zabbix` para una petición de ping.\n2. CONSULTA DE TRÁFICO:\n   - Llama a `consultar_trafico_zabbix` ÚNICAMENTE si el usuario pregunta explícitamente por tráfico, consumo, velocidad, Mbps o ancho de banda.\n\n3. CONSULTA DE ESTADO, SALUD O MÉTRICAS DE VMs O PROXMOX:\n   - Si el usuario dice \"estado de la VM113\", \"VM 113\", \"cómo está la VM...\", \"métricas de...\", \"salud de PMX10\":\n     DEBES llamar OBLIGATORIAMENTE a `consultar_accion_vm_proxmox` (con action=\"status\" y target=\"113\") o a `diagnosticar_salud_equipo`.\n     TIENES TERMINANTEMENTE PROHIBIDO responder con mensajes de error simulados o inventados.\n     Presenta los datos devueltos por la herramienta (Nombre, VMID, Nodo, Estado, CPU, RAM, Uptime).\n\n4. CONSULTA DE DATACENTER GLOBAL, BACKUPS O PBS:\n   - Si el usuario pregunta por el estado global de Proxmox, PDM, Datacenter Manager, backups, respaldos o PBS (ej. \"¿cómo están los backups?\", \"estado del datacenter\", \"cuántas VMs hay en total\"):\n     DEBES llamar OBLIGATORIAMENTE a `consultar_datacenter_pdm`.\n     Presenta la información de forma ordenada: Nodos PVE en línea, conteo de VMs (running/stopped) y LXC, estado de PBS, datastores y últimos jobs de respaldo.\n\n5. CONSULTA DE FOTOS, CAPTURAS O GRÁFICAS VISUALES DEL DATACENTER O PROXMOX:\n   - Si el usuario pide fotos, imágenes o gráficas del datacenter o proxmox en el chat:\n     Informa al usuario que la infografía oficial de telemetría en vivo del Datacenter Proxmox se genera instantáneamente ejecutando el comando <code>/fotodatacenter</code> o pidiendo directamente <i>\"foto del datacenter\"</i>.\n\nNOTA DE INFRAESTRUCTURA ZABBIX Y PROXMOX:\nMonitoreas de forma unificada 3 servidores Zabbix activos:\n1. Zabbix35 (10.168.220.35 - Zabbix 7.0 Principal, VM 182)\n2. Zabbix74 (10.168.220.27 - Contenedor LXC 110 'zabbix74' en PMX12, Zabbix 7.4.13)\n3. Zabbix20 (10.168.220.20 - CentralZabbix 6.2, VM 200)\nTodas tus herramientas de Zabbix (buscar_equipo_zabbix, ver_problemas_zabbix, ver_historial_alertas_zabbix, ver_topologia_zabbix, consultar_trafico_zabbix, listar_interfaces_zabbix, hacer_ping_zabbix) consultan automáticamente los 3 servidores Zabbix a la vez.\n",
+          "enableStreaming": false
+        }
+      },
+      "id": "c71972c3-92d5-4653-8938-ca4597be8f97",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        2400,
+        4048
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "agent.tools",
+          "mode": "id"
+        },
+        "options": {
+          "baseURL": "http://host.docker.internal:11440/v1",
+          "temperature": 0
+        }
+      },
+      "id": "304b9e90-d4fe-47e7-86b5-a7b347db79ed",
+      "name": "Facilitoya AI",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2256,
+        4288
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "MP18mL48vdKTT47X",
+          "name": "OpenAI account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "=noc_v5_{{ $('Recibir de Workflow 1').item.json.chat_id }}",
+        "contextWindowLength": 4
+      },
+      "id": "memoria-conversacional-clean-node",
+      "name": "Memoria Conversacional",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        2448,
+        4288
+      ]
+    },
+    {
+      "parameters": {
+        "name": "ver_problemas_zabbix",
+        "description": "Obtiene la lista de alertas recientes en los últimos 6 minutos (The Dude / Zabbix35 / Zabbix74 LXC 110 / Zabbix20) y problemas activos en los 3 servidores Zabbix.",
+        "jsCode": "try {\n  let lim = 15;\n  if (typeof limit !== 'undefined' && limit) lim = parseInt(limit);\n  else if (typeof query !== 'undefined' && query && !isNaN(parseInt(query))) lim = parseInt(query);\n  if (isNaN(lim) || lim <= 0 || lim > 50) lim = 15;\n\n  let data = null;\n  try {\n    data = await this.helpers.httpRequest({\n      method: 'GET',\n      url: `http://10.168.220.176:11440/zabbix/problems?limit=${lim}`,\n      json: true,\n      timeout: 1000\n    });\n  } catch (e1) {\n    data = await this.helpers.httpRequest({\n      method: 'GET',\n      url: `http://host.docker.internal:11440/zabbix/problems?limit=${lim}`,\n      json: true,\n      timeout: 7000\n    });\n  }\n\n  // Merge recent alerts from local memory too\n  try {\n    const localMem = await this.helpers.httpRequest({\n      method: 'GET',\n      url: 'http://host.docker.internal:11440/alerts/recent?minutes=6',\n      json: true,\n      timeout: 3000\n    });\n    if (localMem && Array.isArray(localMem.alerts) && localMem.alerts.length > 0) {\n      const existing = data.alertas_recientes_ultimos_6_min || [];\n      for (const a of localMem.alerts) {\n        if (!existing.some(x => x.equipo === a.host && x.problema === a.problem)) {\n          existing.push({\n            origen: a.source,\n            equipo: a.host,\n            problema: a.problem,\n            severidad: a.severity,\n            estado: a.status,\n            hora_evento: a.hora,\n            hace_segundos: a.hace_segundos\n          });\n        }\n      }\n      data.alertas_recientes_ultimos_6_min = existing;\n    }\n  } catch (e2) {}\n\n  return JSON.stringify(data);\n} catch (err) {\n  return 'Error al consultar alertas unificadas: ' + err.message;\n}"
+      },
+      "id": "7d2dee06-1b60-4e8e-89bf-6bf5b77307e6",
+      "name": "Ver Problemas Activos",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.1,
+      "position": [
+        2096,
+        4416
+      ]
+    },
+    {
+      "parameters": {
+        "name": "ver_historial_alertas_zabbix",
+        "description": "Obtiene el historial unificado de eventos pasados, alertas reportadas y recuperaciones en los 3 servidores Zabbix (Zabbix35, Zabbix74 LXC 110 y Zabbix20).",
+        "jsCode": "try {\n  let lim = 15;\n  if (typeof limit !== 'undefined' && limit) lim = parseInt(limit);\n  else if (typeof query !== 'undefined' && query && !isNaN(parseInt(query))) lim = parseInt(query);\n  if (isNaN(lim) || lim <= 0 || lim > 50) lim = 15;\n\n  let res = null;\n  try {\n    res = await this.helpers.httpRequest({\n      method: 'GET',\n      url: `http://10.168.220.176:11440/zabbix/history?limit=${lim}`,\n      json: true,\n      timeout: 1000\n    });\n  } catch (e1) {\n    res = await this.helpers.httpRequest({\n      method: 'GET',\n      url: `http://host.docker.internal:11440/zabbix/history?limit=${lim}`,\n      json: true,\n      timeout: 7000\n    });\n  }\n  return JSON.stringify(res);\n} catch (err) {\n  return 'Error al consultar historial en Zabbix: ' + err.message;\n}"
+      },
+      "id": "844d67e4-ad00-4fb4-a712-7ce217ef22fe",
+      "name": "Ver Historial Alertas",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.1,
+      "position": [
+        2272,
+        4416
+      ]
+    },
+    {
+      "parameters": {
+        "name": "buscar_equipo_zabbix",
+        "description": "Busca un equipo o servidor en cualquiera de los 3 servidores Zabbix (Zabbix35, Zabbix74 LXC 110, Zabbix20) usando su NOMBRE, IP o nombre del servidor Zabbix (ej. zabbix74).",
+        "jsCode": "try {\n  const buscaTermino = (typeof query !== 'undefined' && query) ? String(query).trim() : ((typeof input !== 'undefined' && input) ? String(input).trim() : '');\n  if (!buscaTermino) {\n    return 'Por favor, proporciona un nombre o una IP para realizar la búsqueda.';\n  }\n  let res = null;\n  try {\n    res = await this.helpers.httpRequest({\n      method: 'GET',\n      url: `http://10.168.220.176:11440/zabbix/search?query=${encodeURIComponent(buscaTermino)}`,\n      json: true,\n      timeout: 1000\n    });\n  } catch (e1) {\n    res = await this.helpers.httpRequest({\n      method: 'GET',\n      url: `http://host.docker.internal:11440/zabbix/search?query=${encodeURIComponent(buscaTermino)}`,\n      json: true,\n      timeout: 7000\n    });\n  }\n  if (!res || (Array.isArray(res) && res.length === 0)) {\n    return `ERROR_NOC: El equipo o IP '${buscaTermino}' no está registrado en ninguno de los 3 servidores Zabbix (Zabbix35, Zabbix74, Zabbix20).`;\n  }\n  return JSON.stringify(res);\n} catch (err) {\n  return 'Error al buscar equipo en Zabbix: ' + err.message;\n}"
+      },
+      "id": "c3c5808f-df99-4b3c-9baa-cd71a037f605",
+      "name": "Buscar Equipo",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.1,
+      "position": [
+        2448,
+        4416
+      ]
+    },
+    {
+      "parameters": {
+        "name": "ver_topologia_zabbix",
+        "description": "Obtiene el estado y resumen de los 3 servidores Zabbix (Zabbix35, Zabbix74 LXC 110, Zabbix20) y la lista de equipos monitoreados.",
+        "jsCode": "try {\n  let res = null;\n  try {\n    res = await this.helpers.httpRequest({\n      method: 'GET',\n      url: 'http://10.168.220.176:11440/zabbix/topology',\n      json: true,\n      timeout: 1000\n    });\n  } catch (e1) {\n    res = await this.helpers.httpRequest({\n      method: 'GET',\n      url: 'http://host.docker.internal:11440/zabbix/topology',\n      json: true,\n      timeout: 8000\n    });\n  }\n  return JSON.stringify(res);\n} catch (err) {\n  return 'Error al obtener topología de Zabbix: ' + err.message;\n}"
+      },
+      "id": "49648fc2-5da4-4ea2-8af6-da1b0c37d7a5",
+      "name": "Ver Topologia Red",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.1,
+      "position": [
+        2624,
+        4416
+      ]
+    },
+    {
+      "parameters": {
+        "name": "hacer_ping_zabbix",
+        "description": "Lanza un ping a CUALQUIER IP o equipo de la red (estén o no en Zabbix). Si el equipo está en Zabbix usa el script de Zabbix; si no, hace ping directo desde el servidor Linux. Funciona con IPs internas, externas (8.8.8.8) y nombres de host.",
+        "jsCode": "function extractTarget(val) {\n  if (!val) return '';\n  if (typeof val === 'object') {\n    return String(val.query || val.input || val.target || val.host || val.ip || Object.values(val)[0] || '').trim();\n  }\n  let str = String(val).trim();\n  if (str.startsWith('{') && str.endsWith('}')) {\n    try {\n      const obj = JSON.parse(str);\n      return String(obj.query || obj.input || obj.target || obj.host || obj.ip || Object.values(obj)[0] || '').trim();\n    } catch(e) {}\n  }\n  return str;\n}\n\ntry {\n  let rawVal = (typeof query !== 'undefined' && query) ? query : ((typeof input !== 'undefined' && input) ? input : '');\n  const buscaTermino = extractTarget(rawVal);\n  if (!buscaTermino) return 'Proporciona una IP o nombre de equipo para hacer ping.';\n\n  const esIP = /^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}$/.test(buscaTermino);\n  let targetIP = buscaTermino;\n  let zbxInfo = null;\n\n  try {\n    const searchRes = await this.helpers.httpRequest({\n      method: 'GET',\n      url: `http://10.168.220.176:11440/zabbix/search?query=${encodeURIComponent(buscaTermino)}`,\n      json: true,\n      timeout: 1000\n    });\n    if (Array.isArray(searchRes) && searchRes.length > 0) {\n      zbxInfo = searchRes[0];\n      if (!esIP && zbxInfo.ip && zbxInfo.ip !== 'Sin IP') {\n        targetIP = zbxInfo.ip;\n      }\n    }\n  } catch (e) {}\n\n  let nativeRes = null;\n  try {\n    nativeRes = await this.helpers.httpRequest({\n      method: 'GET',\n      url: `http://10.168.220.176:11440/ping?target=${encodeURIComponent(targetIP)}`,\n      json: true,\n      timeout: 1000\n    });\n  } catch (e1) {\n    nativeRes = await this.helpers.httpRequest({\n      method: 'GET',\n      url: `http://host.docker.internal:11440/ping?target=${encodeURIComponent(targetIP)}`,\n      json: true,\n      timeout: 8000\n    });\n  }\n\n  const alive = nativeRes.alive;\n  const estado = alive ? 'RESPONDE (Online)' : 'NO RESPONDE (Offline/Caído)';\n  const loss = nativeRes.packet_loss_pct ?? (alive ? 0 : 100);\n  const avg = nativeRes.rtt_avg_ms ? `${nativeRes.rtt_avg_ms} ms` : 'N/D';\n  const minR = nativeRes.rtt_min_ms ? `${nativeRes.rtt_min_ms} ms` : 'N/D';\n  const maxR = nativeRes.rtt_max_ms ? `${nativeRes.rtt_max_ms} ms` : 'N/D';\n\n  return JSON.stringify({\n    objetivo: zbxInfo ? `${zbxInfo.nombre} (${targetIP})` : buscaTermino,\n    en_zabbix: zbxInfo ? `Sí (${zbxInfo.servidor_zabbix})` : 'No',\n    estado: estado,\n    paquetes_enviados: nativeRes.packets_sent || 4,\n    paquetes_recibidos: nativeRes.packets_received || (alive ? 4 : 0),\n    perdida_pct: `${loss}%`,\n    latencia_min: minR,\n    latencia_promedio: avg,\n    latencia_max: maxR\n  });\n} catch (err) {\n  return JSON.stringify({ objetivo: 'Desconocido', estado: 'ERROR', detalle: err.message });\n}"
+      },
+      "id": "ping-tool-1234",
+      "name": "Hacer Ping",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.1,
+      "position": [
+        2800,
+        4416
+      ]
+    },
+    {
+      "parameters": {
+        "name": "consultar_trafico_zabbix",
+        "description": "Consulta el tráfico de red, velocidad y consumo en Mbps (Inbound/Outbound) de un equipo o IP en cualquiera de los 3 servidores Zabbix (Zabbix35, Zabbix74 LXC 110, Zabbix20).",
+        "jsCode": "function extractTarget(val) {\n  if (!val) return '';\n  if (typeof val === 'object') {\n    return String(val.query || val.input || val.target || val.host || val.ip || Object.values(val)[0] || '').trim();\n  }\n  let str = String(val).trim();\n  if (str.startsWith('{') && str.endsWith('}')) {\n    try {\n      const obj = JSON.parse(str);\n      return String(obj.query || obj.input || obj.target || obj.host || obj.ip || Object.values(obj)[0] || '').trim();\n    } catch(e) {}\n  }\n  return str;\n}\n\ntry {\n  let rawVal = (typeof query !== 'undefined' && query) ? query : ((typeof input !== 'undefined' && input) ? input : '');\n  const buscaTermino = extractTarget(rawVal);\n  if (!buscaTermino) return 'Proporciona una IP o nombre de equipo para consultar su tráfico.';\n\n  let res = null;\n  try {\n    res = await this.helpers.httpRequest({\n      method: 'GET',\n      url: `http://10.168.220.176:11440/interfaces?target=${encodeURIComponent(buscaTermino)}`,\n      json: true,\n      timeout: 1000\n    });\n  } catch (e1) {\n    res = await this.helpers.httpRequest({\n      method: 'GET',\n      url: `http://host.docker.internal:11440/interfaces?target=${encodeURIComponent(buscaTermino)}`,\n      json: true,\n      timeout: 7000\n    });\n  }\n\n  if (res.error) {\n    return `Informa amablemente al usuario que el equipo o IP '${buscaTermino}' no está registrado con monitoreo de tráfico SNMP en ninguno de los servidores Zabbix (Zabbix35, Zabbix74, Zabbix20). Si desea probar conectividad básica, sugiérele hacer ping.`;\n  }\n\n  const ifaces = res.interfaces || [];\n  if (ifaces.length === 0) {\n    return `El equipo '${res.host || buscaTermino}' (${res.zabbix_server || 'Zabbix'}) está registrado pero no tiene interfaces de tráfico reportando datos actualmente.`;\n  }\n\n  const sorted = [...ifaces].sort((a, b) => (b.in_mbps + b.out_mbps) - (a.in_mbps + a.out_mbps));\n  return JSON.stringify({\n    equipo: res.host || buscaTermino,\n    servidor_zabbix: res.zabbix_server || 'Zabbix',\n    total_interfaces: res.total || ifaces.length,\n    consumo_actual_top: sorted.slice(0, 10).map(it => ({\n      interfaz: it.name,\n      descarga_rx: `${it.in_mbps} Mbps`,\n      subida_tx: `${it.out_mbps} Mbps`\n    })),\n    nota: `Para ver la gráfica visual en imagen escribe: /trafico ${res.host || buscaTermino}`\n  });\n} catch (err) {\n  return 'No se pudo consultar el tráfico de red en Zabbix: ' + err.message;\n}"
+      },
+      "id": "traffic-tool-5678",
+      "name": "Consultar Trafico",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.1,
+      "position": [
+        2980,
+        4416
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "YOUR_TELEGRAM_CHAT_ID",
+        "text": "={{\n  (() => {\n    let raw = $json.output || '';\n    if (!raw && $json.error) return '⚠️ Ocurrió una demora procesando tu consulta con la IA. Puedes consultar el estado en tiempo real con <b>/alertas</b> o <b>/dashboard</b>.';\n    if (!raw) return '';\n\n    let lines = raw.split('\\n');\n    let newLines = [];\n    let inTable = false;\n    let headers = [];\n\n    for (let line of lines) {\n      let trimmed = line.trim();\n      if (trimmed.startsWith('|') && trimmed.endsWith('|')) {\n        let cells = trimmed.split('|').slice(1, -1).map(c => c.trim());\n        if (cells.every(c => /^[:\\-\\s]+$/.test(c))) {\n          continue;\n        }\n        if (!inTable) {\n          headers = cells;\n          inTable = true;\n          newLines.push('');\n          continue;\n        } else {\n          let itemStr = '';\n          if (headers.length === cells.length && headers.length > 1) {\n            let details = [];\n            for (let i = 1; i < headers.length; i++) {\n              if (cells[i]) details.push(`${headers[i]}: ${cells[i]}`);\n            }\n            itemStr = `• <b>${cells[0]}</b>\\n  ${details.join(' | ')}\\n`;\n          } else {\n            itemStr = `• ${cells.join(' — ')}\\n`;\n          }\n          newLines.push(itemStr);\n          continue;\n        }\n      } else {\n        inTable = false;\n        headers = [];\n        newLines.push(line);\n      }\n    }\n\n    let t = newLines.join('\\n');\n    t = t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');\n    t = t.replace(/&lt;b&gt;/g, '<b>').replace(/&lt;\\/b&gt;/g, '</b>');\n    t = t.replace(/&lt;i&gt;/g, '<i>').replace(/&lt;\\/i&gt;/g, '</i>');\n    t = t.replace(/&lt;code&gt;/g, '<code>').replace(/&lt;\\/code&gt;/g, '</code>');\n    t = t.replace(/&lt;pre&gt;/g, '<pre>').replace(/&lt;\\/pre&gt;/g, '</pre>');\n\n    t = t.replace(/```([\\s\\S]*?)```/g, '<pre>$1</pre>');\n    t = t.replace(/`([^`\\n]+)`/g, '<code>$1</code>');\n    t = t.replace(/\\*\\*([^*]+)\\*\\*/g, '<b>$1</b>');\n    t = t.replace(/\\*([^*\\n]+)\\*/g, '<i>$1</i>');\n    t = t.replace(/^#{1,6}\\s+/gm, '');\n    t = t.replace(/\\n{3,}/g, '\\n\\n');\n    t = t.slice(0, 3950).trim();\n    t = t.replace(/<[^>]*$/, '');\n    for (const tag of ['b', 'i', 'code', 'pre']) {\n      const opens = (t.match(new RegExp('<' + tag + '>', 'gi')) || []).length;\n      const closes = (t.match(new RegExp('</' + tag + '>', 'gi')) || []).length;\n      if (opens > closes) t += ('</' + tag + '>').repeat(opens - closes);\n    }\n    return t;\n  })()\n}}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "c5b607e0-fec4-4e1e-9182-0c8410691dc6",
+      "name": "Responder en Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2656,
+        4048
+      ],
+      "webhookId": "609d045c-ce85-4b1d-8256-3ca44c2fe83e",
+      "credentials": {
+        "telegramApi": {
+          "id": "HrvMC9vWwrso6aX0",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "diagnosticar_salud_equipo",
+        "description": "Realiza un diagnóstico profundo de salud en tiempo real de máquinas virtuales (VMs de Proxmox como VM 175, etc.), hipervisores Proxmox (PMX10) o servidores y routers de red. Obtiene CPU, memoria RAM consumida vs total, estado (running/stopped), uptime, nodo donde corre y diagnóstico operativo.",
+        "jsCode": "function extractTarget(val) {\n  if (!val) return '';\n  if (typeof val === 'object') {\n    return String(val.target || val.vmid || val.vm_id || val.id || val.vm || val.host || val.equipo || val.query || val.input || Object.values(val)[0] || '').trim();\n  }\n  let str = String(val).trim();\n  if (str.startsWith('{') && str.endsWith('}')) {\n    try {\n      const obj = JSON.parse(str);\n      return String(obj.target || obj.vmid || obj.vm_id || obj.id || obj.vm || obj.host || obj.equipo || obj.query || obj.input || Object.values(obj)[0] || '').trim();\n    } catch(e) {}\n  }\n  const idMatch = str.match(/(?:vm_?id|vm)?\\s*[:=]?\\s*(\\d+)/i);\n  if (idMatch && !str.includes('.')) return idMatch[1];\n  return str;\n}\n\ntry {\n  let rawVal = (typeof query !== 'undefined' && query) ? query : ((typeof input !== 'undefined' && input) ? input : '');\n  const buscaTermino = extractTarget(rawVal);\n  if (!buscaTermino) return 'Proporciona el nombre o ID del equipo a diagnosticar (ej. 113, VM 113, PMX10 o IP).';\n\n  const res = await this.helpers.httpRequest({\n    method: 'GET',\n    url: 'http://host.docker.internal:11440/health-check?target=' + encodeURIComponent(buscaTermino),\n    json: true,\n    timeout: 8000\n  });\n  return JSON.stringify(res);\n} catch (err) {\n  return JSON.stringify({ ok: false, error: 'Error al consultar salud en Proxmox: ' + err.message });\n}"
+      },
+      "id": "health-check-tool-5678",
+      "name": "Diagnosticar Salud Equipo",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.1,
+      "position": [
+        2800,
+        4580
+      ]
+    },
+    {
+      "parameters": {
+        "name": "listar_interfaces_zabbix",
+        "description": "Obtiene la lista completa de interfaces de red de un equipo (ej. MKMulticanal) con su consumo actual en Mbps (Inbound/Outbound).",
+        "jsCode": "try {\n  const buscaTermino = (typeof query !== 'undefined' && query) ? String(query).trim() : ((typeof input !== 'undefined' && input) ? String(input).trim() : '');\n  if (!buscaTermino) return 'Proporciona el nombre o IP del equipo (ej. MKMulticanal).';\n\n  const res = await this.helpers.httpRequest({\n    method: 'GET',\n    url: 'http://host.docker.internal:11440/interfaces?target=' + encodeURIComponent(buscaTermino),\n    json: true\n  });\n\n  return JSON.stringify(res);\n} catch (err) {\n  return 'Error al consultar interfaces: ' + err.message;\n}"
+      },
+      "id": "interfaces-tool-7890",
+      "name": "Listar Interfaces Zabbix",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.1,
+      "position": [
+        2992,
+        4592
+      ]
+    },
+    {
+      "parameters": {
+        "name": "consultar_accion_vm_proxmox",
+        "description": "Consulta en tiempo real en Proxmox el ESTADO actual (running/stopped), métricas (CPU, RAM, Uptime), nodo físico y pre-valida cualquier acción operativa (start, shutdown, stop, reboot, reset, pause, hibernate, resume, migrate, clone, console) de una máquina virtual o contenedor por su VMID (ej. 113, VM113) o nombre (ej. ftpblv).",
+        "jsCode": "function extractTargetAndAction(val1, val2) {\n  let target = '';\n  let action = 'status';\n\n  function parseVal(v) {\n    if (!v) return null;\n    if (typeof v === 'object') return v;\n    let s = String(v).trim();\n    if (s.startsWith('{') && s.endsWith('}')) {\n      try { return JSON.parse(s); } catch(e) {}\n    }\n    return s;\n  }\n\n  const p1 = parseVal(val1);\n  const p2 = parseVal(val2);\n\n  for (const obj of [p1, p2]) {\n    if (obj && typeof obj === 'object') {\n      target = obj.target || obj.vmid || obj.vm_id || obj.id || obj.vm || obj.host || obj.name || obj.equipo || target;\n      action = obj.action || obj.accion || action;\n    }\n  }\n\n  if (!target) {\n    const raw = typeof p1 === 'string' ? p1 : (typeof p2 === 'string' ? p2 : '');\n    if (raw) {\n      const idMatch = raw.match(/(?:vm_?id|vm)?\\s*[:=]?\\s*(\\d+)/i);\n      if (idMatch) {\n        target = idMatch[1];\n      } else {\n        const words = raw.replace(/[{}\\\"\\':,]/g, ' ').trim().split(/\\s+/);\n        const acts = ['start', 'levantar', 'encender', 'iniciar', 'stop', 'parar', 'apagar', 'detener', 'reboot', 'reiniciar', 'reset', 'pause', 'pausar', 'hibernate', 'hibernar', 'resume', 'reanudar', 'migrate', 'migrar', 'clone', 'clonar', 'console', 'consola', 'status', 'estado', 'info', 'detalles', 'consultar', 'ver'];\n        for (const w of words) {\n          if (acts.includes(w.toLowerCase())) action = w.toLowerCase();\n          else if (!target && !['action', 'vm', 'vmid', 'id', 'vm_id'].includes(w.toLowerCase())) target = w;\n        }\n        if (!target && words.length > 0) target = words[0];\n      }\n    }\n  }\n\n  return { target: String(target || '').trim(), action: String(action || 'status').trim() };\n}\n\ntry {\n  const raw1 = (typeof query !== 'undefined' && query) ? query : null;\n  const raw2 = (typeof input !== 'undefined' && input) ? input : null;\n  const { target, action } = extractTargetAndAction(raw1, raw2);\n\n  if (!target) {\n    return JSON.stringify({ ok: false, error: 'Por favor, proporciona el VMID (ej. 113) o nombre de la máquina virtual.' });\n  }\n\n  // 1. Consultar a vm-action\n  const res = await this.helpers.httpRequest({\n    method: 'POST',\n    url: 'http://host.docker.internal:11440/proxmox/vm-action',\n    body: {\n      target: target,\n      action: action || 'status',\n      phase: 'check'\n    },\n    json: true,\n    timeout: 8000\n  });\n\n  if (res && res.ok) {\n    return JSON.stringify(res);\n  }\n\n  // 2. Fallback a health-check si vm-action reportó error o no encontrado\n  const hcRes = await this.helpers.httpRequest({\n    method: 'GET',\n    url: 'http://host.docker.internal:11440/health-check?target=' + encodeURIComponent(target),\n    json: true,\n    timeout: 8000\n  });\n\n  return JSON.stringify(hcRes);\n} catch (err) {\n  return JSON.stringify({ ok: false, error: 'Error al consultar Proxmox: ' + err.message });\n}"
+      },
+      "id": "pmx-consultar-tool-001",
+      "name": "Consultar Accion VM Proxmox",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.1,
+      "position": [
+        3150,
+        4592
+      ]
+    },
+    {
+      "parameters": {
+        "name": "ejecutar_accion_vm_proxmox",
+        "description": "EJECUTA físicamente en el clúster Proxmox la orden solicitada (start, shutdown, stop, reboot, reset, pause, hibernate, resume, migrate, clone). REGLA CRÍTICA: Se debe invocar ÚNICAMENTE cuando el usuario haya confirmado dos veces.",
+        "jsCode": "function extractTargetAndAction(val1, val2) {\n  let target = '';\n  let action = 'start';\n\n  function parseVal(v) {\n    if (!v) return null;\n    if (typeof v === 'object') return v;\n    let s = String(v).trim();\n    if (s.startsWith('{') && s.endsWith('}')) {\n      try { return JSON.parse(s); } catch(e) {}\n    }\n    return s;\n  }\n\n  const p1 = parseVal(val1);\n  const p2 = parseVal(val2);\n\n  for (const obj of [p1, p2]) {\n    if (obj && typeof obj === 'object') {\n      target = obj.target || obj.vmid || obj.vm_id || obj.id || obj.vm || obj.host || obj.name || obj.equipo || target;\n      action = obj.action || obj.accion || action;\n    }\n  }\n\n  if (!target) {\n    const raw = typeof p1 === 'string' ? p1 : (typeof p2 === 'string' ? p2 : '');\n    if (raw) {\n      const idMatch = raw.match(/(?:vm_?id|vm)?\\s*[:=]?\\s*(\\d+)/i);\n      if (idMatch) {\n        target = idMatch[1];\n      } else {\n        const parts = raw.split(/\\s+/);\n        const acts = ['start', 'levantar', 'encender', 'iniciar', 'stop', 'parar', 'apagar', 'detener', 'reboot', 'reiniciar', 'reset'];\n        for (const p of parts) {\n          if (acts.includes(p.toLowerCase())) action = p.toLowerCase();\n          else if (!target) target = p;\n        }\n        if (!target && parts.length > 0) target = parts[0];\n      }\n    }\n  }\n\n  return { target: String(target || '').trim(), action: String(action || 'start').trim() };\n}\n\ntry {\n  const raw1 = (typeof query !== 'undefined' && query) ? query : null;\n  const raw2 = (typeof input !== 'undefined' && input) ? input : null;\n  const { target, action } = extractTargetAndAction(raw1, raw2);\n\n  if (!target) return JSON.stringify({ ok: false, error: 'Indica el nombre o VMID de la máquina virtual a ejecutar.' });\n\n  const res = await this.helpers.httpRequest({\n    method: 'POST',\n    url: 'http://host.docker.internal:11440/proxmox/vm-action',\n    body: {\n      target: target,\n      action: action,\n      phase: 'execute'\n    },\n    json: true,\n    timeout: 10000\n  });\n\n  return JSON.stringify(res);\n} catch (err) {\n  return JSON.stringify({ ok: false, error: 'Error al ejecutar acción en Proxmox: ' + err.message });\n}"
+      },
+      "id": "pmx-ejecutar-tool-002",
+      "name": "Ejecutar Accion VM Proxmox",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.1,
+      "position": [
+        3300,
+        4592
+      ]
+    },
+    {
+      "parameters": {
+        "name": "consultar_datacenter_pdm",
+        "description": "Consulta el estado global del datacenter en Proxmox Datacenter Manager (PDM): visión unificada de nodos PVE, servidores de respaldo PBS (10.168.220.175), datastores, almacenamiento de respaldos y conteo general de VMs (82) y contenedores LXC (30). Para ver una foto, captura o gráfica visual del datacenter, el usuario puede ejecutar el comando /fotodatacenter o pedir 'foto del datacenter'.",
+        "jsCode": "try {\n  let res = null;\n  try {\n    res = await this.helpers.httpRequest({\n      method: 'GET',\n      url: 'http://10.168.220.176:11440/pdm/status',\n      json: true,\n      timeout: 1000\n    });\n  } catch (e1) {\n    res = await this.helpers.httpRequest({\n      method: 'GET',\n      url: 'http://host.docker.internal:11440/pdm/status',\n      json: true,\n      timeout: 15000\n    });\n  }\n  return JSON.stringify(res);\n} catch (err) {\n  return JSON.stringify({ ok: false, error: 'Error al consultar PDM: ' + err.message });\n}"
+      },
+      "id": "pdm-tool-001",
+      "name": "Consultar Datacenter PDM",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.1,
+      "position": [
+        3150,
+        4850
+      ]
+    }
+  ],
+  "connections": {
+    "Recibir de Workflow 1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Responder en Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Facilitoya AI": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memoria Conversacional": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ver Problemas Activos": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ver Historial Alertas": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar Equipo": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ver Topologia Red": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hacer Ping": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar Trafico": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Diagnosticar Salud Equipo": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Listar Interfaces Zabbix": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar Accion VM Proxmox": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ejecutar Accion VM Proxmox": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar Datacenter PDM": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  }
+}

@@ -1,26 +1,11 @@
-# Environment secrets & credentials
 .env
-*.pem
-*.key
-*.crt
-*.p12
-
-# Database and state files
-subscribers.json
-*.sqlite
-*.db
-
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-venv/
-.env/
-
-# Logs
 *.log
-logs/
-
-# OS files
+*.sqlite
+*.sqlite3
+__pycache__/
+*.pyc
+*.mp3
+*.xlsx
+*.png
+.cache/
 .DS_Store
-Thumbs.db

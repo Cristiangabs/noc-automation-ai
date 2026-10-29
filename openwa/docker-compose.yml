@@ -1,0 +1,15 @@
+services:
+  openwa-api:
+    image: ghcr.io/rmyndharis/openwa:latest
+    container_name: openwa-api
+    restart: always
+    ports:
+      - "2785:2785"
+    environment:
+      - PORT=2785
+      - API_KEY=${OPENWA_API_KEY}
+    volumes:
+      - openwa_sessions:/app/sessions
+
+volumes:
+  openwa_sessions:

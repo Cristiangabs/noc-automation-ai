@@ -1,35 +1,31 @@
-version: '3.8'
-
 services:
   n8n:
-    image: docker.n8n.io/n8nio/n8n:latest
-    container_name: noc-n8n
+    image: docker.n8n.io/n8nio/n8n:2.41.6
+    container_name: n8n
     restart: unless-stopped
     ports:
-      - "5678:5678"
+      - "127.0.0.1:5678:5678"
     environment:
-      - N8N_HOST=localhost
-      - N8N_PORT=5678
-      - N8N_PROTOCOL=http
-      - NODE_ENV=production
-      - WEBHOOK_URL=http://localhost:5678/
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
+      - N8N_PROXY_HOPS=1
       - GENERIC_TIMEZONE=America/Caracas
+      - TZ=America/Caracas
+      - WEBHOOK_URL=${WEBHOOK_URL}
     volumes:
       - n8n_data:/home/node/.n8n
 
-  noc-proxy:
-    build:
-      context: ./proxy
-      dockerfile: Dockerfile
-    container_name: noc-proxy
-    restart: unless-stopped
+  openwa-api:
+    image: ghcr.io/rmyndharis/openwa:latest
+    container_name: openwa-api
+    restart: always
     ports:
-      - "11440:11440"
-    env_file:
-      - .env
+      - "2785:2785"
+    environment:
+      - PORT=2785
+      - API_KEY=${OPENWA_API_KEY}
     volumes:
-      - ./dashboard/oficina_noc.html:/app/oficina_noc.html:ro
-      - ./subscribers.json:/app/subscribers.json
+      - openwa_sessions:/app/sessions
 
 volumes:
   n8n_data:
+  openwa_sessions:

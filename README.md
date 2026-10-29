@@ -1,139 +1,133 @@
-# 🚀 NOC Automation & Intelligent Operations Suite
+# 🌐 NOC Automation & AI Operations Platform
 
-[![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)](https://www.python.org/)
-[![n8n](https://img.shields.io/badge/n8n-Workflow%20Automation-EA4B71?logo=n8n&logoColor=white)](https://n8n.io/)
-[![Zabbix](https://img.shields.io/badge/Zabbix-API%207.0-D40000?logo=zabbix&logoColor=white)](https://www.zabbix.com/)
-[![Proxmox VE](https://img.shields.io/badge/Proxmox-Cluster%20API-E57000?logo=proxmox&logoColor=white)](https://www.proxmox.com/)
-[![Telegram Bot](https://img.shields.io/badge/Telegram-Bot%20API-2CA5E0?logo=telegram&logoColor=white)](https://core.telegram.org/bots)
-[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Python 3.11](https://img.shields.io/badge/Python-3.11-3776AB.svg?logo=python)](https://python.org)
+[![n8n Orchestrator](https://img.shields.io/badge/n8n-Orchestration-EA4B71.svg?logo=n8n)](https://n8n.io)
+[![Docker](https://img.shields.io/badge/Docker-Containers-2496ED.svg?logo=docker)](https://docker.com)
+[![OpenWA](https://img.shields.io/badge/WhatsApp-OpenWA%20API-25D366.svg?logo=whatsapp)](https://openwa.dev)
 
-Plataforma integral de **automatización, correlación inteligente de alertas y gestión interactiva para centros de operaciones de red (NOC)**. Integra telemetría de **Zabbix** y **The Dude**, control de hipervisores **Proxmox VE**, pipelines de mitigación de *flapping* en **n8n**, un asistente de operaciones en **Telegram** con Inteligencia Artificial y un **Dashboard TV** interactivo con síntesis de voz en tiempo real (*TTS*).
+A comprehensive enterprise-grade Operations Center (NOC) automation platform that bridges local **Large Language Models (LLM)**, **Neural Text-to-Speech (TTS)**, **Zabbix Network Telemetry**, **Proxmox Hypervisor Actions**, **Odoo CRM ERP Integration**, and **Multi-tenant WhatsApp Messaging**.
 
 ---
 
-##  Arquitectura del Sistema
+## 🏗️ Architecture Overview
 
 ```mermaid
 flowchart TD
-    subgraph Monitoreo["1. Fuentes de Monitoreo"]
-        ZB[Zabbix API 7.0]
-        TD[The Dude Server]
-        PMX[Proxmox VE Cluster]
+    subgraph Monitoreo & Infraestructura
+        ZBX["Zabbix Servers (1.890+ Hosts)"]
+        PMX["Proxmox VE Cluster (41 VMs)"]
+        OLT["MikroTik OLTs (6 Fibra Óptica)"]
     end
 
-    subgraph Pipeline["2. Pipeline Inteligente (n8n + Proxy)"]
-        PROXY[Proxy Core & EventHub Python]
-        WAIT[Ventana de Amortiguación 5 Min]
-        FILTER{¿Flapping o Microcorte?}
-        MEM[Buffer Deslizante 6 Min]
+    subgraph Cerebro Cognitivo & Voz
+        LLM["Local LLM Server (agent.tools)"]
+        TTS["Microsoft Edge-TTS (SebastianNeural -6%)"]
+        AI_AGENT["LangChain AI Agent (11 Tools)"]
     end
 
-    subgraph Despacho["3. Canales de Operación"]
-        TG[Telegram Bot AI Sentry]
-        TV[NOC TV HUD Dashboard]
-        TTS[Síntesis de Voz JARVIS]
+    subgraph Orquestación & Proxy
+        PROXY["Central Proxy (Python / SSE / Port 11440)"]
+        N8N["n8n Workflow Engine"]
+        WALLBOARD["TV Wallboard (HTML5 / Live Audio)"]
     end
 
-    ZB -->|Webhooks / Polling| PROXY
-    TD -->|Webhooks DOWN/UP| PROXY
-    PMX -->|API Cluster Ticket| PROXY
+    subgraph Canales de Negocio & Operaciones
+        WA_GW["OpenWA Gateway (Port 2785)"]
+        TG_BOT["Telegram NOC Bot"]
+        ODOO["Odoo 15 Enterprise (CRM Leads)"]
+        SR_CALLES["WhatsApp Sr. Calles (Cuadrillas)"]
+    end
 
-    PROXY --> WAIT
-    WAIT --> FILTER
-    FILTER -->|Persiste Caído| TG
-    FILTER -->|Recuperado en <5 min| MEM
-    
-    PROXY -->|Server-Sent Events SSE| TV
-    PROXY -->|Agregador 18s| TTS
-    TG <-->|Comandos & Diagnóstico| PMX
+    ZBX --> PROXY
+    PMX --> PROXY
+    OLT --> PROXY
+    PROXY --> WALLBOARD
+    PROXY <--> LLM
+    PROXY --> TTS
+
+    WA_GW --> PROXY
+    N8N <--> AI_AGENT
+    AI_AGENT <--> LLM
+    AI_AGENT <--> ZBX
+    AI_AGENT <--> PMX
+    N8N <--> TG_BOT
+
+    ODOO -->|Direct PostgreSQL| CRM_SCRIPT["Daily CRM Pipeline"]
+    CRM_SCRIPT -->|Generate XLSX + PNG| WA_GW
+    WA_GW -->|Daily 08:00 AM| SR_CALLES
 ```
 
 ---
 
-##  Características Principales
+## 📦 Key Modules
 
-### 1. Pipeline Inteligente Anti-Flapping (n8n Workflow 1)
-* **Ventana de Gracia de 5 Minutos:** Retiene alertas de acceso (CPEs y routers perimetrales) para evitar spam masivo de microcortes.
-* **Supresión Automática:** Si un enlace o CPE se restablece antes de cumplirse los 5 minutos, el incidente se silencia sin saturar a los operadores de guardia.
-* **Priorización de Infraestructura Crítica:** Los equipos troncales (Core Switches, Routers de Distribución, Hipervisores) se procesan con prioridad alta inmediata.
-* **Filtro Estricto de Recuperación:** Solo se emite notificación de *«RECUPERADO»* si la alerta de caída previa fue efectivamente despachada al canal.
+### 1. 📋 CRM Odoo Installation Dispatcher (`crm/`)
+* **Database Direct Connection:** Queries PostgreSQL directly inside LAN bypassing public Cloudflare WAF challenges (0.2s query latency).
+* **Plantilla 'PLANIF INSTALACIONES' (ID 610):** Filters stage `Aprobado` (Stage 6) for Fiber and Radio Frequency teams.
+* **Intelligent Quadrilla Assignment:**
+  * **Solo Fibra:** Strict fiber-only assignments (Jesús Pérez / Tony Rodríguez).
+  * **Mixta:** Fiber & Radio Frequency capable (Jean Mejías / Edwin Gutiérrez).
+  * **Rotating Assistants:** Even rotation between Darío Perozo & Kleiver Almeida.
+  * **Geo-clustering:** Groups installations in the same geographical sector (e.g. San Agustín, Chacao) to avoid cross-city transit.
+* **Dual Deliverables:** Generates styled corporate `.xlsx` (openpyxl) and high-res summary `.png` image (matplotlib) delivered via WhatsApp at 08:00 AM daily via systemd timer.
 
-### 2. Sentry AI: Asistente Operativo en Telegram (n8n Workflow 2)
-* **Control de Hipervisores Proxmox VE:**
-  * Diagnóstico en vivo de consumo de CPU, RAM, estado y uptime de máquinas virtuales (VMs) y contenedores (LXCs).
-  * Protocolo seguro de **doble confirmación** para acciones críticas (`start`, `shutdown`, `stop`, `reboot`, `reset`).
-  * Generación dinámica de enlaces de consola interactiva NoVNC.
-* **Telemetría y Diagnóstico de Red en Vivo:**
-  * Ping nativo e ICMP vía API de Zabbix.
-  * Inspección de interfaces y consumo de ancho de banda (Mbps) en tiempo real.
-* **Memoria de Incidentes Recientes:** Permite a los operadores consultar: *«¿Qué alertas han llegado en los últimos minutos?»* recibiendo tarjetas limpias y estructuradas con emojis.
+### 2. 🎙️ NOC TV Wallboard & Sentry Voice Brain (`proxy/` & `dashboard/`)
+* **Real-time Ticket Classification:** Parses inbound messages from WhatsApp *Soporte Interno TI*, extracting applicant name, department, office, and core issue with 0% hallucination.
+* **High-Fidelity Audio Synthesis:** Powered by `es-VE-SebastianNeural` with `-6%` speed cadence and local MP3 caching.
+* **Live Operations Dashboard:** Displays aggregated traffic of 6 fiber OLTs, Proxmox status, PBS backups, and animated avatar locution.
 
-### 3. NOC TV HUD: Dashboard Visual & Síntesis de Voz
-* **Panel de Puestos de Operación:** Visualización estilo sala de control con estaciones interactivas (Historial, Zabbix, Proxmox, Ping, Tráfico).
-* **Transmisión de Eventos en Tiempo Real (SSE):** El agente en pantalla se desplaza físicamente al puesto correspondiente cuando se ejecuta una consulta o se registra una alarma.
-* **Coordinador de Voz Inteligente (JARVIS):** Agrupa ráfagas de incidentes en una ventana de 18 segundos y redacta locuciones en español neutro profesional, evitando leer códigos o símbolos técnicos.
+### 3. 🤖 n8n Autonomous Engineering Workflows (`workflows/`)
+* **Workflow 1: Reception & Security (`workflow-1-reception-pin.json`):** Telegram trigger, PIN authentication, immediate feedback, PDF/PNG delivery.
+* **Workflow 2: Cognitive AI Agent (`workflow-2-ai-agent-tools.json`):** LangChain Agent with 11 tools: Ping, Traffic (Tx/Rx), Zabbix Problems, Host Search, Network Topology, Proxmox VM Actions, and Datacenter Environmental Sensors.
+* **Workflow 3: Smart Alerts & Anti-Flapping (`workflow-3-smart-alerts.json`):** Real-time Zabbix & The Dude webhook ingestion with 30s micro-flap filtering and AI-enriched incident summaries.
 
----
-
-##  Estructura del Repositorio
-
-```text
-├── dashboard/
-│   └── oficina_noc.html         # Frontend del TV HUD con animaciones y Web Speech API
-├── proxy/
-│   ├── Dockerfile               # Imagen Docker para el proxy de telemetría
-│   └── proxy.py                 # Core de sincronización, Proxmox API, EventHub y TTS
-├── workflows/
-│   ├── workflow-1-smart-alerts.json   # Pipeline n8n de alertas inteligentes y anti-flapping
-│   └── workflow-2-ai-bot.json         # Pipeline n8n del bot conversacional con LangChain
-├── .env.example                 # Plantilla de variables de entorno (sin credenciales)
-├── docker-compose.yml           # Despliegue unificado de la suite
-└── README.md                    # Documentación técnica del proyecto
-```
+### 4. 📲 Multi-tenant WhatsApp Gateway (`openwa/`)
+* Runs in Docker on port `2785`, supporting concurrent REST API endpoints (`/send-text`, `/send-image`, `/send-document`) for multi-server alert dispatches without disconnections.
 
 ---
 
-##  Despliegue Rápido
+## 🚀 Quick Start Guide
 
-### Prerrequisitos
-* Docker y Docker Compose
-* Instancia de Zabbix 6.x / 7.x con API habilitada
-* Clúster Proxmox VE con credenciales de lectura/operación
-* Bot de Telegram creado vía [@BotFather](https://t.me/BotFather)
+### Prerequisites
+* Docker & Docker Compose
+* Python 3.11+
+* PostgreSQL 12+ (Odoo)
+* Zabbix 6.x / 7.x API access
 
-### Pasos de Instalación
-
-1. **Clonar el repositorio:**
+### Installation
+1. Clone the repository:
    ```bash
-   git clone https://github.com/cristiangsalinasv/noc-automation-ai.git
+   git clone https://github.com/Cristiangabs/noc-automation-ai.git
    cd noc-automation-ai
    ```
-
-2. **Configurar variables de entorno:**
+2. Copy environment template and configure your credentials:
    ```bash
    cp .env.example .env
-   # Edita .env con tus URLs, tokens de Zabbix, Proxmox y Telegram
+   nano .env
    ```
-
-3. **Iniciar los servicios:**
+3. Start the services:
    ```bash
-   docker-compose up -d
+   docker compose up -d
    ```
-
-4. **Importar Workflows en n8n:**
-   * Accede a `http://localhost:5678`.
-   * En la sección **Workflows**, selecciona **Import from File**.
-   * Importa `workflows/workflow-1-smart-alerts.json` y `workflows/workflow-2-ai-bot.json`.
-   * Configura las credenciales de Telegram y activa ambos workflows.
-
-5. **Abrir el Dashboard TV:**
-   * Accede en tu navegador o pantalla del NOC a: `http://localhost:11440/tv`.
+4. Install Python dependencies:
+   ```bash
+   pip install -r proxy/requirements.txt
+   ```
+5. Enable CRM daily dispatch service:
+   ```bash
+   sudo cp crm/daily-crm-report.service /etc/systemd/system/
+   sudo cp crm/daily-crm-report.timer /etc/systemd/system/
+   sudo systemctl daemon-reload
+   sudo systemctl enable --now daily-crm-report.timer
+   ```
 
 ---
 
-##  Autor
+## 🔒 Security & Data Privacy
+This repository contains **strictly sanitized code templates**. All passwords, tokens, API keys, client identifiers, and phone numbers have been stripped and replaced with environment variables.
 
-**Cristian Gabriel Salinas Velasquez**  
-*Administrador de Infraestructura TI & Redes | Soporte y Telecomunicaciones*  
-* Caracas, Venezuela  
-* [LinkedIn](https://linkedin.com) · [Email](mailto:Cristiangsalinasv@gmail.com)
+---
+
+## 📄 License
+Released under the [MIT License](LICENSE).

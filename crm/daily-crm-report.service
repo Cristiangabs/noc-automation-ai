@@ -1,0 +1,12 @@
+[Unit]
+Description=Daily CRM Automated Installation Report Service
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=tecnored
+EnvironmentFile=/etc/environment
+ExecStart=/usr/bin/python3 /opt/noc-automation/crm/daily_crm_report.py
+
+[Install]
+WantedBy=multi-user.target

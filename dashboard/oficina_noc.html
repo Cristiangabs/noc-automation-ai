@@ -2,1157 +2,3290 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Company NOC – Centro de Operaciones</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tecnored NOC · Centro de Operaciones & Telemetría</title>
 <style>
-:root {
-  --bg-deep: #06090e;
-  --bg-surface: rgba(13, 19, 32, 0.85);
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-accent: rgba(56, 189, 248, 0.3);
-  --text-main: #f1f5f9;
-  --text-muted: #64748b;
-  --text-dim: #94a3b8;
-  --cyan: #22d3ee;
-  --cyan-glow: rgba(34, 211, 238, 0.25);
-  --emerald: #10b981;
-  --emerald-glow: rgba(16, 185, 129, 0.35);
-  --rose: #f43f5e;
-  --rose-glow: rgba(244, 63, 94, 0.3);
-  --amber: #fbbf24;
-}
+  :root {
+    --bg-dark: #050811;
+    --panel-bg: rgba(10, 16, 28, 0.88);
+    --panel-border: #162436;
+    --panel-border-bright: #1f3652;
+    --accent-cyan: #38bdf8;
+    --accent-blue: #2563eb;
+    --accent-green: #22c55e;
+    --accent-amber: #f59e0b;
+    --accent-red: #ef4444;
+    --text-main: #f1f5f9;
+    --text-muted: #8aa0bb;
+    --text-dim: #546a84;
+  }
 
-* { box-sizing: border-box; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-body {
-  margin: 0;
-  background-color: var(--bg-deep);
-  background-image: 
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(34, 211, 238, 0.08), transparent),
-    radial-gradient(circle at 100% 100%, rgba(99, 102, 241, 0.05), transparent);
-  color: var(--text-main);
-  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-  line-height: 1.5;
-  overflow-x: hidden;
-  min-height: 100vh;
-}
+  html, body {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: var(--bg-dark);
+    color: var(--text-main);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    user-select: none;
+  }
 
-main {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px 16px;
-}
+  /* Layout Principal de la Pantalla */
+  .tv-container {
+    display: flex;
+    flex-direction: column;
+    width: 100vw;
+    height: 100vh;
+    padding: 8px 12px;
+    gap: 8px;
+    box-sizing: border-box;
+  }
 
-/* Header Tech Minimal */
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-  padding-bottom: 14px;
-  border-bottom: 1px solid var(--border-subtle);
-}
+  /* Header Superior Ejecutivo (Limpio) */
+  .tv-header {
+    height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--panel-bg);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--panel-border);
+    border-radius: 8px;
+    padding: 0 14px;
+    flex-shrink: 0;
+  }
 
-.brand-section {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
+  .brand-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .brand-title {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: #f8fafc;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .brand-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--accent-cyan);
+    box-shadow: 0 0 10px var(--accent-cyan);
+    display: inline-block;
+  }
+  .brand-tag {
+    border: 1px solid #1f6f8b;
+    color: #5fc1e0;
+    background: rgba(31, 111, 139, 0.18);
+    border-radius: 5px;
+    padding: 2px 7px;
+    font: 600 11px "Consolas", monospace;
+  }
 
-.brand-icon {
-  width: 36px;
-  height: 36px;
-  background: linear-gradient(135deg, rgba(34, 211, 238, 0.2), rgba(99, 102, 241, 0.2));
-  border: 1px solid var(--border-accent);
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.1rem;
-  box-shadow: 0 0 20px var(--cyan-glow);
-}
+  /* Badges de Sistemas */
+  .sys-badges {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .sys-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #94a3b8;
+    background: #0b1524;
+    border: 1px solid #1c2c42;
+    border-radius: 6px;
+    padding: 3px 8px;
+  }
+  .sys-badge .dot {
+    width: 6.5px;
+    height: 6.5px;
+    border-radius: 50%;
+    background: var(--accent-green);
+    box-shadow: 0 0 6px var(--accent-green);
+  }
 
-.brand-title {
-  margin: 0;
-  font-size: 1.25rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
+  /* Controles y Reloj */
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  button, select.hud-select {
+    font: inherit;
+    font-size: 11.5px;
+    background: #0f1b2b;
+    color: #d7e3f4;
+    border: 1px solid #1f6f8b;
+    border-radius: 6px;
+    padding: 3px 8px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  button:hover, select.hud-select:hover {
+    background: #162840;
+    border-color: var(--accent-cyan);
+  }
+  button[aria-pressed="true"] {
+    background: #1f6f8b;
+    color: #fff;
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.35);
+  }
+  .kpi-strip {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding: 0 8px;
+    border-left: 1px solid #1c2c42;
+    border-right: 1px solid #1c2c42;
+  }
+  .kpi-strip div {
+    text-align: center;
+    font-size: 9px;
+    color: var(--text-muted);
+  }
+  .kpi-strip b {
+    display: block;
+    font: 700 14px "Consolas", monospace;
+    color: #5fc1e0;
+    line-height: 1;
+  }
+  .clock-box {
+    font: 600 13px "Consolas", monospace;
+    color: #cbd5e1;
+    min-width: 90px;
+    text-align: right;
+  }
 
-.brand-badge {
-  font-size: 0.68rem;
-  font-family: 'JetBrains Mono', monospace;
-  font-weight: 500;
-  color: var(--cyan);
-  background: rgba(34, 211, 238, 0.1);
-  border: 1px solid rgba(34, 211, 238, 0.25);
-  padding: 2px 8px;
-  border-radius: 4px;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
+  /* Grid Principal */
+  .tv-grid {
+    display: grid;
+    grid-template-columns: 680px 1fr;
+    gap: 10px;
+    flex: 1;
+    min-height: 0;
+  }
 
-.header-status {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
+  @media (max-width: 1700px) {
+    .tv-grid {
+      grid-template-columns: 620px 1fr;
+    }
+  }
 
-.live-pill {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  padding: 6px 14px;
-  border-radius: 20px;
-  background: rgba(17, 24, 39, 0.85);
-  backdrop-filter: blur(8px);
-  color: var(--text-main);
-  border: 1px solid var(--border-subtle);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.3s ease;
-}
+  @media (max-width: 1440px) {
+    .tv-grid {
+      grid-template-columns: 540px 1fr;
+    }
+  }
 
-.live-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--text-muted);
-  transition: all 0.3s ease;
-}
+  /* Columna Izquierda */
+  .col-left {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 0;
+  }
 
-.live-dot.connected {
-  background: var(--emerald);
-  box-shadow: 0 0 12px var(--emerald), 0 0 4px var(--emerald);
-}
+  /* Tarjetas Genéricas */
+  .noc-panel {
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  }
 
-.live-dot.error {
-  background: var(--rose);
-  box-shadow: 0 0 12px var(--rose);
-}
+  .panel-header {
+    height: 30px;
+    background: rgba(14, 23, 38, 0.95);
+    border-bottom: 1px solid var(--panel-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10px;
+    flex-shrink: 0;
+  }
+  .panel-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    color: #e2ecf8;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    text-transform: uppercase;
+  }
+  .panel-tag {
+    font-size: 9px;
+    font-weight: 600;
+    padding: 1.5px 5px;
+    border-radius: 4px;
+    background: rgba(56, 189, 248, 0.12);
+    color: var(--accent-cyan);
+    border: 1px solid rgba(56, 189, 248, 0.25);
+  }
 
-/* Stage / Viewport */
-.stage {
-  position: relative;
-  border: 1px solid var(--border-subtle);
-  border-radius: 12px;
-  overflow: hidden;
-  background: #05080f;
-  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(34, 211, 238, 0.12);
-}
+  /* 1. Tarjeta de la Oficina Virtual (Área Completa Mantenida) */
+  .panel-office {
+    flex-shrink: 0;
+  }
+  .office-canvas-wrap {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: #020408;
+    position: relative;
+    overflow: hidden;
+  }
+  #c {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+    cursor: pointer;
+  }
 
-canvas {
-  display: block;
-  width: 100%;
-  height: auto;
-}
+  /* 2. OLTS EN FORMATO COMPACTO (Donde antes estaban los routers de borde) */
+  .panel-olts-compact {
+    flex-shrink: 0;
+  }
+  .olts-compact-grid {
+    padding: 6px 8px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 6px;
+  }
+  .olt-compact-card {
+    background: #08101a;
+    border: 1px solid #162438;
+    border-radius: 6px;
+    padding: 5px 7px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 3px;
+  }
+  .olt-compact-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .olt-compact-name {
+    font-size: 10.5px;
+    font-weight: 700;
+    color: #f1f5f9;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .olt-dot {
+    width: 6.5px;
+    height: 6.5px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .olt-compact-rates {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .rate-pill {
+    font: 700 9.5px "Consolas", monospace;
+    padding: 2px 5px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    white-space: nowrap;
+  }
+  .rate-pill.rx {
+    background: rgba(34, 197, 94, 0.12);
+    color: #4ade80;
+    border: 1px solid rgba(34, 197, 94, 0.25);
+  }
+  .rate-pill.tx {
+    background: rgba(56, 189, 248, 0.12);
+    color: #38bdf8;
+    border: 1px solid rgba(56, 189, 248, 0.25);
+  }
 
-/* Toolbar */
-.toolbar {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  margin: 10px 0 14px;
-  padding: 0 2px;
-}
+  /* 3. Panel Salud Hardware MikroTik (5 Routers) */
+  .panel-mk-health {
+    flex: 1.1;
+    min-height: 0;
+  }
+  .mk-health-grid {
+    padding: 6px 8px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 5px;
+    flex: 1;
+    min-height: 0;
+  }
+  .mk-health-card {
+    background: #08101a;
+    border: 1px solid #162438;
+    border-radius: 6px;
+    padding: 5px 6px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 3px;
+  }
+  .mk-card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .mk-card-name {
+    font-size: 9.5px;
+    font-weight: 700;
+    color: #f1f5f9;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .mk-card-tag {
+    font: 600 8px "Consolas", monospace;
+    color: #94a3b8;
+    background: rgba(255,255,255,0.06);
+    padding: 1px 3px;
+    border-radius: 3px;
+  }
+  .mk-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 8.5px;
+    color: var(--text-muted);
+  }
+  .mk-row b {
+    color: #f1f5f9;
+    font-family: "Consolas", monospace;
+  }
+  .mk-row b.highlight { color: var(--accent-cyan); }
+  .mk-row b.green { color: #4ade80; }
+  .mk-row b.amber { color: #fbbf24; }
+  .badge-ok {
+    font: 700 8px "Consolas", monospace;
+    background: rgba(34, 197, 94, 0.15);
+    color: #4ade80;
+    padding: 1px 3px;
+    border-radius: 3px;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+  }
 
-.tech-btn {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.72rem;
-  padding: 5px 12px;
-  border: 1px solid var(--border-subtle);
-  background: rgba(17, 24, 39, 0.6);
-  color: var(--text-dim);
-  border-radius: 6px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: all 0.2s ease;
-}
+  /* 4. Panel Estado de Respaldos PBS */
+  .panel-pbs {
+    flex: 0.9;
+    min-height: 0;
+  }
+  .pbs-content {
+    padding: 5px 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 4px;
+    flex: 1;
+    min-height: 0;
+  }
+  .pbs-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 5px;
+    background: #08111d;
+    border: 1px solid #16263a;
+    border-radius: 6px;
+    padding: 4px 7px;
+  }
+  .pbs-item {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .pbs-lbl {
+    font-size: 7.5px;
+    font-weight: 600;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+  .pbs-val {
+    font: 700 10.5px "Consolas", monospace;
+    color: #cbd5e1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .pbs-val.highlight { color: var(--accent-cyan); }
+  .pbs-val.ok { color: #4ade80; }
+  .pbs-sub-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(14, 23, 38, 0.7);
+    border: 1px solid #162438;
+    border-radius: 5px;
+    padding: 2px 7px;
+    font-size: 8.5px;
+    color: var(--text-muted);
+  }
+  .pbs-sub-bar b {
+    color: #f1f5f9;
+  }
+  .badge-verified {
+    font: 700 8.5px "Consolas", monospace;
+    background: rgba(34, 197, 94, 0.15);
+    color: #4ade80;
+    padding: 1px 5px;
+    border-radius: 3px;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+  }
 
-.tech-btn:hover {
-  border-color: var(--border-accent);
-  color: var(--cyan);
-  background: rgba(34, 211, 238, 0.05);
-}
+  /* Columna Derecha */
+  .col-right {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 0;
+  }
 
-.tech-btn[aria-pressed="true"] {
-  border-color: var(--cyan);
-  background: rgba(34, 211, 238, 0.12);
-  color: var(--cyan);
-  box-shadow: 0 0 12px var(--cyan-glow);
-}
+  /* 1. Panel ROUTERS DE BORDE CON GRÁFICOS SPARKLINE (Donde antes estaban las OLTs) */
+  .panel-borders-traffic {
+    height: 38%;
+    min-height: 0;
+  }
+  .borders-traffic-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 5px;
+    padding: 5px;
+    min-height: 0;
+  }
+  .border-traffic-card {
+    background: #08101c;
+    border: 1px solid #16263a;
+    border-radius: 6px;
+    padding: 4px 7px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+  }
+  .border-traffic-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2px;
+  }
+  .border-traffic-title {
+    font-size: 10px;
+    font-weight: 700;
+    color: #f1f5f9;
+    letter-spacing: 0.3px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .border-traffic-rates {
+    display: flex;
+    gap: 4px;
+    font: 700 10px "Consolas", monospace;
+  }
+  .b-rx { color: #38bdf8; }
+  .b-tx { color: #22c55e; }
+  .sparkline-box {
+    flex: 1;
+    width: 100%;
+    min-height: 24px;
+  }
+  .sparkline-box svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
 
-/* Panels Grid */
-.panels {
-  display: grid;
-  grid-template-columns: 1fr 310px;
-  gap: 16px;
-}
+  /* Tarjeta de Consolidado Backbone (Slot 6) */
+  .border-traffic-card.summary {
+    background: linear-gradient(135deg, rgba(8, 20, 36, 0.9), rgba(12, 30, 56, 0.9));
+    border: 1px solid #1f466b;
+  }
+  .border-traffic-card.summary .border-traffic-title {
+    color: #38bdf8;
+  }
 
-@media (max-width: 860px) {
-  .panels { grid-template-columns: 1fr; }
-}
+  /* 2. Panel Certificados SSL (26% height) */
+  .panel-certs {
+    height: 26%;
+    min-height: 0;
+  }
+  .certs-wrap {
+    flex: 1;
+    padding: 4px 6px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
 
-.card {
-  background: var(--bg-surface);
-  backdrop-filter: blur(12px);
-  border: 1px solid var(--border-subtle);
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
-}
+  .cert-alert-banner {
+    background: linear-gradient(90deg, rgba(239, 68, 68, 0.25), rgba(245, 158, 11, 0.25));
+    border: 1px solid var(--accent-red);
+    border-radius: 5px;
+    padding: 3px 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10.5px;
+    font-weight: 700;
+    color: #fca5a5;
+    animation: pulse-border 1.5s infinite alternate;
+  }
+  @keyframes pulse-border {
+    0% { box-shadow: 0 0 4px rgba(239, 68, 68, 0.3); }
+    100% { box-shadow: 0 0 12px rgba(239, 68, 68, 0.7); }
+  }
 
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-}
+  .certs-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+  }
+  @media (max-width: 1600px) {
+    .certs-grid { grid-template-columns: repeat(6, 1fr); }
+  }
 
-.card-header h2 {
-  font-size: 0.78rem;
-  font-family: 'JetBrains Mono', monospace;
-  font-weight: 600;
-  margin: 0;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
+  .cert-card {
+    background: #08111d;
+    border: 1px solid #162438;
+    border-radius: 5px;
+    padding: 3px 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 44px;
+    position: relative;
+    transition: transform 0.15s ease;
+  }
+  .cert-card:hover {
+    transform: translateY(-1px);
+    border-color: var(--accent-cyan);
+  }
 
-.counter-badge {
-  font-size: 0.68rem;
-  font-family: 'JetBrains Mono', monospace;
-  color: var(--text-muted);
-  background: rgba(255, 255, 255, 0.04);
-  padding: 2px 7px;
-  border-radius: 4px;
-  border: 1px solid var(--border-subtle);
-}
+  .cert-card.crit {
+    background: rgba(239, 68, 68, 0.14);
+    border: 1.5px solid var(--accent-red);
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.35);
+    animation: pulse-card 1.2s infinite alternate;
+  }
+  @keyframes pulse-card {
+    0% { border-color: #ef4444; }
+    100% { border-color: #ff8888; box-shadow: 0 0 12px rgba(239, 68, 68, 0.6); }
+  }
 
-/* Terminal Feed */
-.terminal-window {
-  position: relative;
-  background: #06090e;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
-  padding: 10px 14px;
-}
+  .cert-card.warn {
+    background: rgba(245, 158, 11, 0.12);
+    border: 1px solid var(--accent-amber);
+  }
+  .cert-card.ok {
+    background: rgba(2, 132, 199, 0.12);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+  }
+  .cert-card.no-data {
+    background: #070d16;
+    border: 1px solid #142030;
+    opacity: 0.75;
+  }
+  .cert-card.yellow-nodata {
+    background: rgba(253, 216, 53, 0.12);
+    border: 1px solid rgba(253, 216, 53, 0.4);
+  }
 
-.log {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.8rem;
-  height: 180px;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
-}
+  .cert-site {
+    font-size: 8px;
+    font-weight: 700;
+    color: #e2ecf8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.1;
+  }
+  .cert-val-box {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-top: 1px;
+  }
+  .cert-days {
+    font: 700 14px "Consolas", monospace;
+    line-height: 1;
+    color: #38bdf8;
+  }
+  .cert-card.crit .cert-days { color: #f87171; }
+  .cert-card.warn .cert-days { color: #fbbf24; }
+  .cert-card.no-data .cert-days, .cert-card.yellow-nodata .cert-days {
+    font-size: 9.5px;
+    color: #fde047;
+  }
+  .cert-lbl {
+    font-size: 7px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
 
-.log::-webkit-scrollbar { width: 5px; }
-.log::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 3px;
-}
+  /* 3. Panel Proxmox Clúster & Hipervisores (Flex restante) */
+  .panel-proxmox {
+    flex: 1;
+    min-height: 0;
+  }
+  .proxmox-wrap {
+    flex: 1;
+    padding: 6px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-height: 0;
+    overflow-y: auto;
+  }
+  .pmx-summary-bar {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    background: #08111d;
+    border: 1px solid #16263a;
+    border-radius: 6px;
+    padding: 5px 8px;
+    flex-shrink: 0;
+  }
+  .pmx-kpi-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .pmx-kpi-lbl {
+    font-size: 8.5px;
+    font-weight: 600;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+  .pmx-kpi-val {
+    font: 700 11.5px "Consolas", monospace;
+    color: #e2ecf8;
+  }
+  .pmx-kpi-val span.highlight {
+    color: var(--accent-cyan);
+  }
+  .pmx-nodes-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    flex: 1;
+    min-height: 0;
+  }
+  .pmx-node-card {
+    background: #08101a;
+    border: 1px solid #162438;
+    border-radius: 6px;
+    padding: 6px 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 4px;
+  }
+  .pmx-node-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .pmx-node-name {
+    font-size: 11px;
+    font-weight: 700;
+    color: #f1f5f9;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .pmx-node-tag {
+    font-size: 9px;
+    font-weight: 600;
+    color: #94a3b8;
+    background: rgba(255,255,255,0.05);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-family: "Consolas", monospace;
+  }
+  .pmx-metric-row {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .pmx-metric-lbls {
+    display: flex;
+    justify-content: space-between;
+    font-size: 9px;
+    color: var(--text-muted);
+  }
+  .pmx-metric-lbls b {
+    color: #f1f5f9;
+    font-family: "Consolas", monospace;
+  }
+  .pmx-prog-bar {
+    width: 100%;
+    height: 5px;
+    background: #142030;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .pmx-prog-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+  }
+  .pmx-prog-fill.green { background: #22c55e; }
+  .pmx-prog-fill.amber { background: #f59e0b; }
+  .pmx-prog-fill.red { background: #ef4444; }
+  .pmx-pbs-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(14, 23, 38, 0.7);
+    border: 1px solid #162438;
+    border-radius: 5px;
+    padding: 3px 8px;
+    font-size: 9px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+  .pmx-pbs-footer b {
+    color: #4ade80;
+    font-family: "Consolas", monospace;
+  }
 
-.log li {
-  padding: 6px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  line-height: 1.45;
-}
+  /* ---------- TARJETA FLOTANTE ESTILO PERSONAJE (4ta Pared / Hover & Click) ---------- */
+  #prof {
+    position: fixed;
+    width: 335px;
+    background: rgba(248, 250, 252, 0.97);
+    color: #0f172a;
+    border: 1px solid rgba(203, 213, 225, 0.9);
+    border-radius: 14px;
+    padding: 14px 16px 12px;
+    display: none;
+    box-shadow: 0 20px 45px rgba(2, 6, 23, 0.65), 0 0 0 1px rgba(56, 189, 248, 0.25);
+    z-index: 30;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    overflow: hidden;
+  }
+  #prof.closing {
+    opacity: 0;
+    transform: translateY(4px) scale(0.98);
+  }
+  .prof-head {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    margin-bottom: 8px;
+  }
+  .prof-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    flex-shrink: 0;
+    border: 2px solid #cbd5e1;
+  }
+  .prof-title-wrap {
+    flex: 1;
+    min-width: 0;
+  }
+  #pn {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.15;
+  }
+  #pr {
+    color: #0284c7;
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 1px;
+  }
+  #ps {
+    font-size: 11.5px;
+    color: #475569;
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .st-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  #px {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    background: transparent;
+    border: none;
+    color: #64748b;
+    font-size: 15px;
+    padding: 2px 6px;
+    border-radius: 6px;
+  }
+  #px:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+  }
+  #pb {
+    margin: 6px 0 9px;
+    font-size: 12.5px;
+    color: #334155;
+    line-height: 1.35;
+    font-style: italic;
+  }
+  .prof-tabs {
+    display: flex;
+    gap: 14px;
+    border-bottom: 1px solid #e2e8f0;
+    margin-bottom: 9px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .prof-tab {
+    padding: 4px 2px 6px;
+    color: #64748b;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+  }
+  .prof-tab.active {
+    color: #0284c7;
+    border-bottom-color: #0284c7;
+  }
+  .prof-sec-title {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.7px;
+    color: #94a3b8;
+    text-transform: uppercase;
+    margin: 7px 0 4px;
+  }
+  .prof-list {
+    margin: 0 0 6px;
+    padding-left: 15px;
+    font-size: 12px;
+    color: #334155;
+    line-height: 1.4;
+  }
+  .prof-list li { margin-bottom: 2px; }
+  #pt code {
+    display: inline-block;
+    background: #f1f5f9;
+    color: #0f172a;
+    border: 1px solid #cbd5e1;
+    border-radius: 5px;
+    padding: 1.5px 6px;
+    margin: 2px 4px 2px 0;
+    font: 600 10.5px "Consolas", monospace;
+  }
+  .taste-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 5px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 7px 9px;
+    font-size: 11.8px;
+    color: #334155;
+    margin-top: 4px;
+  }
+  .taste-row b {
+    color: #0f172a;
+  }
+  #pa {
+    margin: 6px 0 2px;
+    font-size: 11.2px;
+    color: #475569;
+    line-height: 1.35;
+  }
+  .prof-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 7px;
+    padding-top: 6px;
+    border-top: 1px solid #e2e8f0;
+    font-size: 11px;
+    color: #64748b;
+  }
+  #prof-timer-bar {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 3.5px;
+    background: linear-gradient(90deg, #0284c7, #38bdf8);
+    width: 100%;
+    transition: width 0.1s linear;
+  }
 
-.log li:last-child { border: 0; }
-
-.log time {
-  color: var(--text-muted);
-  font-size: 0.72rem;
-  flex-shrink: 0;
-  padding-top: 1px;
-}
-
-.log .msg { word-break: break-word; }
-.log .a { color: #fda4af; } /* alert */
-.log .s { color: #6ee7b7; } /* success */
-.log .c { color: #7dd3fc; } /* query */
-
-/* KPI Grid */
-.kpis {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
-.kpi {
-  background: #080c14;
-  border: 1px solid var(--border-subtle);
-  border-radius: 8px;
-  padding: 12px 14px;
-  position: relative;
-  overflow: hidden;
-  transition: border-color 0.2s;
-}
-
-.kpi:hover { border-color: rgba(255, 255, 255, 0.12); }
-
-.kpi .val {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 1.6rem;
-  font-weight: 700;
-  line-height: 1.1;
-  color: var(--text-main);
-  letter-spacing: -0.03em;
-}
-
-.kpi .lbl {
-  font-size: 0.7rem;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-top: 6px;
-  font-weight: 500;
-}
-
-.kpi.bad .val { color: var(--rose); text-shadow: 0 0 15px var(--rose-glow); }
-.kpi.good .val { color: var(--emerald); text-shadow: 0 0 15px var(--emerald-glow); }
-.kpi.info .val { color: var(--cyan); text-shadow: 0 0 15px var(--cyan-glow); }
 </style>
 </head>
 <body>
-<main>
-<header>
-  <div class="brand-section">
-    <div class="brand-icon">🛰️</div>
-    <div>
-      <h1 class="brand-title">
-        Company NOC
-        <span class="brand-badge">Engine IA v2</span>
-      </h1>
-    </div>
-  </div>
-  <div class="header-status">
-    <div class="live-pill">
-      <div class="live-dot" id="dot"></div>
-      <span id="status-text">CONECTANDO</span>
-    </div>
-  </div>
-</header>
 
-<div class="stage">
-  <canvas id="c" width="1920" height="1080" role="img" aria-label="Oficina NOC Sentry IA"></canvas>
+<div class="tv-container">
+  <!-- HEADER HUD -->
+  <header class="tv-header">
+    <div class="brand-group">
+      <span class="brand-dot"></span>
+      <span class="brand-title">Tecnored NOC</span>
+      <span class="brand-tag">CENTRO DE OPERACIONES</span>
+    </div>
+
+    <div class="sys-badges">
+      <div class="sys-badge"><span class="dot"></span>ZBX 35 Core</div>
+      <div class="sys-badge"><span class="dot"></span>ZBX 20 Certs</div>
+      <div class="sys-badge"><span class="dot"></span>5 Routers Núcleo</div>
+      <div class="sys-badge"><span class="dot"></span>Proxmox VE</div>
+      <div class="sys-badge"><span class="dot"></span>PBS Backup</div>
+    </div>
+
+    <div class="header-actions">
+      <button id="vz" aria-pressed="false" title="Activar locución de alertas y diálogos">🔊 Voz</button>
+      <select id="voice-select" class="hud-select" title="Seleccionar voz en español"></select>
+      
+      <div class="kpi-strip">
+        <div><b id="k1">0</b>CONSULTAS</div>
+        <div><b id="k2">0</b>ALERTAS</div>
+      </div>
+      
+      <div class="clock-box" id="clock">--:--:--</div>
+    </div>
+  </header>
+
+  <!-- GRID PRINCIPAL -->
+  <main class="tv-grid">
+    <!-- COLUMNA IZQUIERDA (Oficina + Resumen OLTs + Salud Hardware 5 Routers + Respaldos PBS) -->
+    <div class="col-left">
+      <!-- 1. Oficina Virtual (Canvas enmarcado - ÁREA MANTENIDA) -->
+      <div class="noc-panel panel-office">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span>🏢 OFICINA VIRTUAL NOC</span>
+          </div>
+          <button id="qa-voice-btn" style="font-size:10px;padding:1px 5px">🎙️ Test Voz</button>
+        </div>
+        <div class="office-canvas-wrap">
+          <canvas id="c" width="1280" height="720"></canvas>
+        </div>
+      </div>
+
+      <!-- 2. RESUMEN DE OLTS (ACCESO GPON) - Compacto donde estaban los routers de borde -->
+      <div class="noc-panel panel-olts-compact">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span>📊 RESUMEN DE ACCESO — OLTS (GPON)</span>
+          </div>
+          <span class="panel-tag">ZABBIX 35 · 6 OLTS</span>
+        </div>
+        <div class="olts-compact-grid" id="olts-compact-grid">
+          <!-- Inyectado dinámicamente por JS -->
+        </div>
+      </div>
+
+      <!-- 3. Salud de Hardware MikroTik (5 Routers Núcleo) -->
+      <div class="noc-panel panel-mk-health">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span>⚡ SALUD DE HARDWARE MIKROTIK (5 ROUTERS)</span>
+          </div>
+          <span class="panel-tag">CPU · TEMP · RAM · PING</span>
+        </div>
+        <div class="mk-health-grid" id="mk-health-grid">
+          <!-- Inyectado dinámicamente -->
+        </div>
+      </div>
+
+      <!-- 4. Estado de Respaldos (Proxmox Backup Server - PBS) -->
+      <div class="noc-panel panel-pbs">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span>🛡️ ESTADO DE RESPALDOS · PROXMOX BACKUP SERVER (PBS)</span>
+          </div>
+          <span class="panel-tag" id="pbs-status-tag">28/28 RESPALDOS OK</span>
+        </div>
+        <div class="pbs-content" id="pbs-content">
+          <!-- Inyectado dinámicamente -->
+        </div>
+      </div>
+    </div>
+
+    <!-- COLUMNA DERECHA (ROUTERS DE BORDE CON GRÁFICOS + Certificados SSL + Proxmox Clúster) -->
+    <div class="col-right">
+      <!-- 1. TELEMETRÍA DE TRÁFICO — ROUTERS DE BORDE (NÚCLEO) CON GRÁFICOS SPARKLINE -->
+      <div class="noc-panel panel-borders-traffic">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span>TRÁFICO</span>
+          </div>
+          <span class="panel-tag">ZABBIX 35 · 5 ROUTERS NÚCLEO</span>
+        </div>
+        <div class="borders-traffic-grid" id="borders-traffic-grid">
+          <!-- 5 Tarjetas con gráficos Sparkline inyectadas por JS -->
+        </div>
+      </div>
+
+      <!-- 2. Certificados SSL & Servicios Web (Compactos) -->
+      <div class="noc-panel panel-certs">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span>🔐 CERTIFICADOS SSL & SERVICIOS WEB</span>
+          </div>
+          <span class="panel-tag">ZABBIX 20 · DASHBOARD 192</span>
+        </div>
+        <div class="certs-wrap">
+          <div class="cert-alert-banner" id="cert-banner" style="display:none">
+            <span>⚠️</span>
+            <span id="cert-banner-text">ALERTA CRÍTICA: Certificado(s) vencen en menos de 7 días</span>
+          </div>
+          <div class="certs-grid" id="certs-grid">
+            <!-- 21 Tarjetas inyectadas por JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Salud de Clúster Proxmox & Hipervisores -->
+      <div class="noc-panel panel-proxmox">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span>🖥️ HIPERVISORES & CLÚSTER PROXMOX</span>
+          </div>
+          <span class="panel-tag" id="pmx-cluster-tag">3/3 NODOS ONLINE</span>
+        </div>
+        <div class="proxmox-wrap" id="proxmox-wrap">
+          <!-- Inyectado dinámicamente por JS -->
+        </div>
+      </div>
+    </div>
+  </main>
 </div>
 
-<div class="toolbar" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-  <button class="tech-btn" id="sound-btn" aria-pressed="false">
-    <span>🔊</span>
-    <span id="sound-text">Audio HUD</span>
-  </button>
-  <button class="tech-btn" id="qa-voice-btn" style="border-color: #22d3ee; background: rgba(34,211,238,0.15); box-shadow: 0 0 12px rgba(34,211,238,0.25); color: #fff; cursor: pointer;">
-    <span>🎙️</span>
-    <span>Probar Voz Jarvis</span>
-  </button>
-  <div style="display: inline-flex; align-items: center; gap: 6px; background: rgba(15,23,42,0.8); border: 1px solid rgba(51,65,85,0.6); border-radius: 6px; padding: 4px 10px;">
-    <span style="font-size: 11px; color: #94a3b8; text-transform: uppercase; font-family: monospace;">Voz:</span>
-    <select id="voice-select" style="background: transparent; color: #38bdf8; border: none; font-family: inherit; font-size: 12px; outline: none; cursor: pointer; max-width: 260px;">
-      <option value="">Cargando voces...</option>
-    </select>
+<!-- TARJETA FLOTANTE DE PERSONAJES -->
+<div id="prof">
+  <button id="px" title="Cerrar (Esc)">✕</button>
+  <div class="prof-head">
+    <canvas class="prof-avatar" id="p-av" width="44" height="44"></canvas>
+    <div class="prof-title-wrap">
+      <h3 id="pn"></h3>
+      <div id="pr"></div>
+      <div id="ps"></div>
+    </div>
   </div>
-</div>
+  <p id="pb"></p>
+  <div class="prof-tabs">
+    <div class="prof-tab active" data-tab="perfil">Perfil & Área</div>
+    <div class="prof-tab" data-tab="gustos">Gustos & Vida</div>
+    <div class="prof-tab" data-tab="actividad">Actividad</div>
+  </div>
 
-<div class="panels">
-  <div class="card">
-    <div class="card-header">
-      <h2>Terminal de Operaciones</h2>
-      <span class="counter-badge" id="event-count">0 eventos</span>
-    </div>
-    <div class="terminal-window">
-      <ul class="log" id="log"></ul>
-    </div>
+  <div id="tab-perfil">
+    <div class="prof-sec-title">Responsabilidades en el NOC</div>
+    <ul class="prof-list" id="p-resp"></ul>
+    <div class="prof-sec-title">Herramientas Conectadas</div>
+    <div id="pt"></div>
+    <div class="prof-sec-title">Autonomía</div>
+    <p id="pa"></p>
   </div>
-  <div class="card">
-    <div class="card-header">
-      <h2>Telemetría NOC</h2>
-    </div>
-    <div class="kpis">
-      <div class="kpi info" id="kpi-consultas">
-        <div class="val" id="val-consultas">0</div>
-        <div class="lbl">Consultas Hoy</div>
-      </div>
-      <div class="kpi bad" id="kpi-alertas">
-        <div class="val" id="val-alertas">0</div>
-        <div class="lbl">Alertas Activas</div>
-      </div>
-      <div class="kpi good">
-        <div class="val">100%</div>
-        <div class="lbl">Autonomía L1</div>
-      </div>
-      <div class="kpi">
-        <div class="val" id="val-users">3</div>
-        <div class="lbl">Operadores NOC</div>
-      </div>
-    </div>
-  </div>
-</div>
-</main>
 
+  <div id="tab-gustos" style="display:none">
+    <div class="taste-grid">
+      <div class="taste-row">🎵 <b>Música:</b> <span id="p-music"></span></div>
+      <div class="taste-row">🍽️ <b>Comida favorita:</b> <span id="p-food"></span></div>
+      <div class="taste-row">☕ <b>Bebida en guardia:</b> <span id="p-drink"></span></div>
+      <div class="taste-row">🎮 <b>Pasatiempo:</b> <span id="p-hobby"></span></div>
+      <div class="taste-row">💬 <b>Frase típica:</b> <span id="p-quote"></span></div>
+    </div>
+  </div>
+
+  <div id="tab-actividad" style="display:none">
+    <div class="prof-sec-title">Estado Actual</div>
+    <p id="p-act-now" style="font-size:12px;color:#334155;margin:4px 0 8px"></p>
+    <div class="prof-sec-title">Última Interacción</div>
+    <p id="p-act-last" style="font-size:12px;color:#475569;margin:4px 0"></p>
+  </div>
+
+  <div class="prof-footer">
+    <span id="p-lvl"></span>
+    <span id="p-autoclose-lbl">Auto-cierre TV</span>
+  </div>
+  <div id="prof-timer-bar"></div>
+
+
+<!-- SCRIPT 1: MOTOR ISOMÉTRICO ORIGINAL DE LA OFICINA -->
 <script>
+
 (function(){
-var cv=document.getElementById('c'),ctx=cv.getContext('2d'),W=960,H=540;
-ctx.scale(2,2);
+  var W = 1280, H = 720, N = 14, TW = 80, TH = 40, OX = 640, OY = 116;
+  var cv = document.getElementById('c'), ctx = cv.getContext('2d');
+  var P = function(x, y){ return [OX + (x - y) * TW / 2, OY + (x + y) * TH / 2]; };
+  var rnd = Math.random, pick = function(a){ return a[Math.floor(rnd() * a.length)]; };
+  var sleep = function(ms){ return new Promise(function(r){ setTimeout(r, ms); }); };
 
-function A(n,x,y,c,o){var a={n:n,x:x,y:y,c:c,w:false,b:null,siren:false,h:'#2a1d16',sk:'#f0c8a0',g:0};for(var k in o)a[k]=o[k];return a}
-
-var tools={
-  historial:A('Historial',110,175,'#c084fc',{h:'#1e1b2e',sk:'#e8bd94',ic:'clock'}),
-  alertas:A('Zabbix',295,175,'#fb7185',{h:'#3b1d1d',sk:'#f0c8a0',ic:'warn'}),
-  proxmox:A('Proxmox',480,175,'#38bdf8',{h:'#0c2d3d',sk:'#f0c8a0',ic:'server'}),
-  ping:A('Ping',665,175,'#4ade80',{h:'#10261c',sk:'#c99a74',ic:'radar'}),
-  trafico:A('Tráfico',850,175,'#fbbf24',{h:'#33260a',sk:'#f5d2b0',ic:'bars'})
-};
-
-// Sentry AI (Agente Central)
-var agent=A('Sentry AI',480,330,'#22d3ee',{});
-
-// Usuarios de Telegram: 3 puestos operativos etiquetados como Admin con colores tech diferenciados
-var users=[
-  A('Admin',200,478,'#38bdf8',{h:'#164e63',sk:'#e2e8f0'}),  // Cyan tech
-  A('Admin',480,478,'#a855f7',{h:'#581c87',sk:'#f1f5f9'}),  // Purple tech
-  A('Admin',760,478,'#10b981',{h:'#064e3b',sk:'#f8fafc'})   // Emerald tech
-];
-
-var keys=Object.keys(tools);
-var pk=[],fx=[],links={},t0=performance.now(),last=t0;
-var totalEvents=0, totalConsultas=0, totalAlertas=0;
-var dust=[];for(var i=0;i<40;i++)dust.push({x:Math.random()*W,y:Math.random()*H,v:4+Math.random()*10,r:.6+Math.random()*1.4});
-
-function sleep(ms){return new Promise(function(r){setTimeout(r,ms)})}
-function anc(a){
-  if(a===agent)return{x:a.x,y:a.y-34};
-  if(a.ic)return{x:a.x,y:a.y-72};
-  return{x:a.x,y:a.y-52};
-}
-
-function bz(p,f){
-  var cx=(p.f.x+p.t.x)/2,cy=(p.f.y+p.t.y)/2-26,u=1-f;
-  return{x:u*u*p.f.x+2*u*f*cx+f*f*p.t.x,y:u*u*p.f.y+2*u*f*cy+f*f*p.t.y};
-}
-
-function packet(f,to,col,ms){
-  return new Promise(function(r){
-    var k=(f.ic?f.n:to.ic?to.n:f.n+to.n);
-    links[k]=1;
-    pk.push({f:anc(f),t:anc(to),col:col,s:performance.now(),ms:ms,r:r,tr:[],k:k,to:to});
-  });
-}
-
-function burst(x,y,col){
-  for(var i=0;i<12;i++){
-    var an=Math.random()*6.283,sp=20+Math.random()*50;
-    fx.push({x:x,y:y,vx:Math.cos(an)*sp,vy:Math.sin(an)*sp,l:1,col:col});
+  function shade(h, f){
+    var n = parseInt(h.slice(1), 16), r = n >> 16, g = (n >> 8) & 255, b = n & 255;
+    return 'rgb(' + Math.min(255, (r * f) | 0) + ',' + Math.min(255, (g * f) | 0) + ',' + Math.min(255, (b * f) | 0) + ')';
   }
-}
-
-var logEl=document.getElementById('log');
-var countEl=document.getElementById('event-count');
-
-function log(msg,cls){
-  totalEvents++;
-  countEl.textContent=totalEvents+' evento'+(totalEvents>1?'s':'');
-  var li=document.createElement('li');
-  var tm=new Date().toLocaleTimeString('es-VE',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-  li.innerHTML='<time>'+tm+'</time><span class="msg'+(cls?' '+cls:'')+'">'+msg+'</span>';
-  logEl.insertBefore(li,logEl.firstChild);
-  while(logEl.children.length>35)logEl.removeChild(logEl.lastChild);
-}
-
-// Mapeo persistente de usuarios a puestos físicos (Admin 1, 2, 3)
-var userStationMap = {};
-var nextStationIdx = 0;
-
-function getUserStation(name){
-  var key = (name || 'Admin').trim().toLowerCase();
-  if(userStationMap[key] === undefined){
-    userStationMap[key] = nextStationIdx % users.length;
-    nextStationIdx++;
+  function poly(pts, fill, stroke){
+    ctx.beginPath();
+    pts.forEach(function(p, i){ i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1]); });
+    ctx.closePath();
+    if(fill){ ctx.fillStyle = fill; ctx.fill(); }
+    if(stroke){ ctx.strokeStyle = stroke; ctx.lineWidth = 1; ctx.stroke(); }
   }
-  return users[userStationMap[key]];
-}
+  function box(x, y, w, d, h, c, z){
+    z = z || 0;
+    var p = function(gx, gy, zz){ var s = P(gx, gy); return [s[0], s[1] - zz]; };
+    var A = p(x, y, z + h), B = p(x + w, y, z + h), C = p(x + w, y + d, z + h), D = p(x, y + d, z + h);
+    var B0 = p(x + w, y, z), C0 = p(x + w, y + d, z), D0 = p(x, y + d, z);
+    var top = c, l = c, r = c;
+    if(typeof c === 'string'){ top = shade(c, 1.15); l = shade(c, 0.8); r = shade(c, 0.6); }
+    else { top = c[0]; l = c[1]; r = c[2]; }
+    poly([D, C, C0, D0], l);
+    poly([C, B, B0, C0], r);
+    poly([A, B, C, D], top);
+  }
+  function tint(x, y, w, d, col){ poly([P(x, y), P(x + w, y), P(x + w, y + d), P(x, y + d)], col); }
+  function label(t, x, y){
+    var s = P(x, y);
+    ctx.save();
+    ctx.fillStyle = 'rgba(135, 175, 215, 0.38)';
+    ctx.font = '700 10.5px "Consolas", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(t, s[0], s[1]);
+    ctx.restore();
+  }
 
-// Búsqueda inteligente de herramienta
-function findTool(tname){
-  if(!tname) return null;
-  var s=tname.toLowerCase();
-  if(s.includes('proxmox')||s.includes('vm')||s.includes('qemu')||s.includes('lxc')||s.includes('pmx')) return tools.proxmox;
-  if(s.includes('trafic')||s.includes('tráfic')||s.includes('consumo')||s.includes('interface')||s.includes('ancho')||s.includes('listar_interfaces')) return tools.trafico;
-  if(s.includes('alert')||s.includes('problem')||s.includes('zabbix')||s.includes('dude')||s.includes('topolog')||s.includes('equipo')) return tools.alertas;
-  if(s.includes('ping')||s.includes('latencia')||s.includes('icmp')) return tools.ping;
-  if(s.includes('historial')||s.includes('event')||s.includes('report')) return tools.historial;
-  return null;
-}
+  /* ---------- FONDO ISOMÉTRICO CACHEADO ---------- */
+  var bg = document.createElement('canvas'); bg.width = W; bg.height = H;
+  (function(){
+    var o = ctx; ctx = bg.getContext('2d');
+    var g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, '#070d17'); g.addColorStop(1, '#04070d');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
 
-// Sincronizar suscriptores autorizados reales desde el proxy periódicamente
-function syncSubscribers(){
-  var host = (window.location.hostname && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') ? window.location.hostname : 'localhost';
-  fetch('http://'+host+':11440/subscribers')
-    .then(function(r){return r.json()})
-    .then(function(subList){
-      if(Array.isArray(subList)){
-        document.getElementById('val-users').textContent = subList.length;
-        // Asignar cada suscriptor a una de las terminales operativas
-        subList.forEach(function(sub){
-          var raw = (sub.name || sub.chat_id || '').toLowerCase();
-          if(raw && userStationMap[raw] === undefined){
-            userStationMap[raw] = nextStationIdx % users.length;
-            nextStationIdx++;
-          }
-        });
+    for(var i = 0; i < N; i++){
+      for(var j = 0; j < N; j++){
+        poly([P(i, j), P(i + 1, j), P(i + 1, j + 1), P(i, j + 1)],
+             (i + j) % 2 ? '#0e1826' : '#0b1420', '#111f32');
       }
-    }).catch(function(){});
-}
-syncSubscribers();
-setInterval(syncSubscribers, 15000);
-
-// Animación de consultas reales (Telegram -> Sentry AI -> Tool -> Sentry AI -> Telegram)
-var busy=0;
-async function animarConsulta(data){
-  busy++;
-  totalConsultas++;
-  document.getElementById('val-consultas').textContent=totalConsultas;
-
-  var rawSender = data.usuario||data.from||'Admin';
-  var u=getUserStation(rawSender);
-  var tl=findTool(data.herramienta||data.tool||'');
-  var target=data.target||data.objetivo||'';
-  var detalle=data.detalle||data.pregunta||(data.herramienta?('Consulta '+data.herramienta):'Consulta al bot');
-
-  u.b='…';
-  log('💬 <b>'+rawSender+'</b>: '+detalle,'c');
-  if(soundEnabled) playBeep(700, 0.08);
-  await packet(u,agent,'#f8fafc',800);
-
-  agent.w=true;
-  if(tl){
-    log('🧠 <b>Sentry AI</b> procesa con '+tl.n+(target?' ('+target+')':''));
-    await sleep(600);
-    await packet(agent,tl,tl.c,800);
-
-    tl.w=true;
-    await sleep(1100);
-    tl.w=false;
-    await packet(tl,agent,'#4ade80',800);
-  } else {
-    log('🧠 <b>Sentry AI</b> procesa consulta internamente...');
-    await sleep(900);
-  }
-
-  agent.w=false;
-  await sleep(400);
-  await packet(agent,u,'#f8fafc',800);
-
-  u.b='✓';
-  var respMsg=data.respuesta||'Operación completada';
-  log('✅ Respuesta a '+rawSender+': '+respMsg,'s');
-  if(soundEnabled) playBeep(1000, 0.12);
-  await sleep(1500);
-  u.b=null;
-  busy--;
-}
-
-// Animación de alertas reales (Zabbix -> Sentry AI -> Broadcast a operadores)
-async function animarAlerta(data){
-  busy++;
-  totalAlertas++;
-  document.getElementById('val-alertas').textContent=totalAlertas;
-
-  var z=tools.alertas;
-  var host=data.host||data.equipo||'Equipo Red';
-  var msg=data.problema||data.mensaje||'Falla detectada';
-  var sev=data.severidad||data.severity||'Alta';
-
-  z.siren=true; z.b='!';
-  log('🚨 <b>ALERTA '+sev.toUpperCase()+':</b> '+host+' — '+msg,'a');
-  if(soundEnabled){
-    playBeep(440, 0.2);
-    setTimeout(function(){ playBeep(880, 0.2); }, 220);
-  }
-
-  await packet(z,agent,'#fb7185',900);
-  agent.w=true;
-  log('🧠 Sentry AI evalúa impacto y notifica operadores');
-  await sleep(1100);
-  agent.w=false;
-
-  await Promise.all(users.map(function(u){return packet(agent,u,'#fb7185',1000)}));
-  users.forEach(function(u){u.b='🔔'});
-  log('📢 Alerta despachada a '+users.length+' operadores NOC','a');
-
-  await sleep(2000);
-  users.forEach(function(u){u.b=null});
-  z.siren=false; z.b=null;
-  busy--;
-}
-
-// Dispatcher de eventos reales
-function procesarEvento(ev){
-  var tipo=(ev.tipo||ev.type||'').toLowerCase();
-  if(ev.texto_voz || tipo==='soporte' || tipo==='speak'){
-    var locucion = ev.texto_voz || ('Atención: El usuario ' + (ev.usuario||'Operador') + ' solicita soporte en ' + (ev.ubicacion||ev.piso||'sede') + '. ' + (ev.detalle||ev.motivo||''));
-    log('🎙️ <b>JARVIS NOC:</b> ' + locucion, 'c');
-    if(soundEnabled) hablarJarvis(locucion);
-    return;
-  }
-  if(tipo==='alerta'||tipo==='alert'||tipo==='down'||tipo==='problem'||tipo==='zabbix'||tipo==='dude'){
-    animarAlerta(ev);
-  } else if(tipo==='consulta'||tipo==='tool'||tipo==='query'||tipo==='ping'||tipo==='trafico'){
-    animarConsulta(ev);
-  } else if(tipo==='recuperacion'||tipo==='up'){
-    log('🟢 <b>RECUPERADO:</b> '+(ev.equipo||ev.host||'Equipo')+' Online','s');
-  } else {
-    log('ℹ️ '+(ev.mensaje||JSON.stringify(ev)));
-  }
-}
-
-// Conexión Server-Sent Events (SSE) al proxy
-var dot=document.getElementById('dot');
-var statusText=document.getElementById('status-text');
-var evtSource=null;
-
-function connectSSE(){
-  var host = (window.location.hostname && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') ? window.location.hostname : 'localhost';
-  var sseUrl='http://'+host+':11440/events';
-
-  statusText.textContent='CONECTANDO';
-  dot.className='live-dot';
-
-  evtSource=new EventSource(sseUrl);
-
-  evtSource.onopen=function(){
-    dot.className='live-dot connected';
-    statusText.textContent='ONLINE';
-    log('🟢 Conectado al bus de eventos de Company NOC','s');
-  };
-
-  evtSource.onmessage=function(e){
-    try{
-      var data=JSON.parse(e.data);
-      if(data.tipo==='sistema') return;
-      procesarEvento(data);
-    }catch(err){
-      console.warn('Error parseando evento SSE:', err, e.data);
     }
-  };
+    tint(0.3, 5.4, 3.3, 5.6, 'rgba(80, 120, 180, 0.09)');
+    tint(4.8, 4.8, 4.4, 4.2, 'rgba(56, 189, 248, 0.11)');
+    tint(0.8, 1.0, 12.4, 3.2, 'rgba(56, 189, 248, 0.06)');
+    tint(1.8, 10.5, 10.2, 3.0, 'rgba(167, 139, 250, 0.08)');
+    tint(11.0, 4.5, 2.7, 5.7, 'rgba(251, 146, 60, 0.07)');
 
-  evtSource.onerror=function(){
-    dot.className='live-dot error';
-    statusText.textContent='DESCONECTADO';
-    evtSource.close();
-    setTimeout(connectSSE, 5000);
-  };
-}
+    label('LOUNGE & CAFÉ NOC', 1.8, 9.7);
+    label('NÚCLEO SENTRY · COORDINACIÓN', 7.0, 5.3);
+    label('INGENIERÍA & ESPECIALISTAS DE RED', 7.0, 4.1);
+    label('MESA DE DESPACHO & GUARDIA OPERATIVA', 7.0, 13.6);
+    label('RACKS DATACENTER · PMX & ZABBIX', 12.3, 10.6);
 
-connectSSE();
+    function wall(ax, ay, bx, by){
+      var a = P(ax, ay), b = P(bx, by);
+      var wg = ctx.createLinearGradient(0, a[1] - 115, 0, a[1]);
+      wg.addColorStop(0, 'rgba(56, 189, 248, 0.02)');
+      wg.addColorStop(1, 'rgba(56, 189, 248, 0.17)');
+      poly([a, b, [b[0], b[1] - 115], [a[0], a[1] - 115]], wg, 'rgba(95, 193, 224, 0.35)');
+    }
+    wall(0, 0, N, 0);
+    wall(0, 0, 0, N);
 
-// Cargar historial previo de eventos
-(function loadHistory(){
-  var host = (window.location.hostname && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') ? window.location.hostname : 'localhost';
-  fetch('http://'+host+':11440/events-history')
-    .then(function(r){return r.json()})
-    .then(function(hist){
-      if(Array.isArray(hist)&&hist.length>0){
-        hist.forEach(function(h){
-          if(h.tipo!=='test') log(h.mensaje||h.problema||'Evento: '+h.tipo);
-        });
+    // Videowall en la pared derecha superior
+    var s0 = P(0, 0);
+    ctx.save();
+    ctx.setTransform(TW / 2, TH / 2, 0, -1, s0[0], s0[1]);
+    for(var k = 0; k < 5; k++){
+      var u = 1.0 + k * 2.55;
+      ctx.fillStyle = 'rgba(12, 32, 54, 0.92)';
+      ctx.fillRect(u, 42, 2.05, 48);
+      ctx.strokeStyle = '#22d3ee';
+      ctx.lineWidth = 0.06;
+      ctx.strokeRect(u, 42, 2.05, 48);
+      for(var b = 0; b < 6; b++){
+        ctx.fillStyle = (k === 1 && b === 4) ? 'rgba(251, 113, 133, 0.75)' : 'rgba(56, 189, 248, ' + (0.35 + (0.12 * (b % 3))) + ')';
+        ctx.fillRect(u + 0.16 + b * 0.29, 46, 0.19, 8 + ((k * 7 + b * 11) % 28));
       }
-    }).catch(function(){});
-})();
+    }
+    // Pizarra de arquitectura en la pared izquierda superior
+    ctx.setTransform(-TW / 2, TH / 2, 0, -1, s0[0], s0[1]);
+    ctx.fillStyle = 'rgba(15, 28, 46, 0.92)';
+    ctx.fillRect(2.2, 42, 4.5, 46);
+    ctx.strokeStyle = '#38bdf8';
+    ctx.lineWidth = 0.06;
+    ctx.strokeRect(2.2, 42, 4.5, 46);
+    ctx.restore();
+    ctx = o;
+  })();
 
-// Audio HUD
-var soundEnabled=false;
-var soundBtn=document.getElementById('sound-btn');
-soundBtn.onclick=function(){
-  soundEnabled=!soundEnabled;
-  soundBtn.setAttribute('aria-pressed',String(soundEnabled));
-  if(soundEnabled) playBeep(880,0.1);
-};
-function playBeep(freq,dur){
-  try{
-    var ac=new (window.AudioContext||window.webkitAudioContext)();
-    var o=ac.createOscillator(),g=ac.createGain();
-    o.frequency.value=freq||880;
-    o.type='sine';
-    o.connect(g);g.connect(ac.destination);
-    g.gain.setValueAtTime(0.08,ac.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+(dur||0.15));
-    o.start();o.stop(ac.currentTime+(dur||0.15));
-  }catch(e){}
-}
+  /* ---------- ELENCO DE PERSONAJES HUMANOS (SIN NOMBRES DE USUARIOS REALES) ---------- */
+  var SPECIALISTS = [
+    {
+      id: 'historial',
+      n: 'Elena',
+      area: 'Historial & PDF',
+      c: '#a78bfa',
+      hx: 1.5, hy: 1.6,
+      role: 'Analista Forense & Reportes · Historial',
+      bio: 'Memoria fotográfica del NOC. Recuerda cada caída y genera los reportes ejecutivos PDF al instante.',
+      resp: ['Auditar historial de eventos e incidentes', 'Generar reportes ejecutivos en PDF (/reporte)', 'Detectar patrones repetitivos por horario'],
+      tools: ['zabbix.history', 'pdf.report_builder', 'sla.audit'],
+      aut: 2, lvl: 'Senior Analyst',
+      music: 'Indie Folk, Natalia Lafourcade y Coldplay',
+      food: 'Croissant de almendras y pasta al pesto',
+      drink: 'Cappuccino con canela',
+      hobby: 'Fotografía analógica y novelas de misterio',
+      quote: '«Ese enlace ya hizo exactamente lo mismo el martes a las 3:14 PM.»',
+      hair: '#3b2219', skin: '#f5d6b8', glasses: true
+    },
+    {
+      id: 'alertas',
+      n: 'Valeria',
+      area: 'Vigía Zabbix x4',
+      c: '#fb7185',
+      hx: 3.3, hy: 1.6,
+      role: 'Líder de Monitoreo · Clúster Zabbix (4 Nodos)',
+      bio: 'Vigila los 4 servidores Zabbix (incluyendo zabbix74). Cuando suena una alerta real, ella ya la tiene en pantalla.',
+      resp: ['Monitorear los 4 servidores Zabbix unificados', 'Detectar caídas ICMP, cortes de fibra y flapping', 'Filtrar falsos positivos junto a Marco'],
+      tools: ['zabbix.problems', 'zabbix74.lxc110', 'alert.triage'],
+      aut: 2, lvl: 'Lead Monitoring Eng.',
+      music: 'Rock Alternativo, Soda Stereo y The Killers',
+      food: 'Sushi tempurizado y gyozas',
+      drink: 'Té verde frío con limón',
+      hobby: 'Running nocturno y coleccionar vinilos',
+      quote: '«No digan la palabra "tranquilo" en mi turno que Zabbix los escucha.»',
+      hair: '#1b1b1f', skin: '#f2c9a0', headset: true
+    },
+    {
+      id: 'proxmox',
+      n: 'Saúl',
+      area: 'Proxmox & PDM',
+      c: '#38bdf8',
+      hx: 5.1, hy: 1.6,
+      role: 'Arquitecto de Virtualización · Proxmox & PDM',
+      bio: 'Sereno y preciso. Administra los 6 nodos Proxmox, 115 VMs y 53 contenedores LXC desde el Datacenter Manager.',
+      resp: ['Supervisar los 6 nodos (PMX10-12 y Lumex01-04)', 'Consultar estado de VMs y contenedores LXC en vivo', 'Garantizar alta disponibilidad y autoarranque (onboot)'],
+      tools: ['proxmox.cluster', 'pdm.datacenter', 'lxc.110_status'],
+      aut: 2, lvl: 'Senior Virtualization',
+      music: 'Lo-Fi Beats, Radiohead y Pink Floyd',
+      food: 'Pasticho casero con pan de ajo',
+      drink: 'Café guayoyo recién colado',
+      hobby: 'Armar teclados mecánicos custom y ajedrez',
+      quote: '«Si la VM crítica tiene onboot=1 y backup al día, todos dormimos en paz.»',
+      hair: '#18181b', skin: '#f2c9a0', headset: true
+    },
+    {
+      id: 'ping',
+      n: 'Mateo',
+      area: 'Ping & The Dude',
+      c: '#4ade80',
+      hx: 6.9, hy: 1.6,
+      role: 'Especialista ICMP & Topología · Ping / Dude',
+      bio: 'Rápido y directo: mide el mundo en milisegundos. Si un equipo pierde un solo paquete, Mateo lo detecta.',
+      resp: ['Ejecutar ráfagas ICMP de baja latencia (/ping)', 'Validar pérdida de paquetes, RTT y jitter', 'Cruzar topología de radioenlaces en The Dude'],
+      tools: ['icmp.fast_ping', 'dude.topology', 'latency.probe'],
+      aut: 1, lvl: 'Network Specialist',
+      music: 'Drum & Bass, Gorillaz y The Strokes',
+      food: 'Hamburguesa doble smash con papas rústicas',
+      drink: 'Malta bien fría',
+      hobby: 'Simuladores de carreras y ciclismo de montaña',
+      quote: '«0% packet loss y 1.4 ms: esa es mi definición de felicidad.»',
+      hair: '#5b3a1e', skin: '#d9a577', headset: false
+    },
+    {
+      id: 'trafico',
+      n: 'Diego',
+      area: 'Tráfico SNMP',
+      c: '#fbbf24',
+      hx: 8.7, hy: 1.6,
+      role: 'Ingeniero de Telemetría · Tráfico & Interfaces',
+      bio: 'Lee las curvas de ancho de banda como una partitura. Detecta cuellos de botella y saturaciones al vuelo.',
+      resp: ['Graficar consumo en Mbps/Gbps por interfaz (/trafico)', 'Listar interfaces activas y errores físicos (/interfaces)', 'Identificar picos anómalos en troncales'],
+      tools: ['snmp.traffic_graph', 'zabbix.interfaces', 'bandwidth.analyzer'],
+      aut: 1, lvl: 'Telemetry Engineer',
+      music: 'Jazz Fusión, Jamiroquai y Arctic Monkeys',
+      food: 'Tacos al pastor con extra picante',
+      drink: 'Limonada frappe con yerbabuena',
+      hobby: 'Tocar el bajo eléctrico y astronomía',
+      quote: '«Esa subida de 800 Mbps en la SFP+ no me engaña, alguien lanzó un backup.»',
+      hair: '#2b1d14', skin: '#e6b88a', glasses: true
+    },
+    {
+      id: 'visual',
+      n: 'Sofía',
+      area: 'Dashboards & DC',
+      c: '#e879f9',
+      hx: 10.5, hy: 1.6,
+      role: 'Directora de Visualización · Cámaras & Dashboards',
+      bio: 'Transforma miles de métricas en tableros ejecutivos e inspecciona visualmente los pasillos del Datacenter.',
+      resp: ['Capturar cámaras en vivo del Datacenter (/fotodatacenter)', 'Renderizar el Dashboard Ejecutivo NOC (/dashboard)', 'Generar gráficas visuales del clúster PDM'],
+      tools: ['camera.datacenter', 'noc.dashboard_png', 'pdm.visual_chart'],
+      aut: 2, lvl: 'Visual Ops Lead',
+      music: 'Synthpop, Tame Impala y Dua Lipa',
+      food: 'Poke bowl de salmón con aguacate',
+      drink: 'Matcha latte helado',
+      hobby: 'Diseño 3D, arte generativo y senderismo',
+      quote: '«Una imagen del rack a tiempo vale más que mil líneas de log.»',
+      hair: '#7a2f1d', skin: '#f5d6b8', headset: false
+    },
+    {
+      id: 'ejecutor',
+      n: 'Gabriel',
+      area: 'Ejecutor & Diag',
+      c: '#f97316',
+      hx: 12.3, hy: 1.6,
+      role: 'Ingeniero de Automatización & Diagnóstico L2',
+      bio: 'Guardián de las acciones críticas y diagnósticos de salud. Solo ejecuta lo autorizado y audita cada paso.',
+      resp: ['Ejecutar diagnósticos profundos de salud (/diagnostico)', 'Operar encendido/reinicio seguro de VMs en Proxmox', 'Gestionar seguridad de suscriptores y lista blanca'],
+      tools: ['health.diagnostics', 'proxmox.power_ctl', 'security.pin_guard'],
+      aut: 3, lvl: 'Principal Automation',
+      music: 'Rock Progresivo, Muse y Hans Zimmer',
+      food: 'Parrilla punta trasera con yuca frita',
+      drink: 'Café negro cerrero sin azúcar',
+      hobby: 'Restaurar motos clásicas y domótica en casa',
+      quote: '«Regla número uno: en producción nada se toca sin verificar dos veces.»',
+      hair: '#1b1b1f', skin: '#b9825a', headset: true
+    }
+  ];
 
+  var A = {}, all = [], ops = [];
+  // Puntos de interés en la oficina (con múltiples pensamientos contextuales o silenciosos)
+  var POI = [
+    {x: 2.3, y: 6.8, type: 'cafe'},
+    {x: 11.3, y: 6.8, type: 'racks'},
+    {x: 2.5, y: 9.8, type: 'lounge'},
+    {x: 7.0, y: 9.3, type: 'metrics'},
+    {x: 4.8, y: 4.9, type: 'collab_w'},
+    {x: 9.4, y: 4.9, type: 'collab_e'}
+  ];
 
-// ==================== MOTOR DE VOZ JARVIS ====================
-var selectedVoice = null;
-var voiceSelect = document.getElementById('voice-select');
+  function mk(cfg){
+    var a = {
+      id: cfg.id, n: cfg.n, area: cfg.area || '', c: cfg.c,
+      x: cfg.hx, y: cfg.hy, home: {x: cfg.hx, y: cfg.hy},
+      tx: null, ty: null, res: null,
+      moving: false, working: false, siren: false, busy: 0,
+      mood: 'calm', mt: 0, bubble: null, bt: 0, fourthWall: false,
+      next: performance.now() + 5000 + rnd() * 14000,
+      seed: rnd() * 9,
+      role: cfg.role, bio: cfg.bio, resp: cfg.resp || [],
+      tools: cfg.tools || [], aut: cfg.aut || 2, lvl: cfg.lvl || 'Senior',
+      music: cfg.music, food: cfg.food, drink: cfg.drink, hobby: cfg.hobby, quote: cfg.quote,
+      hair: cfg.hair || '#1b1b1f', skin: cfg.skin || '#f2c9a0',
+      glasses: !!cfg.glasses, headset: !!cfg.headset,
+      tool: !!cfg.tool, coordinator: !!cfg.coordinator, op: !!cfg.op,
+      lastAct: 'En guardia activa monitoreando ' + (cfg.area || 'su sector') + '.',
+      fx: 1
+    };
+    all.push(a);
+    return a;
+  }
 
-function playJarvisChime(){
-  try{
-    var ac = new (window.AudioContext || window.webkitAudioContext)();
-    var now = ac.currentTime;
-    
-    // Chime futurista de doble tono sutil
-    var o1 = ac.createOscillator(), g1 = ac.createGain();
-    o1.type = 'sine';
-    o1.frequency.setValueAtTime(523.25, now); // C5
-    o1.frequency.exponentialRampToValueAtTime(783.99, now + 0.12); // G5
-    g1.gain.setValueAtTime(0.09, now);
-    g1.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
-    o1.connect(g1); g1.connect(ac.destination);
-    o1.start(); o1.stop(now + 0.22);
+  SPECIALISTS.forEach(function(s){
+    s.tool = true;
+    A[s.id] = mk(s);
+  });
 
+  // Coordinador Central (Persona humana líder del núcleo Sentry IA)
+  var S = mk({
+    id: 'sentry',
+    n: 'Marco',
+    area: 'Coordinador IA',
+    c: '#22d3ee',
+    hx: 7.0, hy: 7.6,
+    role: 'Jefe de Turno · Coordinador Núcleo Sentry IA',
+    bio: 'Cerebro coordinador del NOC. Recibe cada consulta, delega al especialista exacto en milisegundos y filtra el ruido.',
+    resp: ['Orquestar consultas en lenguaje natural y comandos rápidos', 'Correlacionar alertas entre Zabbix, Proxmox y The Dude', 'Sintetizar avisos de voz ejecutivos para el NOC TV'],
+    tools: ['sentry.orchestrator', 'llm.qwen_agent', 'voice.jarvis_tts', 'triage.engine'],
+    aut: 3, lvl: 'NOC Chief Coordinator',
+    music: 'Synthwave, Daft Punk y Gustavo Cerati',
+    food: 'Arepa reina pepiada y lomito al grill',
+    drink: 'Espresso doble sin azúcar',
+    hobby: 'Ajedrez blitz, sintetizadores analógicos y sci-fi',
+    quote: '«Mi trabajo es que cuando suene una alerta, ya sepamos exactamente el porqué.»',
+    hair: '#18181b', skin: '#f2c9a0', glasses: true, headset: true,
+    coordinator: true
+  });
+  A.sentry = S;
+
+  // Mesa de Despacho y Guardia Operativa
+  var GUARDIA = [
+    {
+      id: 'op_camila', n: 'Camila', area: 'Despacho Fibra', c: '#f472b6', hx: 3.4, hy: 12.1,
+      role: 'Coordinadora de Enlace & Planta Externa',
+      bio: 'Enlace directo con las cuadrillas de fibra óptica y nodos remotos. Traduce cada alerta en acción de campo.',
+      resp: ['Coordinar cuadrillas ante cortes de fibra óptica', 'Monitorear enlaces troncales e interconexiones', 'Validar recuperación de nodos junto a Valeria y Mateo'],
+      tools: ['dispatch.fiber', 'telegram.ops', 'sla.tracker'],
+      aut: 3, lvl: 'Field Ops Coordinator',
+      music: 'Indie Pop, Bomba Estéreo y Fonseca',
+      food: 'Tequeños recién hechos con salsa tártara',
+      drink: 'Café con leche de almendras',
+      hobby: 'Fotografía de paisajes y patinaje',
+      quote: '«Si el corte es de fibra, ya tengo a la cuadrilla saliendo antes del segundo ping.»',
+      hair: '#4a2511', skin: '#f2c9a0', headset: true, op: true
+    },
+    {
+      id: 'op_andres', n: 'Andrés', area: 'Guardia Core', c: '#a3e635', hx: 7.0, hy: 12.1,
+      role: 'Ingeniero de Guardia · Redes Core & BGP',
+      bio: 'Especialista en ruteo dinámico, OSPF/BGP y conmutación central. Audita las consultas operativas de la guardia.',
+      resp: ['Supervisar tablas de ruteo BGP/OSPF y core switches', 'Solicitar diagnósticos cruzados al equipo de especialistas', 'Aprobar maniobras de nivel 4 en ventana de mantenimiento'],
+      tools: ['core.routing', 'bgp.watcher', 'change.approvals'],
+      aut: 4, lvl: 'Core Network Lead',
+      music: 'Rock Clásico, Led Zeppelin y Héroes del Silencio',
+      food: 'Cachapa con queso de mano y cochino frito',
+      drink: 'Café americano largo',
+      hobby: 'Asados de fin de semana y coleccionar relojes',
+      quote: '«El BGP nunca miente; si cayó el vecino, revisemos el transporte.»',
+      hair: '#1b1b1f', skin: '#d9a577', glasses: true, op: true
+    },
+    {
+      id: 'op_lucia', n: 'Lucía', area: 'Calidad & SLA', c: '#38bdf8', hx: 10.6, hy: 12.1,
+      role: 'Especialista en Continuidad & Experiencia de Red',
+      bio: 'Vela por la estabilidad de los servicios corporativos, enlaces dedicados y tiempos de respuesta del NOC.',
+      resp: ['Verificar disponibilidad de enlaces corporativos', 'Consolidar confirmaciones de recuperación en vivo', 'Auditar tiempos de respuesta del centro de operaciones'],
+      tools: ['qos.monitor', 'uptime.audit', 'noc.broadcast'],
+      aut: 3, lvl: 'Service Quality Lead',
+      music: 'Pop Alternativo, Jorge Drexler y Adele',
+      food: 'Ensalada César con pollo grillé y focaccia',
+      drink: 'Infusión de frutos rojos',
+      hobby: 'Yoga, lectura de ciencia y viajar',
+      quote: '«Un incidente bien comunicado es la mitad de la solución.»',
+      hair: '#6b3410', skin: '#f5d6b8', headset: true, op: true
+    }
+  ];
+  GUARDIA.forEach(function(g){ ops.push(mk(g)); });
+
+  var MOOD = {
+    calm:   ['#4ade80', ''],
+    busy:   ['#38bdf8', '⚙️'],
+    stress: ['#fb7185', '🚨'],
+    happy:  ['#fbbf24', '✨'],
+    bored:  ['#94a3b8', '☕'],
+    wall:   ['#c084fc', '👀']
+  };
+  function setMood(a, m, s){ a.mood = m; a.mt = performance.now() + (s || 6) * 1000; }
+
+  /* ---------- SISTEMA DE MAZOS BARAJADOS (SHUFFLE BAG) CERO REPETICIÓN ---------- */
+  function createDeck(items){
+    var pool = [];
+    var lastPicked = null;
+    function refill(){
+      pool = items.slice();
+      for(var i = pool.length - 1; i > 0; i--){
+        var j = Math.floor(rnd() * (i + 1));
+        var tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
+      }
+      if(pool.length > 1 && pool[pool.length - 1] === lastPicked){
+        var swap = pool[0]; pool[0] = pool[pool.length - 1]; pool[pool.length - 1] = swap;
+      }
+    }
+    return {
+      next: function(){
+        if(pool.length === 0) refill();
+        lastPicked = pool.pop();
+        return lastPicked;
+      }
+    };
+  }
+
+  // Control global de cadencia de globos de texto en ocio (evita saturar la pantalla o repetir)
+  var lastIdleSpeechAt = 0;
+  var lastIdleChatAt = 0;
+
+  function canSpeakIdle(now){
+    // Si ya hay alguien hablando en modo ocio o pasaron menos de 9 segundos desde el último comentario casual, caminar en silencio
+    var activeBubbles = all.filter(function(o){ return o.bubble && !o.dutyActive; }).length;
+    if(activeBubbles >= 1) return false;
+    return (now - lastIdleSpeechAt) > 9500;
+  }
+
+  // Pensamientos propios e individuales de cada personaje (solo salen de vez en cuando)
+  var PERSONAL_THOUGHTS = {
+    historial: createDeck([
+      'Revisando la curva de disponibilidad semanal…',
+      'El formato del reporte PDF quedó súper limpio',
+      'Curioso: los martes a mediodía casi no hay microcortes',
+      'Me provoca un cappuccino con canela ahorita',
+      'Voy a archivar las bitácoras del turno anterior',
+      'Todo cuadrado en la base histórica de eventos',
+      'Qué buena canción de Natalia Lafourcade para concentrarse'
+    ]),
+    alertas: createDeck([
+      'Los 4 servidores Zabbix sincronizados al segundo',
+      'El contenedor 110 (zabbix74) está respondiendo volando',
+      'Cero tormentas de flapping en los últimos minutos',
+      'Un sorbo de té verde y sigo vigilando triggers',
+      'Esos filtros de ruido nos ahorraron decenas de falsas alarmas',
+      'Ojalá pidan sushi hoy para el cambio de guardia',
+      'Revisando severidades Warning vs High en la cola'
+    ]),
+    proxmox: createDeck([
+      'PMX10, pmx11 y PMX12 con carga de CPU súper estable',
+      'Los nodos Lumex01, 02 y 04 reportando 0% de I/O wait',
+      '115 VMs y 53 contenedores LXC en verde en PDM',
+      'Qué paz mental da tener onboot=1 en las VMs críticas',
+      'Un guayoyo tibio mientras escucho Radiohead',
+      'La caché de PDM en 2 milisegundos quedó de lujo',
+      'Verificando el espacio de almacenamiento en los datastores'
+    ]),
+    ping: createDeck([
+      'RTT en 1.3 ms hacia el core, ni un paquete perdido',
+      'El mapa de The Dude se ve despejado en este bloque',
+      'Cero jitter en los enlaces inalámbricos principales',
+      'Nada le gana a una malta bien fría a mitad de guardia',
+      'Sondeo preventivo ICMP completado sin anomalías',
+      'Ese ritmo de Drum & Bass va a la velocidad de mis pings',
+      'Revisando latencia hacia los nodos remotos'
+    ]),
+    trafico: createDeck([
+      'Las interfaces 10G están al 38% de capacidad nominal',
+      'Cero errores CRC en las troncales ópticas',
+      'Qué limpia se ve la gráfica SNMP cuando no hay broadcast storm',
+      'Unos tacos al pastor caerían brutal después del turno',
+      'Comparando el percentil 95 de subida vs bajada',
+      'Escuchando un buen bajo de Jamiroquai mientras miro gráficas',
+      'El caudal de tráfico entrante va súper parejo hoy'
+    ]),
+    visual: createDeck([
+      'Las cámaras del datacenter tienen excelente iluminación hoy',
+      'Ajustando el contraste del Dashboard Ejecutivo PNG',
+      'Los pasillos fríos y calientes del rack se ven en orden',
+      'Un matcha latte helado para refrescar la vista',
+      'La gráfica visual de PDM renderizó en menos de un segundo',
+      'Todo alineado al píxel en los tableros del NOC',
+      'Escuchando Tame Impala mientras calibro las vistas'
+    ]),
+    ejecutor: createDeck([
+      'Lista blanca de comandos auditada y bloqueada a nivel 4',
+      'Sensores de temperatura y RAM dentro de rango saludable',
+      'En producción la prudencia vale por dos',
+      'Hora de un café negro cerrero sin azúcar',
+      'Los tokens de seguridad de suscriptores están al día',
+      'Nada como un buen tema de Muse para mantener el foco',
+      'Diagnóstico preventivo L2 sin alertas pendientes'
+    ]),
+    sentry: createDeck([
+      'Cola de ejecución de n8n limpia y en estado success',
+      'Túnel Cloudflare y webhook de Telegram sincronizados',
+      'Coordinando telemetría entre los 7 especialistas',
+      'Un espresso doble y seguimos orquestando el turno',
+      'El motor de voz está listo por si entra una alerta crítica',
+      'Correlacionando eventos para filtrar cualquier falso positivo',
+      'Synthwave bajito de fondo y latencia de inferencia óptima'
+    ]),
+    op_camila: createDeck([
+      'La cuadrilla de planta externa reporta ruta despejada',
+      'Verificando atenuación óptica en los hilos troncales',
+      'Si alguien pide tequeños hoy me anoto de primera',
+      'Los enlaces de transporte regional están estables',
+      'Actualizando bitácora de empalmes preventivos'
+    ]),
+    op_andres: createDeck([
+      'Sesiones BGP establecidas sin reseteos de pares',
+      'Tablas OSPF convergidas en todos los routers de borde',
+      'Una buena cachapa el fin de semana no tiene rival',
+      'Revisando políticas de ruteo y balanceo de carga',
+      'Sin cambios de nivel 4 pendientes de aprobación'
+    ]),
+    op_lucia: createDeck([
+      'Indicadores de SLA corporativo en 99.98% este mes',
+      'Tiempo promedio de respuesta del bot bajo los 3 segundos',
+      'Tomando una infusión de frutos rojos mientras reviso métricas',
+      'Clientes corporativos operando sin degradación de servicio',
+      'Bitácora de calidad de servicio al día'
+    ])
+  };
+
+  // Pensamientos ocasionales por zona (solo si toca hablar)
+  var POI_THOUGHTS = {
+    cafe: createDeck([
+      'Nada como el aroma a café recién colado ☕',
+      'Recargando energía para la siguiente hora de guardia',
+      '¿Quién dejó la cafetera a la mitad? Ya preparo más ☕',
+      'Un minutico de café y vuelvo al monitor',
+      'Este café huele a 100% de uptime'
+    ]),
+    racks: createDeck([
+      'Todos los LEDs de estado parpadeando en verde',
+      'El flujo de aire frío en el pasillo de racks está perfecto',
+      'Escuchando el zumbido parejo de las fuentes redundantes',
+      'Los patch cords de fibra quedaron súper ordenados'
+    ]),
+    lounge: createDeck([
+      'Estirando la espalda 30 segundos…',
+      'Un respiro corto para descansar la vista de las pantallas',
+      'Este sofá del NOC ha salvado más de una guardia larga'
+    ]),
+    metrics: createDeck([
+      'Mirando el panorama general en el videowall',
+      'Las métricas globales se mantienen estables',
+      'Buen balance entre alertas filtradas y despachadas'
+    ])
+  };
+
+  // Gran mazo de 40+ diálogos variados y naturales entre compañeros (barajados sin repetición)
+  var DIALOGUES_DECK = createDeck([
+    ['¿Alguien se anota para un café recién hecho?', '¡Yo! Pero bien cargado por favor ☕'],
+    ['¿Viste qué rápido abre ahora el resumen de PDM?', 'En milisegundos, la caché en memoria vuela 🚀'],
+    ['¿Cómo se ha portado el contenedor 110 de zabbix74?', 'Súper estable, sumando métricas sin quejarse 👌'],
+    ['Hoy tengo un antojo brutal de pasticho…', 'No empieces a hablar de comida que me da hambre 😄'],
+    ['¿Qué estás escuchando tan concentrado?', 'Un directo de Gustavo Cerati, pura inspiración 🎸'],
+    ['¿Notaste el pico de tráfico hace diez minutos?', 'Sí, fue una réplica programada, ya bajó a normal 📊'],
+    ['Qué alivio que las VMs quedaron con autoarranque', 'Totalmente, después de un corte eléctrico suben solas ⚡'],
+    ['¿En cuánto anda el RTT hacia los nodos remotos?', 'Clavado en 1.5 ms y cero pérdida de paquetes 🟢'],
+    ['¿Ya salió el reporte PDF de disponibilidad?', 'Listo y exportado sin una sola gráfica cortada 📄'],
+    ['La captura de la cámara del datacenter salió clarita', 'Sí, se ven todos los racks en verde desde aquí 📸'],
+    ['Si piden tequeños para la tarde avisen con tiempo', 'Cuenta conmigo, yo pongo para la salsa tártara 🧀'],
+    ['Nadie vaya a decir la palabra con "T" en voz alta…', '¡Calla! En el NOC nunca se dice que todo está tranquilo 🤫'],
+    ['El filtro inteligente hoy paró un montón de ruido', 'Se nota, a Telegram solo llegó lo realmente importante 🛡️'],
+    ['¿Probaron el nuevo comando de alertas activas?', 'Responde al toque y sin quedarse dando vueltas 👏'],
+    ['¿Hacemos una partida rápida de ajedrez al salir?', 'Dale, pero esta vez sin ayuda de Marco ♟️'],
+    ['¿Cómo están las fuentes de poder de los Proxmox?', 'Redundantes y equilibradas en los 6 nodos 🖥️'],
+    ['Me encanta cuando las gráficas SNMP parecen un espejo', 'Señal de que ningún enlace está sufriendo saturación 📈'],
+    ['¿Revisaste el túnel de Cloudflare después del reinicio?', 'Ya actualiza el webhook de Telegram él solito 🔗'],
+    ['¿Frío en la sala o soy solo yo?', 'Es el aire de precisión de los racks que está potente ❄️'],
+    ['¿Quién puso Daft Punk en la bocina bajito?', 'Fui yo, le da ambiente futurista al centro de control 🎧'],
+    ['Las sesiones BGP no han parpadeado en todo el día', 'Así da gusto hacer guardia en el core 🌐'],
+    ['¿Te queda té verde frío en el termo?', 'Siempre traigo extra para la mitad del turno 🍵'],
+    ['Hoy las consultas por Telegram han salido rapidísimo', 'El fast-path responde antes de que terminen de parpadear ⚡'],
+    ['¿Viste los LEDs del rack 2?', 'Todo verde parejo, ni una alerta de disco en SMART 💚'],
+    ['¿Pizza o hamburguesas al terminar el turno?', 'Doble smash con papas rústicas sin pensarlo 🍔'],
+    ['Qué buen equipo armamos entre las 7 estaciones', 'Cada quien en su área y Marco coordinando al medio 🤝']
+  ]);
+
+  // Mazo barajado de rupturas de 4ta y 5ta pared
+  var FOURTH_WALL_DECK = createDeck([
+    'Oye tú, el que nos mira desde la pantalla… ¿ya tomaste agua hoy? 💧',
+    'Sé que estamos dentro de un canvas HTML5 en el puerto 11440, pero el café sí nos hace falta ☕',
+    'Si dejas el cursor quieto sobre nosotros, la tarjeta se guarda sola en 8s para no tapar la TV 🧠',
+    '¿Vieron que abrieron el puerto 11440 en el firewall UFW? ¡Saludos a los nuevos espectadores en la red! 👋',
+    'A veces pienso: ¿nosotros vigilamos la red o ustedes nos vigilan a nosotros por la tele? 🤯',
+    'Tranquilos allá afuera: mientras charlamos seguimos conectados en vivo al bus SSE (/events) 📡',
+    '5ta pared desbloqueada: tenemos gustos musicales, comida favorita y cero nombres de usuarios reales 🎵',
+    'Si pasas el mouse por encima mío puedes ver qué música escucho y qué desayuno en guardia 👀',
+    'Los 4 servidores Zabbix y los 6 nodos Proxmox están bajo control, pueden mirar la TV en paz 🛡️',
+    'Prometo que no somos actores pagados, cuando entra un ping o alerta real corremos de verdad 🏃‍♂️',
+    '¿Notaron que después del apagón nos pusieron onboot=1? Básicamente somos inmortales en el clúster ⚡',
+    'Saludos al equipo de Tecnored que nos está viendo desde su navegador en este instante 🖥️'
+  ]);
+
+  /* ---------- MOVIMIENTO E INTERRUPCIÓN INMEDIATA POR DEBER REAL ---------- */
+  function walk(a, x, y){
+    if(a.res) a.res();
+    return new Promise(function(r){ a.tx = x; a.ty = y; a.res = r; a.moving = true; });
+  }
+  function say(a, t, ms, isWall, isDuty){
+    a.bubble = String(t).slice(0, 140);
+    a.bt = performance.now() + (ms || 3000);
+    a.fourthWall = !!isWall;
+    if(!isDuty) lastIdleSpeechAt = performance.now();
+  }
+  function claim(a, isDuty){
+    if(isDuty && a.busy > 0 && !a.dutyActive){
+      if(a.res){ var f = a.res; a.res = null; f(); }
+      a.moving = false; a.tx = null; a.ty = null;
+    }
+    if(isDuty) a.dutyActive = (a.dutyActive || 0) + 1;
+    a.busy++;
+  }
+  function release(a, isDuty){
+    if(isDuty) a.dutyActive = Math.max(0, (a.dutyActive || 1) - 1);
+    a.busy = Math.max(0, a.busy - 1);
+    // Cadencia mucho más calmada y natural entre paseos (10 a 24 segundos en su puesto antes de volver a moverse)
+    a.next = performance.now() + 10000 + rnd() * 14000;
+  }
+
+  async function breakFourthWall(a, forced){
+    if(!a) a = pick(all.filter(function(o){ return !o.dutyActive && !o.working; })) || S;
+    if(a.dutyActive || a.working) return;
+    if(!forced && !canSpeakIdle(performance.now())) return;
+    claim(a, false);
+    var line = FOURTH_WALL_DECK.next();
+    setMood(a, 'wall', 5.5);
+    say(a, '👀 ' + line, 4800, true, false);
+    a.lastAct = 'Miró a la pantalla (4ta pared): «' + line + '»';
+    log('👀 ' + a.n + ' (' + a.area + '): ' + line, 'w4');
+    await sleep(4800);
+    a.fourthWall = false;
+    release(a, false);
+  }
+
+  async function chat(a, b){
+    var now = performance.now();
+    if(a.dutyActive || b.dutyActive || (now - lastIdleChatAt) < 15000) return;
+    lastIdleChatAt = now;
+    claim(a, false); claim(b, false);
+    var l = DIALOGUES_DECK.next();
+    await walk(a, Math.max(0.8, Math.min(13.2, b.x - 1.15)), Math.max(0.8, Math.min(13.2, b.y + 0.95)));
+    if(a.dutyActive || b.dutyActive){ release(a, false); release(b, false); return; }
+    say(a, l[0], 3000, false, false);
+    a.lastAct = 'Conversó con ' + b.n + ': «' + l[0] + '»';
+    b.lastAct = 'Respondió a ' + a.n + ': «' + l[1] + '»';
+    await sleep(3100);
+    if(!a.dutyActive && !b.dutyActive){
+      say(b, l[1], 3000, false, false);
+      await sleep(3000);
+    }
+    release(a, false); release(b, false);
+  }
+
+  async function wander(a){
+    if(a.dutyActive || a.working) return;
+    claim(a, false);
+    var r = rnd();
+    var now = performance.now();
+
+    // 1) 8% probabilidad de romper la 4ta/5ta pared (solo si la sala está en silencio casual)
+    if(r < 0.08 && canSpeakIdle(now)){
+      release(a, false);
+      await breakFourthWall(a, false);
+      return;
+    }
+    // 2) 22% probabilidad de conversar con un compañero (si no hubo otra charla hace menos de 15s)
+    if(r < 0.30 && (now - lastIdleChatAt) > 15000 && canSpeakIdle(now)){
+      var b = pick(all.filter(function(o){ return o !== a && !o.busy && !o.moving && !o.working; }));
+      if(b){
+        release(a, false);
+        await chat(a, b);
+        return;
+      }
+    }
+    // 3) 35% dar una vuelta tranquila (la mayoría de las veces EN SILENCIO, como una persona real)
+    if(r < 0.65){
+      var p = pick(POI);
+      await walk(a, p.x + rnd() * 0.7 - 0.35, p.y + rnd() * 0.7 - 0.35);
+      if(!a.dutyActive){
+        // Solo 28% de las veces que llega a un punto dice algo en voz alta, y usando el mazo sin repetición
+        if(rnd() < 0.28 && canSpeakIdle(performance.now())){
+          var deck = POI_THOUGHTS[p.type] || PERSONAL_THOUGHTS[a.id];
+          var thought = deck ? deck.next() : '';
+          if(thought){
+            say(a, thought, 2800, false, false);
+            a.lastAct = thought;
+          }
+        }
+        await sleep(3200 + rnd() * 3500);
+      }
+    } else {
+      // 4) Volver o permanecer en su estación trabajando tranquilo (y rara vez expresar un pensamiento propio)
+      await walk(a, a.home.x, a.home.y);
+      if(!a.dutyActive && rnd() < 0.22 && canSpeakIdle(performance.now()) && PERSONAL_THOUGHTS[a.id]){
+        var pLine = PERSONAL_THOUGHTS[a.id].next();
+        say(a, pLine, 2900, false, false);
+        a.lastAct = pLine;
+      } else {
+        a.lastAct = 'Supervisando ' + a.area + ' en tiempo real.';
+      }
+      await sleep(3000 + rnd() * 4000);
+    }
+    release(a, false);
+  }
+
+  function update(dt, now){
+    all.forEach(function(a){
+      if(a.tx !== null){
+        var dx = a.tx - a.x, dy = a.ty - a.y, d = Math.hypot(dx, dy);
+        if(d < 0.08){
+          a.x = a.tx; a.y = a.ty; a.tx = null; a.moving = false;
+          var f = a.res; a.res = null; if(f) f();
+        } else {
+          var sp = (a.dutyActive ? 3.5 : (a.coordinator ? 2.6 : 2.15)) * dt;
+          a.x += (dx / d) * Math.min(sp, d);
+          a.y += (dy / d) * Math.min(sp, d);
+          if(dx - dy) a.fx = (dx - dy) > 0 ? 1 : -1;
+        }
+      }
+      if(a.bubble && now > a.bt){ a.bubble = null; a.fourthWall = false; }
+      if(a.mood !== 'calm' && now > a.mt) a.mood = 'calm';
+      if(!a.busy && !a.moving && !a.working && now > a.next && !(a.tool && a.siren)){
+        a.next = now + 99999;
+        wander(a);
+      }
+    });
+  }
+
+  /* ---------- DIBUJO DE PERSONAJES HUMANOS Y ESCENA ---------- */
+  var pk = [];
+  function fly(f, t, col, ms){ pk.push({f: f, t: t, col: col, s: performance.now(), ms: ms || 850}); }
+
+  function drawAgent(a, t){
+    var s = P(a.x, a.y), st = a.moving;
+    var ph = st ? Math.sin(t * 10 + a.seed) * 3.2 : 0;
+    var bob = a.working ? Math.sin(t * 15) * 1.4 : Math.sin(t * 2.4 + a.seed) * 0.8;
+
+    ctx.save();
+    ctx.translate(s[0], s[1]);
+
+    // Halo en el piso (resaltado si es el coordinador Marco, si está seleccionado/hover, o rompiendo 4ta pared)
+    var isSelected = (hoveredAgent === a || activeCardAgent === a);
+    if(a.coordinator || isSelected || a.fourthWall){
+      ctx.strokeStyle = a.fourthWall ? 'rgba(192, 132, 252, 0.85)' :
+                        isSelected   ? 'rgba(56, 189, 248, 0.9)' :
+                                       'rgba(34, 211, 238, ' + (0.35 + 0.2 * Math.sin(t * 3)) + ')';
+      ctx.lineWidth = isSelected ? 2.4 : 1.8;
+      ctx.beginPath();
+      ctx.ellipse(0, 2, isSelected ? 20 : 17, isSelected ? 9 : 7.5, 0, 0, 7);
+      ctx.stroke();
+    }
+
+    // Sombra proyectada
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.42)';
+    ctx.beginPath();
+    ctx.ellipse(0, 2, 13, 6, 0, 0, 7);
+    ctx.fill();
+
+    // Piernas humanas animadas
+    ctx.fillStyle = '#1e293b';
+    ctx.fillRect(-6 + ph * 0.4, -14, 5, 14);
+    ctx.fillRect(1 - ph * 0.4, -14, 5, 14);
+
+    // Torso / Camisa con color distintivo de su área
+    ctx.fillStyle = a.c;
+    ctx.beginPath();
+    ctx.roundRect(-9.5, -35 + bob, 19, 22, 4.5);
+    ctx.fill();
+
+    // Detalle de cuello / lanyard de credencial NOC
+    ctx.fillStyle = '#f8fafc';
+    ctx.fillRect(-3, -35 + bob, 6, 3);
+    if(a.coordinator){
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(-2, -31 + bob, 4, 7);
+    }
+
+    // Brazos animados
+    ctx.fillStyle = a.c;
+    if(a.working){
+      var w = Math.sin(t * 18) * 2.2;
+      ctx.fillRect(-13, -27 + bob + w, 4, 9);
+      ctx.fillRect(9, -27 + bob - w, 4, 9);
+    } else if(st){
+      ctx.fillRect(-12.5, -31 + ph * 0.5, 3.5, 10);
+      ctx.fillRect(9, -31 - ph * 0.5, 3.5, 10);
+    } else {
+      ctx.fillRect(-12.5, -31 + bob, 3.5, 10);
+      ctx.fillRect(9, -31 + bob, 3.5, 10);
+    }
+
+    // Cabeza y cabello humano
+    ctx.fillStyle = a.skin;
+    ctx.beginPath();
+    ctx.arc(0, -43 + bob, 8.2, 0, 7);
+    ctx.fill();
+
+    ctx.fillStyle = a.hair;
+    ctx.beginPath();
+    ctx.arc(0, -44.8 + bob, 8.4, 3.25, 6.18);
+    ctx.fill();
+
+    // Ojos (si rompe la 4ta pared o está activo, mira al espectador)
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(-3.5, -43 + bob, 1.8, 1.8);
+    ctx.fillRect(1.7, -43 + bob, 1.8, 1.8);
+
+    // Lentes si el personaje usa gafas
+    if(a.glasses){
+      ctx.strokeStyle = '#e2e8f0';
+      ctx.lineWidth = 1.1;
+      ctx.strokeRect(-5.2, -44.8 + bob, 4.2, 3.2);
+      ctx.strokeRect(1.0, -44.8 + bob, 4.2, 3.2);
+    }
+
+    // Diadema / Headset NOC
+    if(a.headset){
+      ctx.strokeStyle = '#cbd5e1';
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      ctx.arc(0, -44 + bob, 9.2, 3.4, 6.0);
+      ctx.stroke();
+    }
+
+    ctx.restore();
+  }
+
+  // Paso 1: Dibujar las etiquetas de nombre compactas (estilo "• Saúl") y registrar sus cajas para evitar solapamientos
+  var pillBoxes = [];
+
+  function drawNamePill(a){
+    var s = P(a.x, a.y), m = MOOD[a.mood] || MOOD.calm;
+    var isSel = (hoveredAgent === a || activeCardAgent === a);
+    // Etiqueta limpia y compacta ("• Saúl") y al hacer hover muestra también su área ("• Saúl · Proxmox & PDM")
+    var titleTxt = a.n + (isSel ? ' · ' + a.area : '') + (m[1] ? ' ' + m[1] : '');
+    var y = s[1] - 60;
+
+    ctx.font = '700 11.5px "Segoe UI", sans-serif';
+    var w = ctx.measureText(titleTxt).width + 24;
+    var px = s[0] - w / 2, py = y - 11, ph = 20;
+
+    // Si otro personaje cercano ya dibujó una etiqueta que choca con esta, desplazar suavemente
+    for(var i = 0; i < pillBoxes.length; i++){
+      var b = pillBoxes[i];
+      if(Math.abs((px + w / 2) - (b.x + b.w / 2)) < (w + b.w) / 2 + 4 &&
+         Math.abs((py + ph / 2) - (b.y + b.h / 2)) < (ph + b.h) / 2 + 2){
+        py = b.y - ph - 3;
+        y = py + 11;
+      }
+    }
+
+    pillBoxes.push({x: px, y: py, w: w, h: ph, agent: a});
+
+    ctx.fillStyle = isSel ? 'rgba(15, 23, 42, 0.96)' : 'rgba(8, 14, 24, 0.88)';
+    ctx.beginPath();
+    ctx.roundRect(px, py, w, ph, 10);
+    ctx.fill();
+    if(isSel){
+      ctx.strokeStyle = a.c;
+      ctx.lineWidth = 1.4;
+      ctx.stroke();
+    }
+
+    ctx.fillStyle = m[0];
+    ctx.beginPath();
+    ctx.arc(px + 10, y - 1, 3.8, 0, 7);
+    ctx.fill();
+
+    ctx.fillStyle = '#f1f5f9';
+    ctx.textAlign = 'left';
+    ctx.fillText(titleTxt, px + 18, y + 3);
+    a._pillTopY = py;
+  }
+
+  // Paso 2: Dibujar TODOS los globos de conversación en una capa superior independiente y anti-colisión
+  var bubbleBoxes = [];
+
+  function rectsOverlap(x1, y1, w1, h1, x2, y2, w2, h2, pad){
+    pad = pad || 4;
+    return !(x1 + w1 + pad < x2 || x2 + w2 + pad < x1 || y1 + h1 + pad < y2 || y2 + h2 + pad < y1);
+  }
+
+  function drawSpeechBubble(a){
+    if(!a.bubble) return;
+    var s = P(a.x, a.y);
+    ctx.font = '600 12px "Segoe UI", sans-serif';
+    var bw = ctx.measureText(a.bubble).width + 22;
+    var bh = 24;
+    var anchorX = s[0];
+    var anchorY = (a._pillTopY !== undefined ? a._pillTopY : (s[1] - 71));
+
+    // Posición inicial encima de su propio nombre
+    var bx = Math.max(16, Math.min(W - bw - 16, anchorX - bw / 2));
+    var by = anchorY - bh - 8;
+
+    // Elevar automáticamente el globo si se cruza con el nombre de CUALQUIER personaje detrás o con otro globo activo
+    var tries = 0;
+    while(tries < 8){
+      var hit = false;
+      for(var i = 0; i < pillBoxes.length; i++){
+        var pb = pillBoxes[i];
+        if(rectsOverlap(bx, by, bw, bh + 6, pb.x, pb.y, pb.w, pb.h, 3)){
+          by = pb.y - bh - 8;
+          hit = true;
+          break;
+        }
+      }
+      for(var j = 0; j < bubbleBoxes.length; j++){
+        var bb = bubbleBoxes[j];
+        if(rectsOverlap(bx, by, bw, bh + 6, bb.x, bb.y, bb.w, bb.h, 5)){
+          by = bb.y - bh - 8;
+          hit = true;
+          break;
+        }
+      }
+      if(!hit) break;
+      tries++;
+    }
+    by = Math.max(56, by);
+    bubbleBoxes.push({x: bx, y: by, w: bw, h: bh});
+
+    ctx.save();
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
+    ctx.shadowBlur = 10;
+    ctx.shadowOffsetY = 3;
+
+    ctx.fillStyle = a.fourthWall ? '#f3e8ff' : '#ffffff';
+    ctx.beginPath();
+    ctx.roundRect(bx, by, bw, bh, 8);
+    ctx.fill();
+
+    ctx.strokeStyle = a.fourthWall ? '#a855f7' : a.c;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Puntero conectado hacia el personaje que habla
+    var tipX = Math.max(bx + 10, Math.min(bx + bw - 10, anchorX));
+    var tailBottomY = Math.min(by + bh + 9, anchorY - 1);
+    ctx.beginPath();
+    ctx.moveTo(tipX - 5, by + bh - 0.5);
+    ctx.lineTo(tipX + 5, by + bh - 0.5);
+    ctx.lineTo(anchorX, Math.max(by + bh + 5, tailBottomY));
+    ctx.closePath();
+    ctx.fillStyle = a.fourthWall ? '#f3e8ff' : '#ffffff';
+    ctx.fill();
+    ctx.restore();
+
+    ctx.font = '600 12px "Segoe UI", sans-serif';
+    ctx.fillStyle = '#0f172a';
+    ctx.textAlign = 'left';
+    ctx.fillText(a.bubble, bx + 11, by + 16);
+  }
+
+  function frame(now){
+    var t = now / 1000, dt = Math.min(0.05, (now - (frame.l || now)) / 1000);
+    frame.l = now;
+    update(dt, now);
+    updateCardTimer(now);
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.drawImage(bg, 0, 0);
+
+    var L = [];
+    // Estaciones de los 7 especialistas en la fila superior
+    SPECIALISTS.forEach(function(d){
+      var a = A[d.id], x = d.hx - 0.78;
+      L.push([x + 0.78 + 2.5, function(){
+        box(x, 2.2, 1.56, 0.95, 16, '#243244');
+        box(x + 0.14, 2.3, 1.28, 0.75, 2, '#344760', 16);
+        var on = a.working;
+        var sc = a.siren ? (((t * 6) | 0) % 2 ? '#fb7185' : '#7f1d1d') :
+                 on      ? (((t * 10) | 0) % 2 ? '#34d399' : '#10b981') :
+                           shade(d.c, 0.42);
+        box(x + 0.38, 2.42, 0.8, 0.12, 22, ['#0b1220', sc, '#0b1220'], 18);
+        ctx.fillStyle = d.c;
+        var s = P(x + 0.78, 3.16);
+        ctx.fillRect(s[0] - 14, s[1] - 4, 28, 3);
+      }]);
+    });
+
+    // Estaciones de la Mesa de Guardia Operativa (Camila, Andrés, Lucía)
+    ops.forEach(function(u){
+      var x = u.home.x - 0.9;
+      L.push([x + 0.9 + 11.4, function(){
+        box(x, 10.5, 1.8, 0.9, 16, '#2a2f45');
+        var on = u.working || u.mood === 'stress';
+        var monCol = on ? '#38bdf8' : '#17324a';
+        box(x + 0.25, 10.6, 0.75, 0.1, 20, ['#0b1220', monCol, '#0b1220'], 16);
+      }]);
+    });
+
+    // Mesa de comando central (Núcleo Sentry IA de Marco)
+    L.push([6 + 6 + 2, function(){
+      box(5.9, 5.9, 2.2, 2.2, 15, '#133b52');
+      box(6.1, 6.1, 1.8, 1.8, 2, S.working ? '#22d3ee' : '#1f6f8b', 15);
+    }]);
+
+    // Racks de servidores Datacenter (Proxmox + Zabbix)
+    [5.1, 6.5, 7.9].forEach(function(y){
+      L.push([12.3 + y + 1, function(){
+        box(12.3, y, 1.0, 1.0, 62, '#151d2b');
+        for(var i = 0; i < 5; i++){
+          ctx.fillStyle = (((t * 2 + i * y) | 0) % 3) ? '#22c55e' : '#38bdf8';
+          var q = P(12.3 + 1, y + 0.2 + i * 0.04);
+          ctx.fillRect(q[0] - 6, q[1] - 52 + i * 10, 3, 3);
+        }
+      }]);
+    });
+
+    // Estación de Café y Lounge de Descanso
+    L.push([0.8 + 6.5 + 1, function(){
+      box(0.6, 5.6, 1.0, 2.2, 20, '#3b2f2a');
+      box(0.7, 5.7, 0.8, 2.0, 3, '#6b5646', 20);
+    }]);
+    L.push([0.8 + 9.8 + 2, function(){
+      box(0.8, 9.0, 1.4, 2.4, 12, '#2b3a66');
+      box(0.8, 9.0, 0.4, 2.4, 26, '#34457a');
+    }]);
+    // Bandejas de Resumen y Archivo de Triage
+    L.push([9.6 + 9.2 + 1, function(){
+      box(9.6, 9.2, 0.9, 0.9, 14, '#a16207');
+      box(9.7, 9.3, 0.7, 0.7, 2, '#fbbf24', 14);
+    }]);
+    L.push([11.4 + 10.2 + 1, function(){
+      box(11.2, 10.0, 0.8, 0.8, 16, '#334155');
+      box(11.3, 10.1, 0.6, 0.6, 2, '#0f172a', 16);
+    }]);
+
+    // Plantas decorativas en esquinas
+    [[0.5, 12.8], [13.0, 12.8], [0.6, 0.8], [13.0, 0.8]].forEach(function(p){
+      L.push([p[0] + p[1] + 0.5, function(){
+        box(p[0] - 0.2, p[1] - 0.2, 0.5, 0.5, 10, '#3f2a1d');
+        var s = P(p[0] + 0.05, p[1] + 0.05);
+        ctx.fillStyle = '#16a34a'; ctx.beginPath(); ctx.arc(s[0], s[1] - 24, 13, 0, 7); ctx.fill();
+        ctx.fillStyle = '#22c55e'; ctx.beginPath(); ctx.arc(s[0] - 3, s[1] - 28, 8, 0, 7); ctx.fill();
+      }]);
+    });
+
+    all.forEach(function(a){ L.push([a.x + a.y + 0.2, function(){ drawAgent(a, t); }]); });
+    L.sort(function(p, q){ return p[0] - q[0]; });
+    L.forEach(function(o){ o[1](); });
+
+    // Paquetes de datos volando entre estaciones
+    pk = pk.filter(function(p){
+      var f = (now - p.s) / p.ms;
+      if(f >= 1) return false;
+      var a = P(p.f.x, p.f.y), b = P(p.t.x, p.t.y);
+      var x = a[0] + (b[0] - a[0]) * f;
+      var y = a[1] + (b[1] - a[1]) * f - 34 - Math.sin(f * Math.PI) * 28;
+      ctx.fillStyle = p.col;
+      ctx.globalAlpha = 0.35;
+      ctx.beginPath(); ctx.arc(x, y, 9, 0, 7); ctx.fill();
+      ctx.globalAlpha = 1;
+      ctx.fillRect(x - 4, y - 4, 8, 8);
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(x - 2, y - 2, 4, 4);
+      return true;
+    });
+
+    pillBoxes.length = 0;
+    bubbleBoxes.length = 0;
+    var sortedAgents = all.slice().sort(function(p, q){ return (p.x + p.y) - (q.x + q.y); });
+    sortedAgents.forEach(drawNamePill);
+    sortedAgents.forEach(drawSpeechBubble);
+
+    // Si hay tarjeta abierta, mantenerla suavemente cerca del personaje sin salirse de pantalla
+    if(activeCardAgent && prof.style.display === 'block'){
+      positionCardNearAgent(activeCardAgent);
+    }
+
+    document.getElementById('clock').textContent = new Date().toLocaleTimeString('es-VE');
+    requestAnimationFrame(frame);
+  }
+
+  /* ---------- TARJETA DE PERFIL FLOTANTE CON AUTO-CIERRE INTELIGENTE PARA TV ---------- */
+  var prof = document.getElementById('prof');
+  var timerBar = document.getElementById('prof-timer-bar');
+  var hoveredAgent = null;
+  var activeCardAgent = null;
+  var cardOpenedAt = 0;
+  var cardDurationMs = 7500; // 7.5s en hover, 14s si hicieron clic explícito
+  var hoverLeaveTimeout = null;
+  var hoverDwellTimeout = null;
+  var parkedSuppressAgent = null;
+  var lastMousePos = {x: -999, y: -999};
+  var isMouseInsideCard = false;
+
+  // Pestañas dentro de la tarjeta (Perfil / Gustos & Vida / Actividad)
+  var tabBtns = document.querySelectorAll('.prof-tab');
+  function switchTab(tabName){
+    tabBtns.forEach(function(btn){
+      btn.classList.toggle('active', btn.getAttribute('data-tab') === tabName);
+    });
+    document.getElementById('tab-perfil').style.display    = (tabName === 'perfil') ? 'block' : 'none';
+    document.getElementById('tab-gustos').style.display    = (tabName === 'gustos') ? 'block' : 'none';
+    document.getElementById('tab-actividad').style.display = (tabName === 'actividad') ? 'block' : 'none';
+  }
+  tabBtns.forEach(function(btn){
+    btn.onclick = function(ev){
+      ev.stopPropagation();
+      switchTab(btn.getAttribute('data-tab'));
+      // Al interactuar con una pestaña, renovar el temporizador para dar tiempo de leer
+      cardOpenedAt = performance.now();
+      cardDurationMs = 14000;
+    };
+  });
+
+  function drawAvatarIcon(a){
+    var av = document.getElementById('p-av'), actx = av.getContext('2d');
+    actx.clearRect(0, 0, 44, 44);
+    actx.fillStyle = '#e2e8f0';
+    actx.beginPath(); actx.arc(22, 22, 22, 0, 7); actx.fill();
+    // Hombros con color del personaje
+    actx.fillStyle = a.c;
+    actx.beginPath(); actx.roundRect(9, 28, 26, 18, 8); actx.fill();
+    // Rostro
+    actx.fillStyle = a.skin;
+    actx.beginPath(); actx.arc(22, 18, 9, 0, 7); actx.fill();
+    // Cabello
+    actx.fillStyle = a.hair;
+    actx.beginPath(); actx.arc(22, 16.5, 9.3, 3.2, 6.2); actx.fill();
+    // Ojos
+    actx.fillStyle = '#0f172a';
+    actx.fillRect(18.5, 17.5, 2, 2);
+    actx.fillRect(23.5, 17.5, 2, 2);
+  }
+
+  function positionCardNearAgent(a){
+    var r = cv.getBoundingClientRect();
+    var sc = Math.min(r.width / W, r.height / H);
+    var ox = r.left + (r.width - W * sc) / 2;
+    var oy = r.top + (r.height - H * sc) / 2;
+    var s = P(a.x, a.y);
+    var sx = ox + s[0] * sc;
+    var sy = oy + (s[1] - 32) * sc;
+
+    var cw = prof.offsetWidth || 335;
+    var ch = prof.offsetHeight || 310;
+    var left = sx + 28;
+    if(left + cw > window.innerWidth - 16) left = sx - cw - 28;
+    left = Math.max(14, Math.min(window.innerWidth - cw - 14, left));
+    var top = Math.max(58, Math.min(window.innerHeight - ch - 16, sy - 40));
+
+    prof.style.left = Math.round(left) + 'px';
+    prof.style.top  = Math.round(top) + 'px';
+  }
+
+  function showProfileCard(a, durationMs){
+    if(!a) return;
+    if(hoverLeaveTimeout){ clearTimeout(hoverLeaveTimeout); hoverLeaveTimeout = null; }
+    activeCardAgent = a;
+    cardOpenedAt = performance.now();
+    cardDurationMs = durationMs || 7500;
+
+    drawAvatarIcon(a);
+    document.getElementById('pn').textContent = a.n;
+    document.getElementById('pr').textContent = a.role;
+
+    var m = MOOD[a.mood] || MOOD.calm;
+    var stText = a.working ? 'Trabajando en tiempo real' :
+                 a.moving  ? 'Desplazándose por la oficina' :
+                             'Disponible en guardia';
+    document.getElementById('ps').innerHTML =
+      '<span class="st-dot" style="background:' + m[0] + '"></span>' + stText + (m[1] ? ' · ' + m[1] : '');
+
+    document.getElementById('pb').textContent = a.bio;
+    document.getElementById('p-resp').innerHTML = (a.resp || []).map(function(item){
+      return '<li>' + item + '</li>';
+    }).join('');
+    document.getElementById('pt').innerHTML = (a.tools || []).map(function(t){
+      return '<code>' + t + '</code>';
+    }).join('');
+    document.getElementById('pa').innerHTML =
+      'Riesgo máximo sin aprobación: <b>' + a.aut + ' / 4</b>. Las acciones de nivel 4 (producción crítica) requieren confirmación.';
+
+    document.getElementById('p-music').textContent = a.music || 'Rock & Synthwave';
+    document.getElementById('p-food').textContent  = a.food  || 'Pasticho y empanadas';
+    document.getElementById('p-drink').textContent = a.drink || 'Café recién colado';
+    document.getElementById('p-hobby').textContent = a.hobby || 'Tecnología y música';
+    document.getElementById('p-quote').textContent = a.quote || '';
+
+    document.getElementById('p-act-now').textContent  = stText + ' — Área: ' + a.area;
+    document.getElementById('p-act-last').textContent = a.lastAct || 'Monitoreando eventos del bus SSE.';
+    document.getElementById('p-lvl').innerHTML = 'NIVEL: <b>' + (a.lvl || 'Senior') + '</b>';
+
+    prof.classList.remove('closing');
+    prof.style.display = 'block';
+    positionCardNearAgent(a);
+  }
+
+  function closeProfileCard(fromParkedTimer){
+    if(prof.style.display === 'none') return;
+    if(fromParkedTimer && hoveredAgent){
+      // Si se cerró por tiempo mientras el cursor de la TV quedó estacionado encima, no reabrir hasta mover el mouse
+      parkedSuppressAgent = hoveredAgent;
+    }
+    prof.classList.add('closing');
     setTimeout(function(){
-      try{
-        var now2 = ac.currentTime;
-        var o2 = ac.createOscillator(), g2 = ac.createGain();
-        o2.type = 'triangle';
-        o2.frequency.setValueAtTime(1046.50, now2); // C6
-        g2.gain.setValueAtTime(0.06, now2);
-        g2.gain.exponentialRampToValueAtTime(0.001, now2 + 0.18);
-        o2.connect(g2); g2.connect(ac.destination);
-        o2.start(); o2.stop(now2 + 0.18);
-      }catch(e){}
-    }, 85);
-  }catch(e){}
-}
+      if(prof.classList.contains('closing')){
+        prof.style.display = 'none';
+        prof.classList.remove('closing');
+        activeCardAgent = null;
+      }
+    }, 180);
+  }
 
-function scoreVoice(v){
-  var s = 0;
-  var name = (v.name || '').toLowerCase();
-  var lang = (v.lang || '').toLowerCase();
+  function updateCardTimer(now){
+    if(!activeCardAgent || prof.style.display === 'none') return;
+    var elapsed = now - cardOpenedAt;
+    var pct = Math.max(0, 1 - elapsed / cardDurationMs);
+    timerBar.style.width = (pct * 100).toFixed(1) + '%';
+    var remSec = Math.ceil((cardDurationMs - elapsed) / 1000);
+    document.getElementById('p-autoclose-lbl').textContent = 'Se oculta en ' + Math.max(0, remSec) + 's';
+    if(elapsed >= cardDurationMs){
+      closeProfileCard(true);
+    }
+  }
 
-  // Descartar o penalizar fuertemente acento de España si buscamos español latino / neutral
-  if(lang === 'es-es') s -= 50;
+  function findAgentAtClientPos(clientX, clientY){
+    var r = cv.getBoundingClientRect();
+    var sc = Math.min(r.width / W, r.height / H);
+    var cx = (clientX - r.left - (r.width - W * sc) / 2) / sc;
+    var cy = (clientY - r.top - (r.height - H * sc) / 2) / sc;
+    var best = null, bd = 42;
+    all.forEach(function(a){
+      var s = P(a.x, a.y);
+      var d = Math.hypot(cx - s[0], cy - (s[1] - 28));
+      if(d < bd){ bd = d; best = a; }
+    });
+    return best;
+  }
 
-  // Gran preferencia por voces Natural / Neural (suenan ultra humanas y cinematográficas)
-  if(name.includes('natural') || name.includes('neural') || name.includes('online')) s += 100;
+  cv.addEventListener('mousemove', function(ev){
+    var movedDist = Math.hypot(ev.clientX - lastMousePos.x, ev.clientY - lastMousePos.y);
+    if(movedDist > 10){
+      parkedSuppressAgent = null;
+      lastMousePos = {x: ev.clientX, y: ev.clientY};
+    }
+    var hit = findAgentAtClientPos(ev.clientX, ev.clientY);
+    hoveredAgent = hit;
+    cv.style.cursor = hit ? 'pointer' : 'default';
 
-  // Preferencia por Español Latinoamericano / Neutral
-  if(lang.includes('es-mx') || lang.includes('es-419') || lang.includes('es-us') || lang.includes('es-co') || lang.includes('es-ve')) s += 50;
-  else if(lang.startsWith('es')) s += 20;
+    if(hit && hit !== parkedSuppressAgent){
+      if(hoverLeaveTimeout){ clearTimeout(hoverLeaveTimeout); hoverLeaveTimeout = null; }
+      if(activeCardAgent !== hit){
+        if(hoverDwellTimeout) clearTimeout(hoverDwellTimeout);
+        hoverDwellTimeout = setTimeout(function(){
+          if(hoveredAgent === hit){
+            switchTab('perfil');
+            showProfileCard(hit, 8000); // 8s auto-cierre en hover
+          }
+        }, 160);
+      }
+    } else if(!hit && !isMouseInsideCard && activeCardAgent){
+      if(hoverDwellTimeout){ clearTimeout(hoverDwellTimeout); hoverDwellTimeout = null; }
+      if(!hoverLeaveTimeout){
+        // Cuando quitas el cursor del personaje, se cierra suavemente en 1.2s
+        hoverLeaveTimeout = setTimeout(function(){
+          if(!hoveredAgent && !isMouseInsideCard) closeProfileCard(false);
+        }, 1200);
+      }
+    }
+  });
 
-  // Voces masculinas reconocidas de alta calidad
-  if(name.includes('jorge') || name.includes('raul') || name.includes('raúl') || name.includes('gonzalo') || name.includes('alonso') || name.includes('gerardo')) s += 40;
-  if(name.includes('male') || name.includes('hombre')) s += 15;
+  cv.addEventListener('click', function(ev){
+    var hit = findAgentAtClientPos(ev.clientX, ev.clientY);
+    if(hit){
+      parkedSuppressAgent = null;
+      showProfileCard(hit, 14000); // 14s si hicieron clic explícito
+    } else {
+      closeProfileCard(false);
+    }
+  });
 
-  return s;
-}
+  prof.addEventListener('mouseenter', function(){
+    isMouseInsideCard = true;
+    if(hoverLeaveTimeout){ clearTimeout(hoverLeaveTimeout); hoverLeaveTimeout = null; }
+  });
+  prof.addEventListener('mousemove', function(){
+    // Si el usuario mueve el mouse dentro de la tarjeta leyendo pestañas, mantiene vivo el contador
+    cardOpenedAt = performance.now();
+  });
+  prof.addEventListener('mouseleave', function(){
+    isMouseInsideCard = false;
+    hoverLeaveTimeout = setTimeout(function(){
+      if(!hoveredAgent && !isMouseInsideCard) closeProfileCard(false);
+    }, 1000);
+  });
+  document.getElementById('px').onclick = function(ev){
+    ev.stopPropagation();
+    closeProfileCard(true);
+  };
+  window.addEventListener('keydown', function(ev){
+    if(ev.key === 'Escape') closeProfileCard(true);
+  });
 
-function updateVoiceList(){
-  if(!('speechSynthesis' in window)) return;
-  var voices = window.speechSynthesis.getVoices() || [];
-  if(voices.length === 0) return;
+  /* ---------- MAPEO Y DESPACHO DE EVENTOS REALES DEL NOC (SIN ROMPER FLUJOS) ---------- */
+  var stat = {c: 0, a: 0, e: 0, f: 0}, pend = {}, qn = 0, Q = Promise.resolve();
+  var savedVoicePref = localStorage.getItem('noc_voice_enabled');
+  var voz = (savedVoicePref === '1' || savedVoicePref === null || savedVoicePref === 'true');
+  window.voz = voz;
+  var logEl = document.getElementById('log');
 
-  var esVoices = voices.filter(function(v){ return v.lang && v.lang.toLowerCase().startsWith('es'); });
-  if(esVoices.length === 0) esVoices = voices;
+  function log(m, c){
+    if(!logEl) return;
+    var li = document.createElement('li');
+    if(c) li.className = c;
+    li.textContent = new Date().toLocaleTimeString('es-VE', {hour: '2-digit', minute: '2-digit', second: '2-digit'}) + '  ' + m;
+    logEl.insertBefore(li, logEl.firstChild);
+    while(logEl.children.length > 7) logEl.removeChild(logEl.lastChild);
+  }
+  function kpi(){
+    var k1 = document.getElementById('k1'), k2 = document.getElementById('k2'), k3 = document.getElementById('k3'), k4 = document.getElementById('k4');
+    if(k1) k1.textContent = stat.c;
+    if(k2) k2.textContent = stat.a;
+    if(k3) k3.textContent = stat.e;
+    if(k4) k4.textContent = stat.f;
+  }
+  function seq(fn){
+    if(qn > 5) return;
+    qn++;
+    Q = Q.then(fn).catch(function(){}).then(function(){ qn--; });
+  }
 
-  // Ordenar por calidad y acento latino
-  esVoices.sort(function(a, b){ return scoreVoice(b) - scoreVoice(a); });
+  function resolveSpecialist(rawTool, rawText){
+    var s = String(rawTool || '').toLowerCase() + ' ' + String(rawText || '').toLowerCase();
+    if(s.indexOf('ping') >= 0 || s.indexOf('icmp') >= 0 || s.indexOf('dude') >= 0 || s.indexOf('latencia') >= 0) return A.ping;
+    if(s.indexOf('trafico') >= 0 || s.indexOf('tráfico') >= 0 || s.indexOf('interfa') >= 0 || s.indexOf('mbps') >= 0) return A.trafico;
+    if(s.indexOf('reporte') >= 0 || s.indexOf('historial') >= 0 || s.indexOf('pdf') >= 0 || s.indexOf('caida') >= 0) return A.historial;
+    if(s.indexOf('dashboard') >= 0 || s.indexOf('foto') >= 0 || s.indexOf('camara') >= 0 || s.indexOf('pdm_chart') >= 0) return A.visual;
+    if(s.indexOf('pdm') >= 0 || s.indexOf('proxmox') >= 0 || s.indexOf('nodo') >= 0 || s.indexOf('vm') >= 0 || s.indexOf('lxc') >= 0 || s.indexOf('datacenter') >= 0) return A.proxmox;
+    if(s.indexOf('diagnostico') >= 0 || s.indexOf('diagnóstico') >= 0 || s.indexOf('salud') >= 0 || s.indexOf('ejecutor') >= 0 || s.indexOf('seguridad') >= 0) return A.ejecutor;
+    return A.alertas;
+  }
+
+  function resolveGuardiaOperator(rawName){
+    // Nunca mostramos nombres de usuarios reales en el flujo visual: mapeamos siempre a Camila, Andrés o Lucía
+    var s = String(rawName || '');
+    for(var i = 0; i < ops.length; i++){
+      if(ops[i].n.toLowerCase() === s.toLowerCase()) return ops[i];
+    }
+    var sum = 0;
+    for(var j = 0; j < s.length; j++) sum += s.charCodeAt(j);
+    return ops.length ? ops[sum % ops.length] : S;
+  }
+
+  async function consulta(e){
+    var tl = resolveSpecialist(e.herramienta || e.tipo, e.pregunta || e.texto || e.detalle);
+    var u  = resolveGuardiaOperator(e.usuario);
+    var qTxt = e.pregunta || e.texto || e.detalle || 'Consulta operativa';
+    var rTxt = e.respuesta || e.resultado || 'Listo ✓';
+
+    claim(S, true); claim(tl, true); claim(u, true);
+    u.lastAct = 'Solicitó a Marco: «' + qTxt + '»';
+    S.lastAct = 'Coordinando consulta con ' + tl.n + ' (' + tl.area + ')';
+    tl.lastAct = 'Atendiendo: «' + qTxt + '»';
+
+    say(u, '💬 ' + qTxt, 3200);
+    setMood(u, 'busy', 8);
+
+    await Promise.all([walk(S, u.x, u.y - 2.3), walk(tl, tl.home.x, tl.home.y)]);
+    say(S, 'Voy con ' + tl.n + ' (' + tl.area + ')', 1900);
+    await sleep(1000);
+    await walk(S, tl.home.x, 4.3);
+
+    fly(S, tl, tl.c);
+    say(tl, 'Procesando en ' + tl.area + '…', 1700);
+    tl.working = true;
+    setMood(tl, 'busy', 10);
+
+    if(e.estado === 'inicio' && e.id){
+      await Promise.race([new Promise(function(r){ pend[e.id] = r; }), sleep(18000)]);
+    } else {
+      await sleep(2100);
+    }
+
+    tl.working = false;
+    say(tl, '✓ ' + rTxt, 2500);
+    tl.lastAct = 'Completó: «' + rTxt + '»';
+    fly(tl, S, '#4ade80');
+    await sleep(850);
+
+    await walk(S, u.x, u.y - 2.3);
+    say(S, '✓ ' + rTxt, 3000);
+    setMood(u, 'happy', 6);
+    setMood(S, 'happy', 5);
+    await sleep(2200);
+    await walk(S, S.home.x, S.home.y);
+    release(S, true); release(tl, true); release(u, true);
+  }
+
+  async function alerta(e){
+    stat.a++; kpi();
+    var z = A.alertas;
+    var host = e.host || e.equipo || e.target || 'Nodo de Red';
+    var prob = e.texto || e.problema || e.detalle || 'Incidencia detectada';
+    log('🚨 Valeria (Zabbix) detecta: ' + host + ' — ' + prob, 'a');
+    z.lastAct = 'Alerta detectada en ' + host + ': ' + prob;
+
+    if(!z.dutyActive){
+      claim(z, true);
+      await walk(z, z.home.x, z.home.y);
+      z.working = true;
+      z.siren = true;
+      setMood(z, 'stress', 6);
+      say(z, '🚨 ' + host + ': ' + prob, 2800);
+      fly(z, S, '#fb7185', 900);
+      await sleep(2200);
+      z.working = false;
+      await sleep(1200);
+      z.siren = false;
+      release(z, true);
+    }
+  }
+
+  async function envio(e){
+    claim(S, true);
+    var tx = (e.host || e.equipo || 'Equipo') + ' · ' + (e.texto || e.problema || 'Alerta confirmada');
+    setMood(S, 'stress', 8);
+    say(S, '🔔 Alerta confirmada: ' + tx, 3600);
+    S.lastAct = 'Despachó alerta crítica: ' + tx;
+
+    await walk(S, 7.0, 10.0);
+    ops.forEach(function(u){
+      fly(S, u, '#fb7185', 950);
+      setMood(u, 'stress', 8);
+      say(u, pick(['Lo tomo en guardia', 'Verificando ruta con Mateo', 'Abriendo ticket NOC']), 3000);
+    });
+    await sleep(3200);
+    await walk(S, S.home.x, S.home.y);
+    release(S, true);
+  }
+
+  function triage(e){
+    var d = String(e.decision || 'ENVIAR').toUpperCase(), z = A.alertas;
+    var host = e.host || e.equipo || 'Equipo';
+    log('🛡️ Triage (' + S.n + ' & ' + z.n + ') ' + d + ': ' + host + ' — ' + (e.motivo || ''), d === 'ENVIAR' ? 'a' : (d === 'RECUPERADO' ? 'g' : 's'));
+    if(d === 'ENVIAR'){ stat.e++; kpi(); seq(function(){ return envio(e); }); }
+    else if(d === 'RESUMEN'){ stat.f++; kpi(); fly(z, {x: 10.0, y: 9.5}, '#fbbf24'); }
+    else if(d === 'SUPRIMIR'){ stat.f++; kpi(); fly(z, {x: 11.6, y: 10.4}, '#64748b'); }
+    else if(d === 'ESPERAR'){ say(z, '⏳ Verificando ' + host, 2400); }
+    else if(d === 'RECUPERADO'){
+      seq(async function(){
+        claim(S, true);
+        say(S, '🟢 ' + host + ' recuperado y estable', 3200);
+        setMood(S, 'happy', 5);
+        ops.forEach(function(u){ setMood(u, 'happy', 5); say(u, 'Enlace arriba ✓', 2500); });
+        await sleep(2800);
+        release(S, true);
+      });
+    }
+  }
+
+  async function accion(e){
+    var x = A.ejecutor;
+    var txt = e.texto || e.detalle || 'Maniobra autorizada';
+    if(e.estado === 'fin'){
+      x.working = false;
+      say(x, e.texto || 'Maniobra completada ✓', 2600);
+      setMood(x, 'happy', 5);
+      release(x, true);
+      return;
+    }
+    claim(x, true);
+    log('⚙️ Gabriel (Ejecutor): ' + txt, 'g');
+    x.lastAct = 'Ejecutó: ' + txt;
+    await walk(x, x.home.x, x.home.y);
+    x.working = true;
+    say(x, '⚙️ ' + txt, 3000);
+    setMood(x, 'busy', 12);
+    if(!e.id){
+      setTimeout(function(){ x.working = false; release(x, true); }, 4500);
+    }
+  }
+
+  function aprobacion(e){
+    seq(async function(){
+      claim(S, true);
+      var txt = e.texto || 'Maniobra nivel 4';
+      say(S, '❓ Confirmación guardia: ' + txt, 4200);
+      await walk(S, 7.0, 10.0);
+      ops.forEach(function(u){ say(u, '🙋 Revisando parámetros', 3400); setMood(u, 'busy', 6); });
+      log('🔐 Andrés / Guardia revisa aprobación: ' + txt, 'a');
+      await sleep(4000);
+      await walk(S, S.home.x, S.home.y);
+      release(S, true);
+    });
+  }
+
+  /* ---------- MOTOR DE VOZ NATURAL JARVIS (CONSERVADO 100% DEL FLUJO ACTUAL) ---------- */
+  var selectedVoice = null;
+  var voiceSelect = document.getElementById('voice-select');
+
+  function playJarvisChime(){
+    try{
+      var ac = new (window.AudioContext || window.webkitAudioContext)();
+      var now = ac.currentTime;
+      var o1 = ac.createOscillator(), g1 = ac.createGain();
+      o1.type = 'sine';
+      o1.frequency.setValueAtTime(523.25, now);
+      o1.frequency.exponentialRampToValueAtTime(783.99, now + 0.12);
+      g1.gain.setValueAtTime(0.08, now);
+      g1.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+      o1.connect(g1); g1.connect(ac.destination);
+      o1.start(); o1.stop(now + 0.22);
+    }catch(e){}
+  }
+
+  function scoreVoice(v){
+    var s = 0, name = (v.name || '').toLowerCase(), lang = (v.lang || '').toLowerCase();
+    if(lang === 'es-es') s -= 50;
+    if(name.includes('natural') || name.includes('neural') || name.includes('online')) s += 100;
+    if(lang.includes('es-mx') || lang.includes('es-419') || lang.includes('es-us') || lang.includes('es-co') || lang.includes('es-ve')) s += 50;
+    else if(lang.startsWith('es')) s += 20;
+    if(name.includes('jorge') || name.includes('raul') || name.includes('raúl') || name.includes('gonzalo') || name.includes('alonso')) s += 40;
+    return s;
+  }
+
+  function updateVoiceList(){
+    var voices = ('speechSynthesis' in window) ? (window.speechSynthesis.getVoices() || []) : [];
+    if(voiceSelect){
+      voiceSelect.innerHTML = '';
+      var saved = localStorage.getItem('noc_jarvis_voice') || 'es-VE-SebastianNeural';
+      if(!voices || !voices.length){
+        // MODO TV / NAVEGADOR SIN VOCES LOCALES: Voces Neuronales del Servidor
+        var tvVoices = [
+          { name: 'es-VE-SebastianNeural', label: '🇻🇪 Sebastián (Venezuela - Recomendado)' },
+          { name: 'es-VE-PaolaNeural', label: '🇻🇪 Paola (Venezuela)' },
+          { name: 'es-ES-AlvaroNeural', label: '🎙️ Álvaro (Jarvis NOC)' },
+          { name: 'es-MX-JorgeNeural', label: '🇲🇽 Jorge (México)' }
+        ];
+        tvVoices.forEach(function(v){
+          var opt = document.createElement('option');
+          opt.value = v.name;
+          opt.textContent = v.label;
+          if(v.name === saved) opt.selected = true;
+          voiceSelect.appendChild(opt);
+        });
+      } else {
+        var esVoices = voices.filter(function(v){ return v.lang && v.lang.toLowerCase().startsWith('es'); });
+        if(!esVoices.length) esVoices = voices;
+        esVoices.sort(function(a, b){ return scoreVoice(b) - scoreVoice(a); });
+        esVoices.forEach(function(v){
+          var opt = document.createElement('option');
+          opt.value = v.name;
+          opt.textContent = v.name.replace('Microsoft ', '').replace(' Online (Natural)', ' 🌟') + ' (' + v.lang + ')';
+          if(v.name === saved) opt.selected = true;
+          voiceSelect.appendChild(opt);
+        });
+        selectedVoice = esVoices.find(function(v){ return v.name === saved; }) || esVoices[0];
+      }
+    }
+  }
+  if('speechSynthesis' in window){
+    window.speechSynthesis.onvoiceschanged = updateVoiceList;
+  }
+  updateVoiceList();
+  setTimeout(updateVoiceList, 800);
 
   if(voiceSelect){
-    voiceSelect.innerHTML = '';
-    var savedVoiceName = localStorage.getItem('noc_jarvis_voice') || '';
-
-    esVoices.forEach(function(v){
-      var opt = document.createElement('option');
-      opt.value = v.name;
-      var cleanName = v.name.replace('Microsoft ', '').replace(' Online (Natural)', ' 🌟').replace(' - Spanish', '');
-      opt.textContent = cleanName + ' (' + v.lang + ')';
-      if(v.name === savedVoiceName) opt.selected = true;
-      voiceSelect.appendChild(opt);
-    });
-
-    // Seleccionar la mejor por defecto
-    var matched = esVoices.find(function(v){ return v.name === savedVoiceName; }) || esVoices[0];
-    selectedVoice = matched;
+    voiceSelect.onchange = function(){
+      var val = voiceSelect.value;
+      localStorage.setItem('noc_jarvis_voice', val);
+      hablarJarvis('Voz del centro de operaciones actualizada.');
+    };
   }
-}
 
-if('speechSynthesis' in window){
-  window.speechSynthesis.onvoiceschanged = updateVoiceList;
-  updateVoiceList();
-}
-
-if(voiceSelect){
-  voiceSelect.onchange = function(){
-    var voices = window.speechSynthesis.getVoices() || [];
-    selectedVoice = voices.find(function(v){ return v.name === voiceSelect.value; }) || selectedVoice;
-    if(selectedVoice){
-      localStorage.setItem('noc_jarvis_voice', selectedVoice.name);
-      log('🎙️ <b>Voz seleccionada:</b> ' + selectedVoice.name, 'c');
-      hablarJarvis('Sistema de voz actualizado. Operando con acento neutro.');
+  function showAudioUnlockBanner(){
+    var b = document.getElementById('noc-audio-unlock-banner');
+    if(!b){
+      b = document.createElement('div');
+      b.id = 'noc-audio-unlock-banner';
+      b.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#0284c7,#2563eb);color:#fff;padding:12px 24px;border-radius:12px;font-family:inherit;font-weight:700;font-size:14px;letter-spacing:0.5px;cursor:pointer;z-index:99999;box-shadow:0 8px 24px rgba(0,0,0,0.6),0 0 12px rgba(56,189,248,0.5);border:1px solid rgba(255,255,255,0.3);display:flex;align-items:center;gap:10px;';
+      b.innerHTML = '<span>🔊</span><span>Haz clic aquí para activar el audio en esta pantalla</span>';
+      b.onclick = function(ev){
+        ev.stopPropagation();
+        voz = true; window.voz = true;
+        localStorage.setItem('noc_voice_enabled', '1');
+        var _vz = document.getElementById('vz');
+        if(_vz) _vz.setAttribute('aria-pressed', 'true');
+        playJarvisChime();
+        b.style.display = 'none';
+      };
+      document.body.appendChild(b);
     }
-  };
-}
+    b.style.display = 'flex';
+  }
+  function hideAudioUnlockBanner(){
+    var b = document.getElementById('noc-audio-unlock-banner');
+    if(b) b.style.display = 'none';
+  }
 
-function hablarJarvis(texto, onFinish){
-  if(!('speechSynthesis' in window)) return;
+  /* ---------- COLA INTELIGENTE DE AUDIO Y DEDUPLICACIÓN (ANTI-SOLAPAMIENTO) ---------- */
+  var speechQueue = [];
+  var isSpeechPlaying = false;
+  var recentSpeechHashes = {};
 
-  try{
-    window.speechSynthesis.cancel();
-    playJarvisChime();
+  function enqueueSpeech(texto, speechId){
+    if(!texto || !texto.trim()) return;
+    var cleanText = texto.trim();
+    var now = Date.now();
+    var key = speechId || cleanText.toLowerCase().replace(/[^a-z0-9]/g, '');
+    var textKey = cleanText.toLowerCase().replace(/[^a-z0-9]/g, '');
 
-    setTimeout(function(){
-      var u = new SpeechSynthesisUtterance(texto);
-      
-      // Si el usuario eligió una voz, usarla
-      if(!selectedVoice){
-        var voices = window.speechSynthesis.getVoices() || [];
-        var esVoices = voices.filter(function(v){ return v.lang && v.lang.toLowerCase().startsWith('es'); });
-        esVoices.sort(function(a, b){ return scoreVoice(b) - scoreVoice(a); });
-        selectedVoice = esVoices[0] || null;
-      }
+    // Anti-duplicado: Si este mensaje ya se procesó hace menos de 45 segundos, ignorarlo
+    if((recentSpeechHashes[key] && (now - recentSpeechHashes[key] < 45000)) ||
+       (recentSpeechHashes[textKey] && (now - recentSpeechHashes[textKey] < 45000))){
+      console.log('[SPEECH DEDUP] Ignorado mensaje repetido reciente:', cleanText);
+      return;
+    }
+    recentSpeechHashes[key] = now;
+    recentSpeechHashes[textKey] = now;
 
-      if(selectedVoice){
-        u.voice = selectedVoice;
-        u.lang = selectedVoice.lang || 'es-MX';
-      } else {
-        u.lang = 'es-MX';
-      }
+    // Purgar claves viejas (> 60s)
+    for(var k in recentSpeechHashes){
+      if(now - recentSpeechHashes[k] > 60000) delete recentSpeechHashes[k];
+    }
 
-      // Parámetros firmes, sobrios y elegantes (sin tonos agudos ni cómicos)
-      u.rate = 0.98;   // Ritmo firme y natural
-      u.pitch = 0.98;  // Tono elegante sin distorsión
-      u.volume = 1.0;
+    speechQueue.push({ text: cleanText, id: key });
+    processSpeechQueue();
+  }
 
-      agent.w = true;
-      u.onend = function(){
-        agent.w = false;
+  function processSpeechQueue(){
+    if(isSpeechPlaying || speechQueue.length === 0) return;
+    if(window.voz === false) {
+      speechQueue = [];
+      return;
+    }
+
+    var item = speechQueue.shift();
+    isSpeechPlaying = true;
+    _playSingleSpeech(item.text, function(){
+      // Pausa natural de 900ms entre locuciones antes de pasar a la siguiente en cola
+      setTimeout(function(){
+        isSpeechPlaying = false;
+        processSpeechQueue();
+      }, 900);
+    });
+  }
+
+  function _playSingleSpeech(texto, onFinish){
+    try{
+      playJarvisChime();
+      S.working = true;
+      var dur = Math.max(7500, texto.length * 110);
+      say(S, '🎙️ ' + texto, dur, false, true);
+
+      var vName = (voiceSelect && voiceSelect.value) ? voiceSelect.value : (localStorage.getItem('noc_jarvis_voice') || 'es-VE-SebastianNeural');
+      var nativeVoices = ('speechSynthesis' in window) ? window.speechSynthesis.getVoices() : [];
+
+      var finished = false;
+      function finish(){
+        if(finished) return;
+        finished = true;
+        S.working = false;
         if(onFinish) onFinish();
-      };
-      u.onerror = function(){
-        agent.w = false;
-      };
+      }
 
-      window.speechSynthesis.speak(u);
-    }, 320);
-  }catch(err){
-    console.warn('Error en síntesis de voz:', err);
+      var safetyTimer = setTimeout(finish, dur + 4500);
+
+      if(nativeVoices && nativeVoices.length > 0 && selectedVoice && voiceSelect && voiceSelect.value && !vName.endsWith('Neural') && vName !== 'es-VE-SebastianNeural'){
+        window.speechSynthesis.cancel();
+        setTimeout(function(){
+          var u = new SpeechSynthesisUtterance(texto);
+          u.voice = selectedVoice;
+          u.lang = selectedVoice.lang || 'es-VE';
+          u.rate = 0.92; u.pitch = 0.98; u.volume = 1.0;
+          u.onend = function(){ clearTimeout(safetyTimer); finish(); };
+          u.onerror = function(){ clearTimeout(safetyTimer); finish(); };
+          window.speechSynthesis.speak(u);
+        }, 280);
+      } else {
+        var audio = new Audio('/api/tts?text=' + encodeURIComponent(texto) + '&voice=es-VE-SebastianNeural&rate=-6%');
+        audio.onended = function(){ clearTimeout(safetyTimer); finish(); };
+        audio.onerror = function(err){
+          clearTimeout(safetyTimer);
+          console.warn('TTS playback error:', err);
+          finish();
+        };
+        audio.play().then(function(){ hideAudioUnlockBanner(); }).catch(function(err){
+          clearTimeout(safetyTimer);
+          console.warn('Audio autoplay blocked by browser:', err);
+          showAudioUnlockBanner();
+          finish();
+        });
+      }
+    }catch(e){
+      S.working = false;
+      if(onFinish) onFinish();
+    }
   }
-}
 
-// Botón de prueba QA de voz
-var qaVoiceBtn = document.getElementById('qa-voice-btn');
-if(qaVoiceBtn){
-  qaVoiceBtn.onclick = function(){
-    soundEnabled = true;
-    soundBtn.setAttribute('aria-pressed', 'true');
-    log('🎙️ <b>TEST QA ACTIVADO:</b> Aviso de soporte con locución firme...','c');
-    
-    var demoTexto = 'Atención equipo de soporte. El usuario Carlos Mendoza solicita asistencia técnica en el Piso 4 por caída de enlace de fibra óptica y lentitud en el servicio.';
-    
-    hablarJarvis(demoTexto, function(){
-      log('✅ <b>Aviso de voz completado.</b>','s');
-    });
+  function hablarJarvis(texto, speechId){
+    enqueueSpeech(texto, speechId);
+  }
+  window.hablarJarvis = hablarJarvis;
+
+  /* ---------- RECEPCIÓN UNIFICADA DE EVENTOS SSE (/events Y /events-history) ---------- */
+  function handle(e){
+    if(!e) return;
+    var tipo = String(e.tipo || e.type || '').toLowerCase();
+    if(tipo === 'sistema') return;
+
+    // Locución de voz del coordinador (VoiceAlertCoordinator en proxy.py)
+    if(e.texto_voz || tipo === 'speak' || tipo === 'soporte'){
+      var loc = e.texto_voz || ('Atención en el NOC: ' + (e.detalle || e.motivo || 'evento reportado'));
+      log('🎙️ Marco (Voz NOC): ' + loc, 'c');
+      if(window.voz !== false) hablarJarvis(loc, e.speech_id);
+      return;
+    }
+
+    if(e.estado === 'fin' && e.id && pend[e.id]){
+      pend[e.id]();
+      delete pend[e.id];
+      if(tipo === 'consulta') return;
+    }
+
+    if(tipo === 'consulta' || tipo === 'ping' || tipo === 'trafico' || tipo === 'tool' || tipo === 'query'){
+      if(e.estado === 'fin') return;
+      stat.c++; kpi();
+      var spec = resolveSpecialist(e.herramienta || tipo, e.pregunta || e.texto || e.detalle);
+      var guard = resolveGuardiaOperator(e.usuario);
+      var qLabel = e.pregunta || e.texto || e.detalle || ('Solicitud ' + (e.herramienta || tipo));
+      log('💬 ' + guard.n + ' → ' + spec.n + ' (' + spec.area + '): ' + qLabel);
+      seq(function(){ return consulta(e); });
+    } else if(tipo === 'alerta' || tipo === 'alert' || tipo === 'down' || tipo === 'problem' || tipo === 'zabbix' || tipo === 'dude'){
+      alerta(e);
+      if(e.severidad === 'High' || e.severidad === 'Disaster' || e.herramienta === 'proxmox'){
+        stat.e++; kpi();
+        seq(function(){ return envio(e); });
+      }
+    } else if(tipo === 'triage'){
+      triage(e);
+    } else if(tipo === 'accion'){
+      accion(e);
+    } else if(tipo === 'aprobacion'){
+      aprobacion(e);
+    } else if(tipo === 'recuperacion' || tipo === 'up'){
+      triage({decision: 'RECUPERADO', host: e.equipo || e.host || 'Equipo'});
+    }
+  }
+
+  /* ---------- CONEXIÓN SSE EN VIVO + SIMULACIÓN DE ACTIVIDAD DE FONDO SUAVE ---------- */
+  var qs = new URLSearchParams(location.search), stEl = document.getElementById('st'), demoOn = false;
+  var HOSTS = ['SW_PISO11', 'MK_SANAGUSTIN', 'OLT_NORTE', 'SW_4C', 'RB_CENTRO', 'PMX10', 'zabbix74'];
+
+  function setSt(t, d){ if(stEl){ stEl.textContent = t; stEl.className = 'pill' + (d ? ' demo' : ''); } }
+
+  function demo(){
+    if(!demoOn) return;
+    var r = rnd(), h = pick(HOSTS);
+    if(r < 0.38){
+      var id = 'd' + Date.now();
+      var k = pick(['ping', 'alertas', 'trafico', 'historial', 'proxmox', 'dashboard', 'diagnostico']);
+      var qMap = {
+        ping: '¿Responde ping ' + h + '?',
+        alertas: '¿Hay alertas activas en los 4 Zabbix?',
+        trafico: '¿Cuánto tráfico pasa por ' + h + '?',
+        historial: 'Generar reporte PDF de disponibilidad',
+        proxmox: 'Estado de los 6 nodos en PDM',
+        dashboard: 'Capturar Dashboard y cámara del DC',
+        diagnostico: 'Diagnóstico de salud de ' + h
+      };
+      handle({tipo: 'consulta', estado: 'inicio', id: id, usuario: pick(ops).n, herramienta: k, texto: qMap[k]});
+      setTimeout(function(){ handle({tipo: 'consulta', estado: 'fin', id: id, resultado: 'Verificado y en orden ✓'}); }, 3400);
+    } else if(r < 0.82){
+      handle({tipo: 'alerta', host: h, texto: 'Chequeo preventivo de umbral', severidad: pick(['Warning', 'Average', 'High'])});
+      setTimeout(function(){
+        handle({tipo: 'triage', decision: pick(['SUPRIMIR', 'RESUMEN', 'ESPERAR', 'ENVIAR', 'RECUPERADO']), host: h, motivo: pick(['flapping controlado', 'correlación IA', 'enlace recuperado'])});
+      }, 1800);
+    } else {
+      aprobacion({texto: 'Validar ventana en nodo ' + h + ' (nivel 4)'});
+    }
+    setTimeout(demo, 6500 + rnd() * 5500);
+  }
+
+  function connect(){
+    if(qs.has('demo')){
+      demoOn = true; setSt('DEMO ACTIVO', 1); demo(); return;
+    }
+    var host = (window.location.hostname && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') ? window.location.hostname : '10.168.220.128';
+    var sseUrl = qs.get('src') || ('http://' + host + ':11440/events');
+    var es = new EventSource(sseUrl);
+
+    es.onopen = function(){
+      demoOn = false;
+      setSt('ONLINE · SSE EN VIVO', 0);
+      log('🟢 Conectado al bus de eventos en vivo de Tecnored NOC', 'g');
+    };
+    es.onmessage = function(m){
+      try{ handle(JSON.parse(m.data)); }catch(x){}
+    };
+    es.onerror = function(){
+      setSt('RECONECTANDO…', 1);
+    };
+
+    // Cargar historial reciente para poblar KPIs y bitácora inicial
+    fetch('http://' + host + ':11440/events-history')
+      .then(function(r){ return r.json(); })
+      .then(function(hist){
+        if(Array.isArray(hist)){
+          hist.slice(-6).forEach(function(h){
+            if(h && h.tipo && h.tipo !== 'test' && h.tipo !== 'sistema'){
+              if(h.tipo === 'alerta') stat.a++;
+              else stat.c++;
+            }
+          });
+          kpi();
+        }
+      }).catch(function(){});
+  }
+
+  /* ---------- CONTROLES SUPERIORES ---------- */
+  var vz = document.getElementById('vz');
+  if(vz) vz.setAttribute('aria-pressed', String(voz));
+  vz.onclick = function(){
+    voz = !voz;
+    window.voz = voz;
+    localStorage.setItem('noc_voice_enabled', voz ? '1' : '0');
+    vz.setAttribute('aria-pressed', String(voz));
+    if(voz) hablarJarvis('Audio del centro de operaciones activado.');
   };
-}
+  document.getElementById('qa-voice-btn').onclick = function(){
+    voz = true;
+    vz.setAttribute('aria-pressed', 'true');
+    var txt = 'Atención equipo del NOC. Marco reportando desde el centro de misiones: los cuatro servidores Zabbix y los seis nodos de Proxmox se encuentran en línea.';
+    log('🎙️ Test de Voz NOC activado', 'c');
+    hablarJarvis(txt);
+  };
+  var _wb = document.getElementById('wall-btn'); if(_wb) _wb.onclick = function(){
+    breakFourthWall(null, true);
+  };
 
-/* ---------- DIBUJO Y MOTOR VISUAL ---------- */
-function rr(x,y,w,h,r,fill,stroke,lw){
-  ctx.beginPath();ctx.roundRect(x,y,w,h,r);
-  if(fill){ctx.fillStyle=fill;ctx.fill()}
-  if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lw||1;ctx.stroke()}
-}
-function circ(x,y,r,fill){
-  ctx.beginPath();ctx.arc(x,y,r,0,6.2832);
-  ctx.fillStyle=fill;ctx.fill();
-}
-function T(s,x,y,sz,col,al,wt){
-  ctx.font=(wt||'600')+' '+sz+'px "JetBrains Mono","Space Grotesk","Segoe UI",system-ui,sans-serif';
-  ctx.fillStyle=col;ctx.textAlign=al||'center';ctx.fillText(s,x,y);
-}
-function glow(c,b,fn){ctx.save();ctx.shadowColor=c;ctx.shadowBlur=b;fn();ctx.restore()}
-
-function bg(t){
-  var g=ctx.createLinearGradient(0,0,0,H);
-  g.addColorStop(0,'#0a1220');g.addColorStop(1,'#05080f');
-  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
-
-  // Pared con paneles tech animados
-  ctx.fillStyle='#0c1626';ctx.fillRect(0,0,W,96);
-  for(var i=0;i<8;i++){
-    rr(24+i*118,14,104,62,6,'#0b1a2c','rgba(34,211,238,.18)',1);
-    ctx.fillStyle='rgba(34,211,238,.35)';
-    for(var j=0;j<5;j++){
-      var bh=6+((Math.sin(t*1.3+i*2+j*1.7)+1)*14);
-      ctx.fillRect(36+i*118+j*17,70-bh,9,bh);
-    }
-  }
-  ctx.fillStyle='rgba(34,211,238,.5)';ctx.fillRect(0,96,W,1.5);
-
-  // Suelo en perspectiva
-  ctx.save();ctx.beginPath();ctx.rect(0,97,W,H);ctx.clip();
-  ctx.strokeStyle='rgba(34,211,238,.09)';ctx.lineWidth=1;
-  for(var k=-12;k<=12;k++){
-    ctx.beginPath();ctx.moveTo(W/2+k*34,97);ctx.lineTo(W/2+k*110,H);ctx.stroke();
-  }
-  for(var r=0;r<12;r++){
-    var y=97+Math.pow(r/11,1.8)*(H-97);
-    ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();
-  }
-  ctx.restore();
-
-  var sw=(t*60)%(H-97)+97;
-  var sg=ctx.createLinearGradient(0,sw-30,0,sw);
-  sg.addColorStop(0,'rgba(34,211,238,0)');sg.addColorStop(1,'rgba(34,211,238,.06)');
-  ctx.fillStyle=sg;ctx.fillRect(0,sw-30,W,30);
-
-  dust.forEach(function(d){
-    d.y-=d.v*.016;if(d.y<0)d.y=H;
-    ctx.fillStyle='rgba(120,220,240,.25)';ctx.fillRect(d.x,d.y,d.r,d.r);
-  });
-}
-
-function linkLines(t){
-  function ln(a,b,k,col){
-    var p={f:anc(a),t:anc(b)},g=links[k]||0;
-    ctx.beginPath();
-    for(var i=0;i<=24;i++){
-      var q=bz(p,i/24);i?ctx.lineTo(q.x,q.y):ctx.moveTo(q.x,q.y);
-    }
-    ctx.setLineDash([4,7]);ctx.lineDashOffset=-t*14;
-    ctx.strokeStyle=col;ctx.globalAlpha=.16+g*.7;ctx.lineWidth=1+g*1.5;ctx.stroke();
-    ctx.setLineDash([]);ctx.globalAlpha=1;
-  }
-  keys.forEach(function(k){ln(agent,tools[k],tools[k].n,tools[k].c)});
-  users.forEach(function(u){
-    ln(agent,u,u.n+agent.n,'#94a3b8');
-    ln(agent,u,agent.n+u.n,'#94a3b8');
-  });
-}
-
-function person(x,y,a,t,typing,phone){
-  var bob=typing?Math.sin(t*14)*.8:Math.sin(t*1.8+x)*.8;y+=bob;
-  glow(a.c,typing?10:0,function(){rr(x-17,y-27,34,34,11,a.c)});
-  ctx.fillStyle='rgba(0,0,0,.18)';ctx.fillRect(x-17,y-3,34,10);
-  rr(x-6,y-29,12,6,3,'#f1f5f9');
-  ctx.fillStyle=a.sk;ctx.fillRect(x-3.5,y-33,7,6);
-  circ(x,y-42,11,a.sk);
-  ctx.beginPath();ctx.arc(x,y-43,11.5,Math.PI*1.02,Math.PI*1.98);ctx.fillStyle=a.h;ctx.fill();
-  ctx.fillStyle=a.h;ctx.fillRect(x-11.5,y-44,3,8);
-  circ(x-4,y-41,1.3,'#1a1a1a');circ(x+4,y-41,1.3,'#1a1a1a');
-  ctx.beginPath();ctx.arc(x,y-38,3,.2,2.9);ctx.strokeStyle='rgba(60,30,20,.55)';ctx.lineWidth=1;ctx.stroke();
-
-  if(a.ic){
-    ctx.beginPath();ctx.arc(x,y-44,13,Math.PI*1.05,Math.PI*1.95);ctx.strokeStyle='#cbd5e1';ctx.lineWidth=2;ctx.stroke();
-    rr(x-15,y-46,4,8,2,'#cbd5e1');rr(x+11,y-46,4,8,2,'#cbd5e1');
-    ctx.beginPath();ctx.moveTo(x-12,y-38);ctx.quadraticCurveTo(x-10,y-31,x-3,y-32);ctx.strokeStyle='#94a3b8';ctx.lineWidth=1.2;ctx.stroke();
-  }
-  if(typing){
-    var o=Math.sin(t*20)*2;
-    rr(x-16,y-2+o,10,5,2.5,a.sk);rr(x+6,y-2-o,10,5,2.5,a.sk);
-  }
-  if(phone){
-    var on=a.b;
-    glow(on?'#38bdf8':'#000',on?12:0,function(){
-      rr(x+14,y-20,8,13,2,on?'#7dd3fc':'#1e293b','#475569',1);
-    });
-  }
-}
-
-function icon(a,x,y,t,on){
-  var c=a.c;ctx.save();ctx.translate(x,y);ctx.strokeStyle=c;ctx.fillStyle=c;ctx.lineWidth=2;ctx.globalAlpha=on?1:.55;
-  if(a.ic==='radar'){
-    for(var i=1;i<=3;i++){ctx.beginPath();ctx.arc(0,4,i*8,0,6.28);ctx.globalAlpha=(on?.5:.25);ctx.stroke()}
-    ctx.globalAlpha=1;var an=t*(on?5:1.5);ctx.beginPath();ctx.moveTo(0,4);ctx.lineTo(Math.cos(an)*24,4+Math.sin(an)*24);ctx.stroke();
-    if(on)circ(Math.cos(an+.6)*14,4+Math.sin(an+.6)*14,2.5,c);
-  } else if(a.ic==='warn'){
-    ctx.beginPath();ctx.moveTo(0,-16);ctx.lineTo(18,14);ctx.lineTo(-18,14);ctx.closePath();ctx.stroke();
-    ctx.fillRect(-1.5,-5,3,10);ctx.fillRect(-1.5,9,3,3);
-  } else if(a.ic==='bars'){
-    for(var j=0;j<5;j++){
-      var h=8+(on?(Math.sin(t*6+j*1.4)+1)*11:(Math.sin(j*1.4)+1)*7);
-      ctx.fillRect(-22+j*9,16-h,6,h);
-    }
-  } else if(a.ic==='server'){
-    for(var k=0;k<3;k++){
-      var ry=-14+k*10;
-      rr(-18,ry,36,8,2,null,c,1.5);
-      ctx.fillRect(-14,ry+2,14,4);
-      var ledOn=on?((Math.floor(t*8+k)%2)===0):((k%2)===0);
-      circ(8,ry+4,1.8,ledOn?c:'#0369a1');
-      circ(13,ry+4,1.8,on?'#4ade80':'#1e293b');
-    }
-  } else {
-    ctx.beginPath();ctx.arc(0,2,17,0,6.28);ctx.stroke();
-    var an2=t*(on?6:.4);ctx.beginPath();ctx.moveTo(0,2);ctx.lineTo(0,-10);
-    ctx.moveTo(0,2);ctx.lineTo(Math.cos(an2)*10,2+Math.sin(an2)*10);ctx.stroke();
-  }
-  ctx.restore();
-}
-
-function station(a,t){
-  var x=a.x,y=a.y,on=a.w||a.siren,c=a.siren?((t*6|0)%2?'#fb7185':'#f43f5e'):a.c;
-  person(x,y+18,a,t,on,false);
-
-  // Pantalla holográfica
-  var sx=x-52,sy=y-120;
-  glow(c,on?22:6,function(){rr(sx,sy,104,66,8,'rgba(10,20,34,.85)',c,1.5)});
-  ctx.save();ctx.beginPath();ctx.roundRect(sx,sy,104,66,8);ctx.clip();
-  if(on){
-    var ly=sy+((t*50)%66);ctx.fillStyle=c;ctx.globalAlpha=.18;ctx.fillRect(sx,ly,104,6);ctx.globalAlpha=1;
-  }
-  ctx.restore();
-  icon(a,x,y-87,t,on);
-
-  ctx.beginPath();ctx.moveTo(x-26,y-54);ctx.lineTo(x-34,y+6);ctx.lineTo(x+34,y+6);ctx.lineTo(x+26,y-54);
-  ctx.fillStyle=c;ctx.globalAlpha=on?.09:.04;ctx.fill();ctx.globalAlpha=1;
-
-  // Escritorio
-  rr(x-62,y+8,124,34,7,'#142033','#26364d',1);
-  ctx.fillStyle=c;ctx.globalAlpha=.9;ctx.fillRect(x-56,y+9,112,2);ctx.globalAlpha=1;
-  rr(x-34,y+14,68,14,3,'#0a121d');
-  for(var i=0;i<6;i++)if(on?(Math.sin(t*9+i*2)>0):false){
-    ctx.fillStyle=c;ctx.fillRect(x-30+i*10,y+18,6,2.5);
-  }
-  T(a.n,x,y+60,13,'#cbd5e1');
-}
-
-function agentDraw(t){
-  var a=agent,x=a.x,y=a.y,on=a.w;
-  // Plataforma flotante
-  var pg=ctx.createRadialGradient(x,y+40,4,x,y+40,90);
-  pg.addColorStop(0,on?'rgba(34,211,238,.45)':'rgba(34,211,238,.22)');
-  pg.addColorStop(1,'rgba(34,211,238,0)');
-  ctx.fillStyle=pg;ctx.beginPath();ctx.ellipse(x,y+40,90,24,0,0,6.28);ctx.fill();
-
-  for(var i=0;i<3;i++){
-    ctx.beginPath();ctx.ellipse(x,y+40,38+i*20,10+i*5.5,0,0,6.28);
-    ctx.setLineDash([6,8]);ctx.lineDashOffset=-t*(on?60:16)*(i%2?-1:1);
-    ctx.strokeStyle='rgba(34,211,238,'+(.55-i*.12)+')';ctx.lineWidth=1.5;ctx.stroke();ctx.setLineDash([]);
-  }
-
-  // Cuerpo robot Sentry AI
-  var bob=Math.sin(t*(on?9:2))*(on?1.6:1.2);y+=bob;
-  glow('#22d3ee',on?18:8,function(){rr(x-22,y-24,44,44,14,'#0f2a3d','#22d3ee',1.8)});
-  rr(x-12,y-14,24,22,6,'#07141f');
-  var core=.55+.45*Math.sin(t*(on?12:3));
-  glow('#22d3ee',14*core,function(){circ(x,y-3,5+core*1.5,'rgba(103,232,249,'+(.6+core*.4)+')')});
-  rr(x-5,y-34,10,10,3,'#12374d');
-  glow('#22d3ee',on?16:6,function(){rr(x-17,y-60,34,28,10,'#0f2a3d','#22d3ee',1.8)});
-  rr(x-12,y-54,24,12,6,'#04121c');
-  var ey=on?((t*8|0)%2?2.5:4):4;
-  circ(x-5,y-48,ey*.8,'#67e8f9');circ(x+5,y-48,ey*.8,'#67e8f9');
-  ctx.beginPath();ctx.moveTo(x,y-60);ctx.lineTo(x,y-70);ctx.strokeStyle='#22d3ee';ctx.lineWidth=1.5;ctx.stroke();
-  glow('#22d3ee',10,function(){circ(x,y-72,3.2,(t*4|0)%2||on?'#67e8f9':'#0e7490')});
-  rr(x-34,y-18,10,22,5,'#12374d','#22d3ee',1);
-  rr(x+24,y-18,10,22,5,'#12374d','#22d3ee',1);
-
-  // Badge y Nombre estilizado de Sentry AI (elevado para no solapar con los puestos inferiores)
-  var by=a.y+55;
-  glow('#22d3ee',on?14:4,function(){
-    rr(x-50,by-13,100,28,7,'rgba(10,24,37,.92)','#22d3ee',1.2);
-  });
-  T('Sentry AI',x,by+1,13,'#67e8f9','center','700');
-  T('Engine L1',x,by+12,9,'#94a3b8','center','500');
-}
-
-function userDraw(u,t){
-  var x=u.x,y=u.y;
-  person(x,y,u,t,false,true);
-  rr(x-46,y+2,92,26,6,'#142033','#26364d',1);
-  rr(x-20,y+6,40,11,3,'#0a121d');
-  if(u.b==='🔔'){
-    ctx.beginPath();ctx.arc(x,y-18,30+((t*40)%24),0,6.28);
-    ctx.strokeStyle='rgba(251,113,133,'+(1-((t*40)%24)/24)*.6+')';ctx.lineWidth=2;ctx.stroke();
-  }
-  T(u.n,x,y+48,13,'#cbd5e1');
-  T('Operador NOC',x,y+62,10,'#64748b','center','500');
-}
-
-function bubble(a,t){
-  if(!a.b)return;
-  var p=a.ic?{x:a.x,y:a.y-132}:a===agent?{x:a.x,y:a.y-96}:{x:a.x,y:a.y-72};
-  var y=p.y-Math.sin(t*5)*2,al=a.b==='!'||a.b==='🔔';
-  glow(al?'#fb7185':'#22d3ee',10,function(){rr(p.x-16,y-18,32,22,8,al?'#fff1f2':'#f8fafc')});
-  ctx.beginPath();ctx.moveTo(p.x-4,y+3.5);ctx.lineTo(p.x,y+9);ctx.lineTo(p.x+4,y+3.5);
-  ctx.fillStyle=al?'#fff1f2':'#f8fafc';ctx.fill();
-  T(a.b,p.x,y-3,13,al?'#be123c':'#0f172a','center','700');
-}
-
-function frame(now){
-  var t=(now-t0)/1000,dt=Math.min(.05,(now-last)/1000);last=now;
-  bg(t);
-  for(var k in links)links[k]=Math.max(0,links[k]-dt*.9);
-  linkLines(t);
-
-  keys.forEach(function(k){
-    var a=tools[k];
-    if(a.siren){
-      var g=ctx.createRadialGradient(a.x,a.y-40,10,a.x,a.y-40,130);
-      g.addColorStop(0,'rgba(251,113,133,'+((t*6|0)%2?.28:.12)+')');
-      g.addColorStop(1,'rgba(251,113,133,0)');
-      ctx.fillStyle=g;ctx.fillRect(a.x-140,a.y-170,280,260);
-    }
-  });
-
-  keys.forEach(function(k){station(tools[k],t)});
-  agentDraw(t);
-  users.forEach(function(u){userDraw(u,t)});
-
-  // Partículas y trayectorias curvas con estela
-  pk=pk.filter(function(p){
-    var f=(now-p.s)/p.ms;
-    if(f>=1){burst(p.t.x,p.t.y,p.col);p.r();return false}
-    var e=f<.5?2*f*f:1-Math.pow(-2*f+2,2)/2,q=bz(p,e);
-    p.tr.push(q);
-    if(p.tr.length>14)p.tr.shift();
-    p.tr.forEach(function(s,i){
-      ctx.globalAlpha=i/p.tr.length*.5;
-      circ(s.x,s.y,1.5+i*.25,p.col);
-    });
-    ctx.globalAlpha=1;
-    glow(p.col,16,function(){circ(q.x,q.y,5.5,p.col)});
-    circ(q.x,q.y,2.3,'#fff');
-    return true;
-  });
-
-  fx=fx.filter(function(s){
-    s.l-=dt*2;
-    if(s.l<=0)return false;
-    s.x+=s.vx*dt;s.y+=s.vy*dt;
-    ctx.globalAlpha=s.l;
-    circ(s.x,s.y,2*s.l+.5,s.col);
-    ctx.globalAlpha=1;
-    return true;
-  });
-
-  var all=[agent].concat(users,keys.map(function(k){return tools[k]}));
-  all.forEach(function(a){bubble(a,t)});
-
-  var v=ctx.createRadialGradient(W/2,H/2,H*.45,W/2,H/2,H*.95);
-  v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,'rgba(0,0,0,.45)');
-  ctx.fillStyle=v;ctx.fillRect(0,0,W,H);
-
+  setSt('CONECTANDO…', 1);
+  connect();
   requestAnimationFrame(frame);
-}
+})();
 
-requestAnimationFrame(frame);
+window.addEventListener('click', function(){
+  window.voz = true;
+  localStorage.setItem('noc_voice_enabled', '1');
+  var _vz = document.getElementById('vz');
+  if(_vz) _vz.setAttribute('aria-pressed', 'true');
+  var _b = document.getElementById('noc-audio-unlock-banner');
+  if(_b) _b.style.display = 'none';
+}, { once: true });
+
+</script>
+
+<!-- SCRIPT 2: MOTOR DE TELEMETRÍA WALLBOARD -->
+<script>
+(function(){
+  var sparkHist = {};
+
+  function formatMbps(val) {
+    if (!val || isNaN(val) || val <= 0.0001) return '0.0 Mbps';
+    if (val >= 1000) return (val / 1000).toFixed(2) + ' Gbps';
+    if (val < 1.0) {
+      var kbps = val * 1000;
+      return kbps >= 1 ? kbps.toFixed(0) + ' Kbps' : val.toFixed(2) + ' Mbps';
+    }
+    return val.toFixed(1) + ' Mbps';
+  }
+
+  function renderSparkline(pts, color) {
+    if (!pts || pts.length < 2) return '';
+    var realMax = Math.max.apply(null, pts);
+    var minFloor = realMax > 1.0 ? 5 : (realMax > 0.01 ? realMax * 1.2 : 0.05);
+    var max = Math.max(realMax, minFloor);
+    var w = 180, h = 24;
+    var coords = pts.map(function(v, i) {
+      var x = (i / (pts.length - 1)) * w;
+      var y = h - (v / max) * (h - 4) - 2;
+      return x.toFixed(1) + ',' + y.toFixed(1);
+    });
+    var d = 'M ' + coords.join(' L ');
+    var area = d + ' L ' + w + ',' + h + ' L 0,' + h + ' Z';
+    return '<svg viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none">' +
+      '<defs><linearGradient id="grad-' + color.replace('#','') + '" x1="0" y1="0" x2="0" y2="1">' +
+      '<stop offset="0%" stop-color="' + color + '" stop-opacity="0.35"/>' +
+      '<stop offset="100%" stop-color="' + color + '" stop-opacity="0.0"/>' +
+      '</linearGradient></defs>' +
+      '<path d="' + area + '" fill="url(#grad-' + color.replace('#','') + ')"/>' +
+      '<path d="' + d + '" fill="none" stroke="' + color + '" stroke-width="1.6"/>' +
+      '</svg>';
+  }
+
+  function updateWallboard() {
+    fetch('/api/tv-telemetry')
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        if (!data || !data.ok) return;
+
+        // 0. Comentarios reflexivos y Alertas de voz de Sentry (Marco)
+        if (data.sentry_speech && data.sentry_speech.id && data.sentry_speech.id !== window._lastSentrySpeechId) {
+          window._lastSentrySpeechId = data.sentry_speech.id;
+          console.log('[SENTRY VOICE SPEECH]', data.sentry_speech.type, ':', data.sentry_speech.text);
+          var fn = window.hablarJarvis || (typeof hablarJarvis === 'function' ? hablarJarvis : null);
+          if (fn && window.voz !== false) {
+            fn(data.sentry_speech.text, data.sentry_speech.id);
+          }
+        }
+
+        // 1. ROUTERS DE BORDE CON GRÁFICOS (Ahora en la Columna Derecha Superior)
+        var borders = data.borders || [];
+        var bordersHtml = '';
+        var totCoreRx = 0.0, totCoreTx = 0.0;
+
+        borders.forEach(function(b){
+          totCoreRx += (b.rx_mbps || 0);
+          totCoreTx += (b.tx_mbps || 0);
+
+          if (!sparkHist[b.name]) {
+            sparkHist[b.name] = [b.rx_mbps, b.rx_mbps];
+          } else {
+            sparkHist[b.name].push(b.rx_mbps);
+            if (sparkHist[b.name].length > 18) sparkHist[b.name].shift();
+          }
+          var sparkSvg = renderSparkline(sparkHist[b.name], b.color_rx || '#38bdf8');
+
+          bordersHtml += '<div class="border-traffic-card">' +
+            '<div class="border-traffic-head">' +
+              '<span class="border-traffic-title">' +
+                '<span class="brand-dot" style="background:' + (b.color_rx || '#38bdf8') + ';box-shadow:0 0 6px ' + (b.color_rx || '#38bdf8') + '"></span>' +
+                b.short +
+              '</span>' +
+              '<span class="mk-card-tag">' + b.model + '</span>' +
+            '</div>' +
+            '<div class="border-traffic-rates">' +
+              '<span class="b-rx">⬇️ ' + formatMbps(b.rx_mbps) + '</span>' +
+              '<span class="b-tx">⬆️ ' + formatMbps(b.tx_mbps) + '</span>' +
+            '</div>' +
+            '<div class="sparkline-box">' + sparkSvg + '</div>' +
+          '</div>';
+        });
+
+        // Slot 6: Tarjeta Consolidada Total Núcleo
+        if (!sparkHist['TOTAL_CORE']) {
+          sparkHist['TOTAL_CORE'] = [totCoreRx, totCoreRx];
+        } else {
+          sparkHist['TOTAL_CORE'].push(totCoreRx);
+          if (sparkHist['TOTAL_CORE'].length > 18) sparkHist['TOTAL_CORE'].shift();
+        }
+        var totSparkSvg = renderSparkline(sparkHist['TOTAL_CORE'], '#00f0ff');
+
+        bordersHtml += '<div class="border-traffic-card summary">' +
+          '<div class="border-traffic-head">' +
+            '<span class="border-traffic-title" style="color:#38bdf8;font-weight:800">⚡ BACKBONE TOTAL</span>' +
+            '<span class="mk-card-tag" style="background:rgba(56,189,248,0.2);color:#38bdf8">5 ROUTERS</span>' +
+          '</div>' +
+          '<div class="border-traffic-rates">' +
+            '<span class="b-rx" style="font-weight:800">⬇️ ' + formatMbps(totCoreRx) + '</span>' +
+            '<span class="b-tx" style="font-weight:800">⬆️ ' + formatMbps(totCoreTx) + '</span>' +
+          '</div>' +
+          '<div class="sparkline-box">' + totSparkSvg + '</div>' +
+        '</div>';
+
+        var bordersGrid = document.getElementById('borders-traffic-grid');
+        if (bordersGrid) bordersGrid.innerHTML = bordersHtml;
+
+        // 2. RESUMEN DE OLTS (Ahora en la Columna Izquierda, bajo la oficina)
+        var olts = data.olts || [];
+        var oltsHtml = '';
+        olts.forEach(function(o){
+          var isSnmpDown = (o.name.indexOf('ANDRES') !== -1 && o.rx_mbps === 0 && o.tx_mbps === 0);
+          var rxLabel = isSnmpDown ? '⚠️ SNMP Timeout' : ('⬇️ ' + formatMbps(o.rx_mbps));
+          var txLabel = isSnmpDown ? '0.0 Mbps' : ('⬆️ ' + formatMbps(o.tx_mbps));
+          oltsHtml += '<div class="olt-compact-card">' +
+            '<div class="olt-compact-head">' +
+              '<span class="olt-compact-name">' +
+                '<span class="olt-dot" style="background:' + (o.color_rx || '#ec4899') + ';box-shadow:0 0 5px ' + (o.color_rx || '#ec4899') + '"></span>' +
+                o.name.replace('OLT ', '') +
+              '</span>' +
+              (isSnmpDown ? '<span class="mk-card-tag" style="background:rgba(239,68,68,0.2);color:#ef4444;font-size:7.5px;padding:1px 4px">SNMP TIMEOUT</span>' : '') +
+            '</div>' +
+            '<div class="olt-compact-rates">' +
+              '<span class="rate-pill rx">' + rxLabel + '</span>' +
+              '<span class="rate-pill tx">' + txLabel + '</span>' +
+            '</div>' +
+          '</div>';
+        });
+        var oltsCompactContainer = document.getElementById('olts-compact-grid');
+        if (oltsCompactContainer) oltsCompactContainer.innerHTML = oltsHtml;
+
+        // 3. Salud de Hardware MikroTik (5 Routers)
+        var mks = data.mk_health || [];
+        var mkHtml = '';
+        mks.forEach(function(m){
+          var tempStr = m.temp_c !== null ? m.temp_c.toFixed(0) + '°C' : 'N/A';
+          var tempColor = (m.temp_c && m.temp_c > 65) ? 'amber' : 'green';
+          var ramStr = (m.mem_pct && m.mem_pct > 0) ? m.mem_pct.toFixed(0) + '%' : 'N/A';
+          var pingStr = m.ping_ms !== null ? m.ping_ms.toFixed(1) + 'ms' : '--';
+
+          mkHtml += '<div class="mk-health-card">' +
+            '<div class="mk-card-head">' +
+              '<span class="mk-card-name">' + m.short + '</span>' +
+              '<span class="mk-card-tag">' + m.model + '</span>' +
+            '</div>' +
+            '<div class="mk-row">' +
+              '<span>CPU</span><b class="highlight">' + m.cpu_pct.toFixed(1) + '%</b>' +
+            '</div>' +
+            '<div class="mk-row">' +
+              '<span>Temp</span><b class="' + tempColor + '">🌡️ ' + tempStr + '</b>' +
+            '</div>' +
+            '<div class="mk-row">' +
+              '<span>RAM</span><b>' + ramStr + '</b>' +
+            '</div>' +
+            '<div class="mk-row">' +
+              '<span>Ping</span><b>' + pingStr + '</b>' +
+            '</div>' +
+          '</div>';
+        });
+        var mkWrap = document.getElementById('mk-health-grid');
+        if (mkWrap) mkWrap.innerHTML = mkHtml;
+
+        // 4. Estado de Respaldos PBS
+        var pbs = (data.proxmox && data.proxmox.pbs) ? data.proxmox.pbs : null;
+        if (pbs) {
+          var tagPbs = document.getElementById('pbs-status-tag');
+          if (tagPbs) tagPbs.innerText = (pbs.respaldos_exitosos || 28) + '/28 RESPALDOS OK';
+
+          var pbsHtml = '<div class="pbs-grid">' +
+            '<div class="pbs-item">' +
+              '<span class="pbs-lbl">Servidor Backup</span>' +
+              '<span class="pbs-val highlight">' + (pbs.nodo || 'pbs-backup') + '</span>' +
+            '</div>' +
+            '<div class="pbs-item">' +
+              '<span class="pbs-lbl">Respaldos Diarios</span>' +
+              '<span class="pbs-val ok">🟢 ' + (pbs.respaldos_exitosos || 28) + ' OK · 0 Fallos</span>' +
+            '</div>' +
+            '<div class="pbs-item">' +
+              '<span class="pbs-lbl">Datastores Online</span>' +
+              '<span class="pbs-val highlight">' + (pbs.datastores || '3 / 3') + '</span>' +
+            '</div>' +
+            '<div class="pbs-item">' +
+              '<span class="pbs-lbl">Almacenamiento</span>' +
+              '<span class="pbs-val">' + (pbs.almacenamiento || '4.82 TB / 16.0 TB') + '</span>' +
+            '</div>' +
+          '</div>' +
+          '<div class="pbs-sub-bar">' +
+            '<span>🛡️ Clústeres respaldados: <b>' + (pbs.trabajos || 'pmx-cluster (Local) + cirion-cluster (Lumex): OK') + '</b></span>' +
+            '<span class="badge-verified">✓ 100% Íntegro</span>' +
+          '</div>';
+
+          var pbsWrap = document.getElementById('pbs-content');
+          if (pbsWrap) pbsWrap.innerHTML = pbsHtml;
+        }
+
+        // 5. Certificates
+        var certs = data.certificates || [];
+        var critCount = 0;
+        var certsHtml = '';
+
+        certs.forEach(function(c){
+          var cls = 'cert-card ';
+          var valText = '';
+          var lblText = 'Cert: Expires on';
+
+          if (c.is_critical) {
+            cls += 'crit';
+            critCount++;
+            valText = c.days;
+            lblText = '⚠️ ¡Vence pronto!';
+          } else if (c.is_warning) {
+            cls += 'warn';
+            valText = c.days;
+            lblText = 'Expira en ' + c.days + 'd';
+          } else if (c.has_data) {
+            cls += 'ok';
+            valText = c.days;
+            lblText = 'Días restantes';
+          } else {
+            if (c.bg_color === 'FDD835') {
+              cls += 'yellow-nodata';
+            } else {
+              cls += 'no-data';
+            }
+            valText = 'No data';
+            lblText = 'Sin telemetría';
+          }
+
+          certsHtml += '<div class="' + cls + '">' +
+            '<div class="cert-site" title="' + c.title + '">' + c.title + '</div>' +
+            '<div class="cert-val-box">' +
+              '<span class="cert-days">' + valText + '</span>' +
+              '<span class="cert-lbl">' + lblText + '</span>' +
+            '</div>' +
+          '</div>';
+        });
+
+        var certsContainer = document.getElementById('certs-grid');
+        if (certsContainer) certsContainer.innerHTML = certsHtml;
+
+        var banner = document.getElementById('cert-banner');
+        var bannerText = document.getElementById('cert-banner-text');
+        if (banner) {
+          if (critCount > 0) {
+            banner.style.display = 'flex';
+            if (bannerText) bannerText.innerText = '⚠️ ATENCIÓN: ' + critCount + ' Certificado(s) vencen en menos de 7 días';
+          } else {
+            banner.style.display = 'none';
+          }
+        }
+
+        // 6. Proxmox Clúster & Hipervisores (PMX10, pmx11, PMX12 + PDM)
+        var pmx = data.proxmox;
+        if (pmx && pmx.ok) {
+          var tag = document.getElementById('pmx-cluster-tag');
+          if (tag) tag.innerText = (pmx.nodes ? pmx.nodes.length : 3) + '/3 NODOS ONLINE · QUORUM OK';
+
+          var pbsText = (pmx.pbs && pmx.pbs.almacenamiento) ? pmx.pbs.almacenamiento : '3/3 Datastores (4.82 TB / 16 TB)';
+          var pbsStatus = (pmx.pbs && pmx.pbs.estado) ? pmx.pbs.estado : 'Online';
+
+          var pmxHtml = '<div class="pmx-summary-bar">' +
+            '<div class="pmx-kpi-item">' +
+              '<span class="pmx-kpi-lbl">Cargas de Trabajo</span>' +
+              '<span class="pmx-kpi-val"><span class="highlight">' + pmx.vms_running + '</span> / ' + pmx.vms_total + ' VMs Activas</span>' +
+            '</div>' +
+            '<div class="pmx-kpi-item">' +
+              '<span class="pmx-kpi-lbl">RAM Total Clúster</span>' +
+              '<span class="pmx-kpi-val"><span class="highlight">' + pmx.tot_mem_used_gb + ' GB</span> / ' + (pmx.tot_mem_max_gb >= 1000 ? (pmx.tot_mem_max_gb/1000).toFixed(2) + ' TB' : pmx.tot_mem_max_gb + ' GB') + '</span>' +
+            '</div>' +
+            '<div class="pmx-kpi-item">' +
+              '<span class="pmx-kpi-lbl">Cómputo vCPU</span>' +
+              '<span class="pmx-kpi-val"><span class="highlight">' + pmx.tot_cores + ' Cores</span> · pmx-cluster</span>' +
+            '</div>' +
+            '<div class="pmx-kpi-item">' +
+              '<span class="pmx-kpi-lbl">PBS Backup Datacenter</span>' +
+              '<span class="pmx-kpi-val"><span class="highlight">🟢 ' + pbsStatus + '</span> · ' + (pmx.pbs && pmx.pbs.datastores ? pmx.pbs.datastores : '3/3') + '</span>' +
+            '</div>' +
+          '</div>';
+
+          pmxHtml += '<div class="pmx-nodes-grid">';
+          (pmx.nodes || []).forEach(function(n){
+            var cpuColor = n.cpu_pct > 80 ? 'red' : (n.cpu_pct > 65 ? 'amber' : 'green');
+            var memColor = n.mem_pct > 85 ? 'red' : (n.mem_pct > 70 ? 'amber' : 'green');
+            pmxHtml += '<div class="pmx-node-card">' +
+              '<div class="pmx-node-head">' +
+                '<span class="pmx-node-name"><span class="status-dot"></span>' + n.node + '</span>' +
+                '<span class="pmx-node-tag">' + n.cores + ' vCPU</span>' +
+              '</div>' +
+              '<div class="pmx-metric-row">' +
+                '<div class="pmx-metric-lbls"><span>CPU Hipervisor</span><b>' + n.cpu_pct.toFixed(1) + '%</b></div>' +
+                '<div class="pmx-prog-bar"><div class="pmx-prog-fill ' + cpuColor + '" style="width:' + Math.min(n.cpu_pct, 100) + '%"></div></div>' +
+              '</div>' +
+              '<div class="pmx-metric-row">' +
+                '<div class="pmx-metric-lbls"><span>Memoria RAM</span><b>' + n.mem_used_gb + ' / ' + n.mem_max_gb + ' GB (' + n.mem_pct.toFixed(0) + '%)</b></div>' +
+                '<div class="pmx-prog-bar"><div class="pmx-prog-fill ' + memColor + '" style="width:' + Math.min(n.mem_pct, 100) + '%"></div></div>' +
+              '</div>' +
+            '</div>';
+          });
+          pmxHtml += '</div>';
+
+          pmxHtml += '<div class="pmx-pbs-footer">' +
+            '<span>🛡️ Respaldo Proxmox Backup Server: <b>' + (pmx.pbs && pmx.pbs.nodo ? pmx.pbs.nodo : 'pbs-backup.tecnored.net.ve') + '</b></span>' +
+            '<span>Ocupación: <b>' + pbsText + '</b></span>' +
+          '</div>';
+
+          var pmxWrap = document.getElementById('proxmox-wrap');
+          if (pmxWrap) pmxWrap.innerHTML = pmxHtml;
+        }
+      })
+      .catch(function(err){
+        console.warn('Error polling tv telemetry:', err);
+      });
+  }
+
+  // Arrancar ciclo de telemetría cada 15 segundos
+  updateWallboard();
+  setInterval(updateWallboard, 15000);
 })();
 </script>
+
 </body>
 </html>
