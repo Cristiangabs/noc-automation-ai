@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Tecnored NOC · Centro de Operaciones & Telemetría</title>
+<title>NetCore NOC · Centro de Operaciones & Telemetría</title>
 <style>
   :root {
     --bg-dark: #050811;
@@ -966,7 +966,7 @@
   <header class="tv-header">
     <div class="brand-group">
       <span class="brand-dot"></span>
-      <span class="brand-title">Tecnored NOC</span>
+      <span class="brand-title">NetCore NOC</span>
       <span class="brand-tag">CENTRO DE OPERACIONES</span>
     </div>
 
@@ -1704,7 +1704,7 @@
     'Los 4 servidores Zabbix y los 6 nodos Proxmox están bajo control, pueden mirar la TV en paz 🛡️',
     'Prometo que no somos actores pagados, cuando entra un ping o alerta real corremos de verdad 🏃‍♂️',
     '¿Notaron que después del apagón nos pusieron onboot=1? Básicamente somos inmortales en el clúster ⚡',
-    'Saludos al equipo de Tecnored que nos está viendo desde su navegador en este instante 🖥️'
+    'Saludos al equipo de operaciones NOC que nos está viendo desde su navegador en este instante 🖥️'
   ]);
 
   /* ---------- MOVIMIENTO E INTERRUPCIÓN INMEDIATA POR DEBER REAL ---------- */
@@ -2894,14 +2894,14 @@
     if(qs.has('demo')){
       demoOn = true; setSt('DEMO ACTIVO', 1); demo(); return;
     }
-    var host = (window.location.hostname && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') ? window.location.hostname : '10.168.220.128';
+    var host = (window.location.hostname && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') ? window.location.hostname : '192.168.1.50';
     var sseUrl = qs.get('src') || ('http://' + host + ':11440/events');
     var es = new EventSource(sseUrl);
 
     es.onopen = function(){
       demoOn = false;
       setSt('ONLINE · SSE EN VIVO', 0);
-      log('🟢 Conectado al bus de eventos en vivo de Tecnored NOC', 'g');
+      log('🟢 Conectado al bus de eventos en vivo de NetCore NOC', 'g');
     };
     es.onmessage = function(m){
       try{ handle(JSON.parse(m.data)); }catch(x){}
@@ -3154,7 +3154,7 @@ window.addEventListener('click', function(){
             '</div>' +
           '</div>' +
           '<div class="pbs-sub-bar">' +
-            '<span>🛡️ Clústeres respaldados: <b>' + (pbs.trabajos || 'pmx-cluster (Local) + cirion-cluster (Lumex): OK') + '</b></span>' +
+            '<span>🛡️ Clústeres respaldados: <b>' + (pbs.trabajos || 'pmx-cluster (Local) + cluster-secondary (Site-B): OK') + '</b></span>' +
             '<span class="badge-verified">✓ 100% Íntegro</span>' +
           '</div>';
 
@@ -3268,7 +3268,7 @@ window.addEventListener('click', function(){
           pmxHtml += '</div>';
 
           pmxHtml += '<div class="pmx-pbs-footer">' +
-            '<span>🛡️ Respaldo Proxmox Backup Server: <b>' + (pmx.pbs && pmx.pbs.nodo ? pmx.pbs.nodo : 'pbs-backup.tecnored.net.ve') + '</b></span>' +
+            '<span>🛡️ Respaldo Proxmox Backup Server: <b>' + (pmx.pbs && pmx.pbs.nodo ? pmx.pbs.nodo : 'pbs-backup.noc-telecom.net') + '</b></span>' +
             '<span>Ocupación: <b>' + pbsText + '</b></span>' +
           '</div>';
 

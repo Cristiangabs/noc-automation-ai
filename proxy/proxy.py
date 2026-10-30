@@ -21,28 +21,28 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
 
 PORT = 11440
-CA_CERT = '/home/tecnored/n8n/multicanal-ca.crt'
-TARGET_BASE = 'https://10.168.220.117:11443'
+CA_CERT = os.getenv('CA_CERT_PATH', '/etc/ssl/certs/internal-ca.crt')
+TARGET_BASE = os.getenv('AI_API_BASE', 'https://192.168.1.60:11443')
 if os.path.exists(CA_CERT):
     ssl_context = ssl.create_default_context(cafile=CA_CERT)
 else:
     ssl_context = ssl.create_default_context()
     ssl_context.check_hostname = False
     ssl_context.verify_mode = ssl.CERT_NONE
-ZABBIX_URL = 'http://10.168.220.35/zabbix/api_jsonrpc.php'
+ZABBIX_URL = os.getenv('ZABBIX35_URL', 'http://192.168.1.35/zabbix/api_jsonrpc.php')
 ZABBIX_TOKEN = 'YOUR_ZABBIX_API_TOKEN'
-ZABBIX74_URL = 'http://10.168.220.27/zabbix/api_jsonrpc.php'
+ZABBIX74_URL = os.getenv('ZABBIX74_URL', 'http://192.168.1.27/zabbix/api_jsonrpc.php')
 ZABBIX74_USER = 'Admin'
 ZABBIX74_PASS = 'zabbix'
-ZABBIX20_URL_API = 'http://10.168.220.20/zabbix/api_jsonrpc.php'
+ZABBIX20_URL_API = os.getenv('ZABBIX20_URL', 'http://192.168.1.20/zabbix/api_jsonrpc.php')
 ZABBIX20_USER_API = 'Admin'
 ZABBIX20_PASS_API = 'zabbix'
-SUBSCRIBERS_FILE = '/home/tecnored/n8n/subscribers.json'
+SUBSCRIBERS_FILE = os.getenv('SUBSCRIBERS_FILE', '/data/subscribers.json')
 
 ZABBIX_SERVERS_META = {
-    'zbx35': {'name': 'Zabbix35 (7.0 Principal - 10.168.220.35)', 'short': 'Zabbix35', 'ip': '10.168.220.35', 'url': ZABBIX_URL},
-    'zbx74': {'name': 'Zabbix74 (LXC 110 - 7.4 - 10.168.220.27)', 'short': 'Zabbix74', 'ip': '10.168.220.27', 'url': ZABBIX74_URL},
-    'zbx20': {'name': 'Zabbix20 (CentralZabbix 6.2 - 10.168.220.20)', 'short': 'Zabbix20', 'ip': '10.168.220.20', 'url': ZABBIX20_URL_API},
+    'zbx35': {'name': 'Zabbix Core (7.0 Principal - 192.168.1.35)', 'short': 'ZabbixCore', 'ip': '192.168.1.35', 'url': ZABBIX_URL},
+    'zbx74': {'name': 'Zabbix Dist (7.4 Distribuido - 192.168.1.27)', 'short': 'ZabbixDist', 'ip': '192.168.1.27', 'url': ZABBIX74_URL},
+    'zbx20': {'name': 'Zabbix Legacy (6.2 Central - 192.168.1.20)', 'short': 'ZabbixLegacy', 'ip': '192.168.1.20', 'url': ZABBIX20_URL_API},
 }
 
 _zbx_tokens = {'zbx35': (ZABBIX_TOKEN, 9999999999), 'zbx74': (None, 0), 'zbx20': (None, 0)}
@@ -404,7 +404,7 @@ def get_host_interfaces(target):
         "interfaces": ifaces_list
     }
 
-def get_traffic_graph_with_stats(query_term="10.168.220.28", period_str="3h", iface_filter=""):
+def get_traffic_graph_with_stats(query_term="192.168.1.1", period_str="3h", iface_filter=""):
     query_term = str(query_term or '').strip()
     iface_filter = str(iface_filter or '').strip()
 
@@ -535,7 +535,7 @@ def get_traffic_graph_with_stats(query_term="10.168.220.28", period_str="3h", if
         ax.plot(t_out, v_out, color='#3B82F6', linewidth=1.6, label=f'TX (Outbound): Act={last_out:.2f} Mbps | Max={max_out:.2f} | Avg={avg_out:.2f}')
         ax.fill_between(t_out, v_out, color='#3B82F6', alpha=0.25)
 
-    ax.set_title(f"TECNORED NOC · {host_name} · {disp_iface} ({period_label})", fontsize=11, fontweight='bold', color='#F3F4F6', pad=12)
+    ax.set_title(f"NETCORE NOC · {host_name} · {disp_iface} ({period_label})", fontsize=11, fontweight='bold', color='#F3F4F6', pad=12)
     ax.set_ylabel("Ancho de Banda (Mbps)", fontsize=9, color='#9CA3AF')
     ax.grid(True, linestyle='--', alpha=0.22, color='#4B5563')
 
@@ -564,7 +564,7 @@ def get_traffic_graph_with_stats(query_term="10.168.220.28", period_str="3h", if
         "tx_last": last_out, "tx_max": max_out, "tx_avg": avg_out
     }
 
-def get_traffic_graph_bytes(query_term="10.168.220.28", period_str="3h", iface_filter=""):
+def get_traffic_graph_bytes(query_term="192.168.1.1", period_str="3h", iface_filter=""):
     img_bytes, _ = get_traffic_graph_with_stats(query_term, period_str, iface_filter)
     return img_bytes
 
@@ -578,7 +578,7 @@ def build_pdf_report(period_hours=24, host_target="", iface_filter=""):
 
     since_ts, now_ts, duration_sec, period_label, raw_period = parse_time_window(period_hours)
     
-    target_to_graph = host_target or ("MKMulticanal" if iface_filter else "")
+    target_to_graph = host_target or ("CoreRouter-01" if iface_filter else "")
     is_interface_specific = bool(iface_filter or (host_target and host_target.lower() != 'all'))
 
     buf = io.BytesIO()
@@ -689,7 +689,7 @@ def build_pdf_report(period_hours=24, host_target="", iface_filter=""):
         recovered_gen = sum(1 for e in events if e.get('value') == '0')
         disaster_count = sum(1 for e in events if e.get('severity') in ['4', '5'])
 
-        report_title = "TECNORED NOC · REPORTE EJECUTIVO GENERAL"
+        report_title = "NETCORE NOC · REPORTE EJECUTIVO GENERAL"
         report_subtitle = f"Monitoreo Zabbix & The Dude · Periodo: {period_label} · Generado: {now_str}"
 
         story.append(Paragraph(report_title, header_title_style))
@@ -793,7 +793,7 @@ def build_pdf_report(period_hours=24, host_target="", iface_filter=""):
 
     story.append(Spacer(1, 16))
     story.append(HRFlowable(width="100%", thickness=0.5, color=colors.HexColor('#94A3B8'), spaceAfter=8))
-    story.append(Paragraph("Tecnored Telecomunicaciones · Centro de Control de Operaciones (NOC) · Documento Confidencial", subtitle_style))
+    story.append(Paragraph("NetCore Telecom Solutions · Centro de Control de Operaciones (NOC) · Documento Confidencial", subtitle_style))
 
     doc.build(story)
     buf.seek(0)
@@ -841,7 +841,7 @@ def get_dashboard_snapshot_bytes():
 
     gs = fig.add_gridspec(2, 2, hspace=0.35, wspace=0.25)
     now_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
-    fig.suptitle(f"TECNORED NOC - DASHBOARD EJECUTIVO EN TIEMPO REAL\n{now_str}", 
+    fig.suptitle(f"NETCORE NOC - DASHBOARD EJECUTIVO EN TIEMPO REAL\n{now_str}", 
                  fontsize=13, fontweight='bold', color='#F8FAFC', y=0.97)
 
     ax1 = fig.add_subplot(gs[0, 0])
@@ -938,7 +938,7 @@ def run_linux_ping(target, count=4):
     except Exception as e:
         return {"target": target, "alive": False, "error": str(e)}
 
-PROXMOX_HOST = '10.168.220.10'
+PROXMOX_HOST = os.getenv('PROXMOX_HOST', '192.168.1.10')
 PROXMOX_USER = 'root@pam'
 PROXMOX_PASS = os.getenv("PROXMOX_PASSWORD", "your_proxmox_password")
 
@@ -1002,13 +1002,13 @@ def get_proxmox_health(target=''):
         with urllib.request.urlopen(res_req, context=ctx, timeout=8) as r:
             all_res = json.loads(r.read().decode('utf-8'))['data']
         try:
-            c_login = urllib.request.Request('https://10.1.1.80:8006/api2/json/access/ticket', data=login_data)
+            c_login = urllib.request.Request('https://192.168.1.80:8006/api2/json/access/ticket', data=login_data)
             with urllib.request.urlopen(c_login, context=ctx, timeout=5) as cr:
                 c_ticket = json.loads(cr.read().decode('utf-8'))['data']['ticket']
-            c_res_req = urllib.request.Request('https://10.1.1.80:8006/api2/json/cluster/resources', headers={'Cookie': f'PVEAuthCookie={c_ticket}'})
+            c_res_req = urllib.request.Request('https://192.168.1.80:8006/api2/json/cluster/resources', headers={'Cookie': f'PVEAuthCookie={c_ticket}'})
             with urllib.request.urlopen(c_res_req, context=ctx, timeout=5) as cr2:
                 for item in json.loads(cr2.read().decode('utf-8')).get('data', []):
-                    item['_pve_host'] = '10.1.1.80'
+                    item['_pve_host'] = '192.168.1.80'
                     all_res.append(item)
         except Exception:
             pass
@@ -1369,7 +1369,7 @@ def check_device_health(target):
 
 
 # --- ZABBIX 20 REALTIME COLLECTOR ---
-ZABBIX20_URL = 'http://10.168.220.20/zabbix/api_jsonrpc.php'
+ZABBIX20_URL = os.getenv('ZABBIX20_URL', 'http://192.168.1.20/zabbix/api_jsonrpc.php')
 ZABBIX20_USER = 'Admin'
 ZABBIX20_PASS = 'zabbix'
 N8N_WEBHOOK_ZABBIX = 'http://127.0.0.1:5678/webhook/zabbix-alert'
@@ -1560,7 +1560,7 @@ class Zabbix74Collector(threading.Thread):
             print(f"[Zabbix74 -> n8n] Failed to post webhook: {e}", flush=True)
 
     def run(self):
-        print("[Zabbix74] Collector thread started (10.168.220.27 - LXC 110). Polling every 30s...", flush=True)
+        print("[ZabbixDist] Collector thread started (192.168.1.27). Polling every 30s...", flush=True)
         time.sleep(6)
         while True:
             try:
@@ -1699,7 +1699,7 @@ def handle_unified_zabbix_problems(limit=15):
                     'hora': datetime.fromtimestamp(int(p.get('clock', time.time()))).strftime('%H:%M')
                 })
     return {
-        'servidores_monitoreados': ['Zabbix35 (10.168.220.35)', 'Zabbix74 LXC-110 (10.168.220.27)', 'Zabbix20 CentralZabbix (10.168.220.20)'],
+        'servidores_monitoreados': ['Zabbix Core (192.168.1.35)', 'Zabbix Dist (192.168.1.27)', 'Zabbix Legacy (192.168.1.20)'],
         'alertas_recientes_ultimos_6_min': [
             {
                 'origen': a['source'],
@@ -1751,13 +1751,13 @@ def handle_unified_zabbix_search(query):
     # Special case: asking for a whole Zabbix instance like zabbix74, zabbix20, zabbix35
     target_srvs = ('zbx35', 'zbx74', 'zbx20')
     list_all_on_srv = False
-    if ql in ('zabbix74', 'zabbix 74', 'zabbix-74', '10.168.220.27', 'lxc 110', 'contenedor 110', 'zabbix27'):
+    if ql in ('zabbix74', 'zabbix 74', 'zabbixdist', '192.168.1.27'):
         target_srvs = ('zbx74',)
         list_all_on_srv = True
-    elif ql in ('zabbix35', 'zabbix 35', '10.168.220.35', 'zabbix 7.0'):
+    elif ql in ('zabbix35', 'zabbix 35', 'zabbixcore', '192.168.1.35'):
         target_srvs = ('zbx35',)
         list_all_on_srv = True
-    elif ql in ('zabbix20', 'zabbix 20', 'centralzabbix', '10.168.220.20'):
+    elif ql in ('zabbix20', 'zabbix 20', 'zabbixlegacy', '192.168.1.20'):
         target_srvs = ('zbx20',)
         list_all_on_srv = True
 
@@ -2023,8 +2023,8 @@ def format_traffic_summary_response(raw_query, chat_id=None, period='24h', iface
     dir_label = " (Tráfico saliendo / Outbound)" if direction == 'outbound' else (" (Tráfico entrando / Inbound)" if direction == 'inbound' else "")
     
     related_notes = []
-    if 'sanagustin' in resolved.get('clean_compact', '') or 'san agustin' in raw_query.lower():
-        related_notes.append("• <code>vlan763-sanag-bqn(San Agustin)</code> en <b>MKMulticanal</b>: ⬆️ ~665 Mbps (Tráfico hacia el nodo)")
+    if 'nodoeast' in resolved.get('clean_compact', '') or 'nodo este' in raw_query.lower():
+        related_notes.append("• <code>vlan100-core-trunk</code> en <b>CoreRouter-01</b>: ⬆️ ~665 Mbps (Tráfico hacia el nodo)")
     
     caption_lines = [
         f"📈 <b>Tráfico de Red — {target_host}</b>",
@@ -2165,8 +2165,8 @@ def format_interfaces_response(raw_query, chat_id=None):
                 srv_key = res_inv['srv_key']
                 
     if not target_host:
-        target_host = 'MKMulticanal'
-        res_inv = network_inv.resolve('MKMulticanal')
+        target_host = 'CoreRouter-01'
+        res_inv = network_inv.resolve('CoreRouter-01')
         if res_inv:
             resolved = res_inv['resolved']
             srv_key = res_inv['srv_key']
@@ -2254,7 +2254,7 @@ class SentryVoiceBrain:
                 'Authorization': 'Bearer YOUR_LLM_BEARER_TOKEN'
             }
             req = urllib.request.Request(
-                'https://10.168.220.117:11443/v1/chat/completions',
+                'https://192.168.1.60:11443/v1/chat/completions',
                 data=json.dumps(req_data).encode('utf-8'),
                 headers=headers
             )
@@ -2288,7 +2288,7 @@ class SentryVoiceBrain:
                             self.last_alert_time = now
                             user_p = f"ALERTA OPERATIVA INMEDIATA: Se detectó caída o desconexión en el router de borde {bname} ({ip}). Da un aviso breve y directo al equipo en la sala NOC."
                             text = self.ask_llm(
-                                "Eres Marco, coordinador del NOC de Tecnored. Da una alerta técnica breve y directa en voz alta (máximo 16 palabras).",
+                                "Eres Marco, coordinador del NOC de NetCore NOC. Da una alerta técnica breve y directa en voz alta (máximo 16 palabras).",
                                 user_p
                             )
                             if text:
@@ -2303,7 +2303,7 @@ class SentryVoiceBrain:
                             self.last_alert_time = now
                             user_p = f"RECUPERACIÓN: El router {bname} ({ip}) se ha restablecido y vuelve a responder en línea. Da un aviso breve de normalización."
                             text = self.ask_llm(
-                                "Eres Marco, coordinador del NOC de Tecnored. Da un aviso breve de recuperación técnica en voz alta (máximo 14 palabras).",
+                                "Eres Marco, coordinador del NOC de NetCore NOC. Da un aviso breve de recuperación técnica en voz alta (máximo 14 palabras).",
                                 user_p
                             )
                             if text:
@@ -2325,7 +2325,7 @@ class SentryVoiceBrain:
                         self.last_alert_time = now
                         user_p = f"ALERTA CRÍTICA: El hipervisor {nname} del clúster Proxmox ha pasado a estado OFFLINE. Da una advertencia operativa rápida."
                         text = self.ask_llm(
-                            "Eres Marco, coordinador del NOC de Tecnored. Da una advertencia técnica urgente y concisa en voz alta (máximo 16 palabras).",
+                            "Eres Marco, coordinador del NOC de NetCore NOC. Da una advertencia técnica urgente y concisa en voz alta (máximo 16 palabras).",
                             user_p
                         )
                         if text:
@@ -2354,10 +2354,10 @@ class SentryVoiceBrain:
             mem_p = round((mem_u / mem_m) * 100, 1) if mem_m else 47.0
             ctx = f"Clúster Proxmox totalmente estable con {pmx.get('vms_running', 38)} de {pmx.get('vms_total', 41)} VMs activas y memoria utilizada al {mem_p}% ({mem_u} GB de {mem_m} GB de capacidad física)."
         elif topic == 'core_traffic':
-            ctx = f"Tráfico troncal de borde con {round(tot_rx/1000, 1)} Gbps de bajada y {round(tot_tx/1000, 1)} Gbps de subida; enlaces Multicanal, Don Bosco y Humboldt operando sin saturación."
+            ctx = f"Tráfico troncal de borde con {round(tot_rx/1000, 1)} Gbps de bajada y {round(tot_tx/1000, 1)} Gbps de subida; enlaces WAN Troncal Principal, Enlace de Respaldo y Red de Distribución operando sin saturación."
         elif topic == 'hardware_health':
             temps = [f"{m.get('short')}: {m.get('temp_c')}°C" for m in mk if m.get('temp_c')]
-            ctx = f"Salud física de los MikroTik núcleo: temperaturas operativas estables ({', '.join(temps[:3])}), procesadores bajo 10% y enlace San Agustín normal."
+            ctx = f"Salud física de los MikroTik núcleo: temperaturas operativas estables ({', '.join(temps[:3])}), procesadores bajo 10% y enlace troncal de distribución normal."
         else: # pbs_backups
             ctx = f"Servidor PBS de respaldos con {pbs.get('respaldos_exitosos', 28)} de 28 respaldos diarios íntegros y cero fallos en datastores."
 
@@ -2366,7 +2366,7 @@ class SentryVoiceBrain:
             hist_clause = f"IMPORTANTE: No repitas ideas ni palabras de lo dicho antes: {'; '.join(self.last_comments[-3:])}."
 
         sys_p = (
-            "Eres Marco, coordinador de guardia del NOC de Tecnored. Hablas en voz alta en la sala de operaciones "
+            "Eres Marco, coordinador de guardia del NOC de NetCore NOC. Hablas en voz alta en la sala de operaciones "
             "como un ingeniero de redes senior, de forma espontánea, técnica y concisa. "
             "Da una sola frase breve (máximo 16 palabras) reflexionando sobre el estado actual de la infraestructura. "
             "La infraestructura opera de forma normal y estable. Habla con calma y realismo técnico, sin alarmismos. "
@@ -2433,28 +2433,28 @@ import unicodedata
 
 NOC_OPERATORS = [
     {
-        "nombre": "Adrián Mercado",
+        "nombre": "Operador NOC 1",
         "jid": "584120000001@c.us",
         "phone": "584120000001",
-        "alias": ["adrian", "adrián", "mercado"]
+        "alias": ["operador1", "guardia1"]
     },
     {
-        "nombre": "Johan Rojas",
+        "nombre": "Operador NOC 2",
         "jid": "584240000002@c.us",
         "phone": "584240000002",
-        "alias": ["johan", "joan", "jhoan", "rojas"]
+        "alias": ["operador2", "guardia2"]
     },
     {
-        "nombre": "Junior Sosa",
+        "nombre": "Operador NOC 3",
         "jid": "584140000003@c.us",
         "phone": "584140000003",
-        "alias": ["junior", "sosa"]
+        "alias": ["operador3", "guardia3"]
     },
     {
-        "nombre": "Estiwar Quintero",
+        "nombre": "Operador NOC 4",
         "jid": "584240000004@c.us",
         "phone": "584240000004",
-        "alias": ["estiwar", "quintero"]
+        "alias": ["operador4", "guardia4"]
     }
 ]
 
@@ -2473,7 +2473,7 @@ def detect_mentioned_operators(data, body_text):
                     if op["nombre"] not in mentioned:
                         mentioned.append(op["nombre"])
 
-    # 2. Text mentions (@alias or whole-word alias, including johan, joan, jhoan, etc.)
+    # 2. Text mentions (@alias or whole-word alias, including guardia, operador, etc.)
     clean_text = strip_accents_text(body_text.lower())
     for op in NOC_OPERATORS:
         if op["nombre"] in mentioned:
@@ -2500,7 +2500,7 @@ def classify_whatsapp_ticket(body_text, mentioned_ops=None):
         )
 
     prompt = (
-        "Eres el clasificador y sintetizador de voz de IA del NOC de Tecnored para el grupo de WhatsApp 'Soporte Interno TI'.\n"
+        "Eres el clasificador y sintetizador de voz de IA del NOC de NetCore NOC para el grupo de WhatsApp 'Soporte Interno TI'.\n"
         "Tu misión es procesar mensajes entrantes para generar la locución de voz clara, formal y perfectamente entendible que se anunciará a los operadores por altavoz en el centro de operaciones.\n"
         f"{ops_instruction}\n"
         "REGLAS DE CLASIFICACIÓN:\n"
@@ -2511,10 +2511,10 @@ def classify_whatsapp_ticket(body_text, mentioned_ops=None):
         "   - Estructura y tono: Debe sonar natural, pausada y clara para síntesis de voz (TTS). Máximo 32 palabras.\n"
         "   - Formato recomendado:\n"
         "     \"Nuevo requerimiento de [Departamento u Oficina]: [Nombre Completo del Solicitante] solicita [Descripción clara del problema o requerimiento].\"\n"
-        "     Ejemplo: \"Nuevo requerimiento de Asesoría Legal, oficina PH-E: Nairelys Peraza solicita habilitación de internet en teléfono celular.\"\n"
+        "     Ejemplo: \"Nuevo requerimiento de Soporte Corporativo, oficina 4-B: María Fernández solicita habilitación de acceso VPN corporativo.\"\n"
         "   - Si no hay nombre de persona: \"Nuevo requerimiento de [Departamento/Oficina]: [descripción del problema].\"\n"
         "   - Si no hay departamento: \"Nuevo requerimiento solicitado por [Nombre]: [descripción del problema].\"\n"
-        "   - NUNCA inventes, cambies ni omitas el nombre de la persona (ej: 'Nairelys' no debe cambiarse por nada).\n"
+        "   - NUNCA inventes, cambies ni omitas el nombre de la persona (ej: 'María' no debe cambiarse por nada).\n"
         "   - NUNCA incluyas números de cédula (C.I.), números telefónicos, saludos ni despedidas en la locución.\n"
         "   - Usa puntuación clara (puntos y comas) para generar pausas naturales al hablar.\n\n"
         "2. MENSAJES QUE NO DEBEN HABLARSE:\n"
@@ -2537,7 +2537,7 @@ def classify_whatsapp_ticket(body_text, mentioned_ops=None):
         "Authorization": "Bearer YOUR_LLM_BEARER_TOKEN"
     }
     req = urllib.request.Request(
-        "https://10.168.220.117:11443/v1/chat/completions",
+        "https://192.168.1.60:11443/v1/chat/completions",
         data=json.dumps(payload).encode('utf-8'),
         headers=headers
     )
@@ -2606,12 +2606,12 @@ def process_whatsapp_webhook(payload):
 def fetch_tv_telemetry_live():
     # 1. OLTs (Zabbix 35)
     olt_configs = [
-        {"name": "OLT HUMBOLDT", "host": "SW_MIKROTIK_HUMBOLDT", "color_rx": "#ec4899", "color_tx": "#3b82f6", "iface": "sfp-sfpplus2"},
-        {"name": "OLT ANDRES BELLO", "host": "MK_ANDRESBELLO", "color_rx": "#06b6d4", "color_tx": "#1d4ed8", "iface": "sfp-sfpplus8"},
-        {"name": "OLT DON BOSCO", "host": "SW_MIKROTIK_AZOTEA", "color_rx": "#00ffff", "color_tx": "#22c55e", "iface": "sfp-sfpplus8"},
-        {"name": "OLT YARACUY", "host": "MK_RES.YARACUY", "color_rx": "#ef4444", "color_tx": "#f87171", "iface": "sfp-sfpplus1"},
-        {"name": "OLT SAN AGUSTIN", "host": "Mikrotik_SANAGUSTIN", "color_rx": "#f59e0b", "color_tx": "#ea580c", "iface": "sfp-sfpplus1"},
-        {"name": "OLT MACARACUAY", "host": "MK_MACARACUAY", "color_rx": "#c084fc", "color_tx": "#9333ea", "iface": "sfp-sfpplus1"},
+        {"name": "OLT REGION SOUTH", "host": "SW_CORE_SOUTH", "color_rx": "#ec4899", "color_tx": "#3b82f6", "iface": "sfp-sfpplus2"},
+        {"name": "OLT REGION CENTRAL", "host": "MK_CORE_CENTRAL", "color_rx": "#06b6d4", "color_tx": "#1d4ed8", "iface": "sfp-sfpplus8"},
+        {"name": "OLT REGION NORTH", "host": "SW_CORE_NORTH", "color_rx": "#00ffff", "color_tx": "#22c55e", "iface": "sfp-sfpplus8"},
+        {"name": "OLT REGION WEST", "host": "MK_CORE_WEST", "color_rx": "#ef4444", "color_tx": "#f87171", "iface": "sfp-sfpplus1"},
+        {"name": "OLT REGION EAST", "host": "SW_CORE_EAST", "color_rx": "#f59e0b", "color_tx": "#ea580c", "iface": "sfp-sfpplus1"},
+        {"name": "OLT REGION METRO", "host": "MK_CORE_METRO", "color_rx": "#c084fc", "color_tx": "#9333ea", "iface": "sfp-sfpplus1"},
     ]
 
     olt_hosts = [c["host"] for c in olt_configs]
@@ -2653,23 +2653,23 @@ def fetch_tv_telemetry_live():
     # 2. Routers de Borde & Núcleo (5 Routers en Zabbix 35 - Medición limpia de interfaz WAN/Tránsito real)
     border_configs = [
         {
-            "name": "BORDE DON BOSCO 1072", "short": "Don Bosco 1072", "model": "CCR1072", "hostid": "10654", "ip": "172.17.66.1", "tag": "Core Cisco / 5009", "color_rx": "#38bdf8", "color_tx": "#60a5fa",
+            "name": "BORDER-ROUTER-NORTH", "short": "Edge-North-1072", "model": "CCR1072", "hostid": "10654", "ip": "192.168.10.1", "tag": "Core Distribution / 5009", "color_rx": "#38bdf8", "color_tx": "#60a5fa",
             "rx_key": "net.if.in[ifHCInOctets.2]", "tx_key": "net.if.out[ifHCOutOctets.2]", "iface_match": "sfp-sfpplus2"
         },
         {
-            "name": "BORDE HUMBOLDT 2216", "short": "Humboldt 2216", "model": "CCR2216", "hostid": "12277", "ip": "172.29.29.1", "tag": "MDS / Troncales", "color_rx": "#818cf8", "color_tx": "#a78bfa",
+            "name": "BORDER-ROUTER-SOUTH", "short": "Edge-South-2216", "model": "CCR2216", "hostid": "12277", "ip": "192.168.20.1", "tag": "Trunk Backbone / Uplink", "color_rx": "#818cf8", "color_tx": "#a78bfa",
             "rx_key": "net.if.in[ifHCInOctets.12]", "tx_key": "net.if.out[ifHCOutOctets.12]", "iface_match": "sfp28-2"
         },
         {
-            "name": "MK MULTICANAL", "short": "Multicanal", "model": "CCR2216", "hostid": "12535", "ip": "38.41.27.252", "tag": "BQN / WAN Principal", "color_rx": "#34d399", "color_tx": "#4ade80",
+            "name": "COREROUTER-01", "short": "CoreRouter", "model": "CCR2216", "hostid": "12535", "ip": "198.51.100.1", "tag": "Core WAN Principal", "color_rx": "#34d399", "color_tx": "#4ade80",
             "rx_key": "net.if.in[ifHCInOctets.26]", "tx_key": "net.if.out[ifHCOutOctets.26]", "iface_match": "wan-mds"
         },
         {
-            "name": "MIKROTIK SAN AGUSTIN", "short": "San Agustín", "model": "RB5009", "hostid": "10648", "ip": "172.16.174.1", "tag": "Bonding / Troncal", "color_rx": "#fbbf24", "color_tx": "#f59e0b",
+            "name": "DIST-ROUTER-EAST", "short": "Dist-East-5009", "model": "RB5009", "hostid": "10648", "ip": "192.168.30.1", "tag": "Bonding / Trunk", "color_rx": "#fbbf24", "color_tx": "#f59e0b",
             "rx_key": "net.if.in[ifHCInOctets.18]", "tx_key": "net.if.out[ifHCOutOctets.18]", "iface_match": "bonding-sag"
         },
         {
-            "name": "MK PLAZA PALOS GRANDES", "short": "Palos Grandes", "model": "RB750Gr3", "hostid": "10676", "ip": "172.16.45.147", "tag": "Hotspot / Plaza", "color_rx": "#f472b6", "color_tx": "#ec4899",
+            "name": "ACCESS-ROUTER-WEST", "short": "Access-West-750", "model": "RB750Gr3", "hostid": "10676", "ip": "192.168.40.1", "tag": "Hotspot Gateway / Office", "color_rx": "#f472b6", "color_tx": "#ec4899",
             "rx_key": "net.if.in[ifHCInOctets.1]", "tx_key": "net.if.out[ifHCOutOctets.1]", "iface_match": "ether1"
         }
     ]
@@ -2867,13 +2867,13 @@ def fetch_tv_telemetry_live():
             if pdm_s and pdm_s.get('ok'):
                 pbs_raw = pdm_s.get('pbs_backup', {})
                 pbs_info = {
-                    "nodo": pbs_raw.get('nodo_pbs', 'pbs-backup.tecnored.net.ve'),
+                    "nodo": pbs_raw.get('nodo_pbs', 'pbs-backup.netcore-isp.net'),
                     "estado": pbs_raw.get('estado', 'Online y Operativo'),
-                    "datastores": pbs_raw.get('datastores_online', '3 / 3 (backup-local, lumex, archive)'),
+                    "datastores": pbs_raw.get('datastores_online', '3 / 3 (datastore-local, datastore-remote, archive)'),
                     "almacenamiento": pbs_raw.get('almacenamiento', '4.82 TB / 16.0 TB (30.1%)'),
                     "respaldos_exitosos": pbs_raw.get('respaldos_exitosos', 28),
                     "respaldos_fallidos": pbs_raw.get('respaldos_fallidos', 0),
-                    "trabajos": "pmx-cluster (Local) + cirion-cluster (Lumex): OK"
+                    "trabajos": "cluster-primary (Site-A) + cluster-secondary (Site-B): OK"
                 }
         except Exception:
             pass
@@ -3023,7 +3023,7 @@ class ProxyHandler(http.server.BaseHTTPRequestHandler):
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Vinculación de WhatsApp - NOC Tecnored</title>
+  <title>Vinculación de WhatsApp - NetCore NOC</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0b0f19; color: #f1f5f9; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 16px; box-sizing: border-box; }
@@ -3156,7 +3156,7 @@ class ProxyHandler(http.server.BaseHTTPRequestHandler):
 
         if parsed.path in ['/tv', '/oficina', '/visor']:
             try:
-                html_path = '/home/tecnored/n8n/oficina_noc.html'
+                html_path = os.getenv('DASHBOARD_HTML_PATH', '/app/dashboard/oficina_noc.html')
                 if not os.path.exists(html_path):
                     html_path = os.path.join(os.path.dirname(__file__), 'oficina_noc.html')
                 with open(html_path, 'rb') as f:
@@ -3305,7 +3305,7 @@ class ProxyHandler(http.server.BaseHTTPRequestHandler):
         if parsed.path == '/ping':
             try:
                 qs = parse_qs(parsed.query)
-                target = qs.get('target', ['10.168.220.28'])[0].strip()
+                target = qs.get('target', ['192.168.1.1'])[0].strip()
                 count = int(qs.get('count', [4])[0])
                 res = run_linux_ping(target, count)
                 event_hub.publish({
@@ -3436,7 +3436,7 @@ class ProxyHandler(http.server.BaseHTTPRequestHandler):
         if parsed.path == '/interfaces':
             try:
                 qs = parse_qs(parsed.query)
-                target = qs.get('target', ['MKMulticanal'])[0].strip()
+                target = qs.get('target', ['CoreRouter-01'])[0].strip()
                 ifaces_data = get_host_interfaces(target)
                 resp_body = json.dumps(ifaces_data).encode('utf-8')
                 self.send_response(200)
@@ -3486,7 +3486,7 @@ class ProxyHandler(http.server.BaseHTTPRequestHandler):
         if parsed.path == '/generate-traffic-chart':
             try:
                 qs = parse_qs(parsed.query)
-                target = qs.get('target', ['MKMulticanal'])[0].strip()
+                target = qs.get('target', ['CoreRouter-01'])[0].strip()
                 period = qs.get('period', ['3h'])[0].strip()
                 iface = qs.get('interface', [''])[0].strip()
                 event_hub.publish({

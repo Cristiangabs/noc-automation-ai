@@ -4,7 +4,7 @@ After=network-online.target
 
 [Service]
 Type=oneshot
-User=tecnored
+User=noc-operator
 EnvironmentFile=/etc/environment
 ExecStart=/usr/bin/python3 /opt/noc-automation/crm/daily_crm_report.py
 

@@ -4,8 +4,8 @@
 Reporte Diario Automatizado de CRM Odoo - Plantilla PLANIF INSTALACIONES
 Asignación inteligente por cuadrillas y zonas geográficas.
 Envío de Excel (.xlsx) + Imagen gráfica del cuadro (.png).
-Destinatario principal: Sr. Calles (+58 424-2067845)
-Empresa: Inversiones Multicanal, C.A.
+Destinatario principal: Coordinador de Despacho (+58 412-0000000)
+Empresa: Telecom & ISP Solutions, C.A.
 """
 
 import os
@@ -33,7 +33,7 @@ DEST_CHAT_IDS = os.getenv("DEST_CHAT_IDS", "584XXXXXXXXX@c.us").split(",")
 OPENWA_SESSION = os.getenv("OPENWA_SESSION_ID", "your_openwa_session_id")
 OPENWA_BASE = f"http://127.0.0.1:2785/api/sessions/{OPENWA_SESSION}/messages"
 API_KEY = os.getenv("OPENWA_API_KEY", "your_openwa_api_key")
-LOG_FILE = "/var/log/daily_crm_calles.log"
+LOG_FILE = "/var/log/daily_crm_dispatch.log"
 
 def log(msg):
     ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -68,11 +68,11 @@ CLOSINGS = [
 
 def fetch_data():
     conn = psycopg2.connect(
-        host=os.getenv("ODOO_PG_HOST", "10.168.220.138"),
+        host=os.getenv("ODOO_PG_HOST", "192.168.1.70"),
         port=5432,
         user=os.getenv("ODOO_PG_USER", "odoo"),
         password=os.getenv("ODOO_PG_PASSWORD", "your_pg_password"),
-        dbname=os.getenv("ODOO_PG_DB", "multicanal"),
+        dbname=os.getenv("ODOO_PG_DB", "isp_database"),
         connect_timeout=10
     )
     cur = conn.cursor()
@@ -122,14 +122,14 @@ def assign_cuadrillas(rows):
     # Ayudantes rotativos basados en el día del año
     day_of_year = datetime.now().timetuple().tm_yday
     if day_of_year % 2 == 0:
-        ayudante_mixta = "Dario"
-        ayudante_fibra = "Almeida"
+        ayudante_mixta = "Luis"
+        ayudante_fibra = "Torres"
     else:
-        ayudante_mixta = "Almeida"
-        ayudante_fibra = "Dario"
+        ayudante_mixta = "Torres"
+        ayudante_fibra = "Luis"
 
-    tecnicos_mixta = "Jean, Edwin"
-    tecnicos_fibra = "Jesus, Tony"
+    tecnicos_mixta = "Carlos, Roberto"
+    tecnicos_fibra = "Alejandro, Daniel"
 
     # Agrupar clientes por ubicación principal
     zones = defaultdict(list)
@@ -180,10 +180,10 @@ def generate_caption(total_records, count_mixta, count_fibra, ayudante_mixta, ay
         f"• *Total Aprobados:* {total_records} instalaciones\n\n"
         f"👷‍♂️ *Distribución de Cuadrillas por Zona:*\n"
         f"🔴 *Cuadrilla Mixta ({count_mixta} clientes):*\n"
-        f"  • Técnicos: Jean Mejias, Edwin Gutierrez\n"
+        f"  • Técnicos: Carlos Mendoza, Roberto Silva\n"
         f"  • Ayudante: {ayudante_mixta}\n\n"
         f"🔵 *Cuadrilla Solo Fibra ({count_fibra} clientes):*\n"
-        f"  • Técnicos: Jesus Perez, Tony Rodriguez\n"
+        f"  • Técnicos: Alejandro Gomez, Daniel Herrera\n"
         f"  • Ayudante: {ayudante_fibra}\n\n"
         f"📸 *Se adjunta imagen gráfica resumen y archivo Excel formal.*\n\n"
         f"{closing}"
@@ -303,7 +303,7 @@ def build_png_table(rows, output_path):
         loc = loc[:32]
         
         cuad_short = "Mixta" if "Mixta" in r[10] else "Solo Fibra"
-        tecs_short = "Jean M. / Edwin G." if "Jean" in r[11] else "Jesus P. / Tony R."
+        tecs_short = "Carlos M. / Roberto S." if "Carlos" in r[11] else "Alejandro G. / Daniel H."
         ayudante = r[12]
         
         table_data.append([sub_code, lead_id, cliente, tech, loc, cuad_short, tecs_short, ayudante])
@@ -315,7 +315,7 @@ def build_png_table(rows, output_path):
     ax.axis('off')
 
     date_str = datetime.now().strftime("%d/%m/%Y")
-    fig.text(0.5, 0.96, f"INVERSIONES MULTICANAL, C.A. - PLANIFICACIÓN DE INSTALACIONES ({date_str})", 
+    fig.text(0.5, 0.96, f"TELECOM & ISP SOLUTIONS, C.A. - PLANIFICACIÓN DE INSTALACIONES ({date_str})", 
              ha='center', va='center', fontsize=14, weight='bold', color='#1B365D')
     fig.text(0.5, 0.93, "Distribución de Clientes por Zona Geográfica y Cuadrilla Operativa", 
              ha='center', va='center', fontsize=10, style='italic', color='#555555')

@@ -36,7 +36,7 @@ flowchart TD
         WA_GW["OpenWA Gateway (Port 2785)"]
         TG_BOT["Telegram NOC Bot"]
         ODOO["Odoo 15 Enterprise (CRM Leads)"]
-        SR_CALLES["WhatsApp Sr. Calles (Cuadrillas)"]
+        DISPATCH["WhatsApp Coordinador de Despacho (Cuadrillas)"]
     end
 
     ZBX --> PROXY
@@ -55,7 +55,7 @@ flowchart TD
 
     ODOO -->|Direct PostgreSQL| CRM_SCRIPT["Daily CRM Pipeline"]
     CRM_SCRIPT -->|Generate XLSX + PNG| WA_GW
-    WA_GW -->|Daily 08:00 AM| SR_CALLES
+    WA_GW -->|Daily 08:00 AM| DISPATCH
 ```
 
 ---
@@ -66,10 +66,10 @@ flowchart TD
 * **Database Direct Connection:** Queries PostgreSQL directly inside LAN bypassing public Cloudflare WAF challenges (0.2s query latency).
 * **Plantilla 'PLANIF INSTALACIONES' (ID 610):** Filters stage `Aprobado` (Stage 6) for Fiber and Radio Frequency teams.
 * **Intelligent Quadrilla Assignment:**
-  * **Solo Fibra:** Strict fiber-only assignments (Jesús Pérez / Tony Rodríguez).
-  * **Mixta:** Fiber & Radio Frequency capable (Jean Mejías / Edwin Gutiérrez).
-  * **Rotating Assistants:** Even rotation between Darío Perozo & Kleiver Almeida.
-  * **Geo-clustering:** Groups installations in the same geographical sector (e.g. San Agustín, Chacao) to avoid cross-city transit.
+  * **Solo Fibra:** Strict fiber-only assignments (Alejandro Gómez / Daniel Herrera).
+  * **Mixta:** Fiber & Radio Frequency capable (Carlos Mendoza / Roberto Silva).
+  * **Rotating Assistants:** Even rotation between Luis Ramírez & Manuel Torres.
+  * **Geo-clustering:** Groups installations in the same geographical sector (e.g. Sector Norte, Distrito Centro) to avoid cross-city transit.
 * **Dual Deliverables:** Generates styled corporate `.xlsx` (openpyxl) and high-res summary `.png` image (matplotlib) delivered via WhatsApp at 08:00 AM daily via systemd timer.
 
 ### 2. 🎙️ NOC TV Wallboard & Sentry Voice Brain (`proxy/` & `dashboard/`)
