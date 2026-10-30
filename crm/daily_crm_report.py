@@ -47,14 +47,14 @@ def log(msg):
 
 # Saludos ejecutivos y profesionales rotativos
 GREETING_TEMPLATES = [
-    "Estimado Sr. Calles, un cordial saludo. Le hago entrega del reporte de planificación de instalaciones (Aprobados) correspondiente a la jornada de hoy.",
-    "Buen día, Sr. Calles. Espero se encuentre muy bien. A continuación le comparto la distribución de instalaciones según plantilla y asignación por zonas.",
-    "Muy buenos días, Sr. Calles. Por medio del presente le remito el cuadro y archivo detallado de planificación de instalaciones para su respectiva gestión.",
-    "Estimado Sr. Calles, gusto en saludarle. Cumplo con adjuntarle el consolidado de prospectos aprobados con asignación de cuadrillas y ayudantes.",
-    "Buen día, Sr. Calles. Le adjunto el cuadro gráfico y el archivo Excel de planificación de instalaciones (Fibra Óptica Comunitaria y Radio Frecuencia).",
-    "Estimado Sr. Calles, reciba un cordial saludo. Le comparto el reporte diario de instalaciones aprobadas en sistema para las coordinaciones pertinentes.",
-    "Muy buen día, Sr. Calles. Le hago llegar la planificación de instalaciones asignada a cuadrillas de la fecha. Quedamos atentos ante cualquier requerimiento.",
-    "Estimado Sr. Calles, un placer saludarle. Le remito adjunto la planificación de instalaciones y su respectivo cuadro de seguimiento."
+    "Estimado Sr. un cordial saludo. Le hago entrega del reporte de planificación de instalaciones (Aprobados) correspondiente a la jornada de hoy.",
+    "Buen día, Sr. Espero se encuentre muy bien. A continuación le comparto la distribución de instalaciones según plantilla y asignación por zonas.",
+    "Muy buenos días, Sr. Por medio del presente le remito el cuadro y archivo detallado de planificación de instalaciones para su respectiva gestión.",
+    "Estimado Sr. gusto en saludarle. Cumplo con adjuntarle el consolidado de prospectos aprobados con asignación de cuadrillas y ayudantes.",
+    "Buen día, Sr. Le adjunto el cuadro gráfico y el archivo Excel de planificación de instalaciones (Fibra Óptica Comunitaria y Radio Frecuencia).",
+    "Estimado Sr. reciba un cordial saludo. Le comparto el reporte diario de instalaciones aprobadas en sistema para las coordinaciones pertinentes.",
+    "Muy buen día, Sr. Le hago llegar la planificación de instalaciones asignada a cuadrillas de la fecha. Quedamos atentos ante cualquier requerimiento.",
+    "Estimado Sr. un placer saludarle. Le remito adjunto la planificación de instalaciones y su respectivo cuadro de seguimiento."
 ]
 
 CLOSINGS = [
@@ -122,14 +122,14 @@ def assign_cuadrillas(rows):
     # Ayudantes rotativos basados en el día del año
     day_of_year = datetime.now().timetuple().tm_yday
     if day_of_year % 2 == 0:
-        ayudante_mixta = "Dario Perozo"
-        ayudante_fibra = "Kleiver Almeida"
+        ayudante_mixta = "Dario"
+        ayudante_fibra = "Almeida"
     else:
-        ayudante_mixta = "Kleiver Almeida"
-        ayudante_fibra = "Dario Perozo"
+        ayudante_mixta = "Almeida"
+        ayudante_fibra = "Dario"
 
-    tecnicos_mixta = "Jean Mejias, Edwin Gutierrez"
-    tecnicos_fibra = "Jesus Perez, Tony Rodriguez"
+    tecnicos_mixta = "Jean, Edwin"
+    tecnicos_fibra = "Jesus, Tony"
 
     # Agrupar clientes por ubicación principal
     zones = defaultdict(list)
@@ -200,7 +200,7 @@ def build_excel(rows, output_path):
     # Title Banner
     ws.merge_cells("A1:M1")
     title_cell = ws["A1"]
-    title_cell.value = f"INVERSIONES MULTICANAL, C.A. - PLANIFICACIÓN DE INSTALACIONES ({date_str})"
+    title_cell.value = f"INVERSIONES. - PLANIFICACIÓN DE INSTALACIONES ({date_str})"
     title_cell.font = Font(name="Calibri", size=13, bold=True, color="FFFFFF")
     title_cell.fill = PatternFill(start_color="1B365D", end_color="1B365D", fill_type="solid")
     title_cell.alignment = Alignment(horizontal="center", vertical="center")
