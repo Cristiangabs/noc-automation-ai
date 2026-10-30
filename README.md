@@ -77,7 +77,7 @@ flowchart TD
 * **High-Fidelity Audio Synthesis:** Powered by `es-VE-SebastianNeural` with `-6%` speed cadence and local MP3 caching.
 * **Live Operations Dashboard:** Displays aggregated traffic of 6 fiber OLTs, Proxmox status, PBS backups, and animated avatar locution.
 
-### 3.  n8n Autonomous Engineering Workflows (`workflows/`)
+### 3.  n8n autonomous Engineering Workflows (`workflows/`)
 * **Workflow 1: Reception & Security (`workflow-1-reception-pin.json`):** Telegram trigger, PIN authentication, immediate feedback, PDF/PNG delivery.
 * **Workflow 2: Cognitive AI Agent (`workflow-2-ai-agent-tools.json`):** LangChain Agent with 11 tools: Ping, Traffic (Tx/Rx), Zabbix Problems, Host Search, Network Topology, Proxmox VM Actions, and Datacenter Environmental Sensors.
 * **Workflow 3: Smart Alerts & Anti-Flapping (`workflow-3-smart-alerts.json`):** Real-time Zabbix & The Dude webhook ingestion with 30s micro-flap filtering and AI-enriched incident summaries.
