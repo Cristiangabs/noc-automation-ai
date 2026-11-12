@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720">
+  <rect width="1280" height="720" fill="#090D16"/>
+  <rect width="1280" height="64" fill="#0F172A"/>
+  <line x1="0" y1="64" x2="1280" y2="64" stroke="#1E293B" stroke-width="2"/>
+  <rect x="24" y="16" width="114" height="32" rx="6" fill="#065F46" stroke="#10B981"/>
+  <text x="81" y="36" fill="#A7F3D0" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold" text-anchor="middle">FIELD OPS PWA</text>
+  <text x="154" y="28" fill="#F8FAFC" font-family="Segoe UI, Arial, sans-serif" font-size="17" font-weight="bold">FTTH FIELD OPERATIONS PWA &amp; ZERO-TOUCH SMARTOLT PROVISIONING</text>
+  <text x="154" y="48" fill="#94A3B8" font-family="Segoe UI, Arial, sans-serif" font-size="12">Offline-First IndexedDB Queue  |  Zero-Collision IP Pool  |  Odoo ERP Sync  |  Digital Contract PDF</text>
+
+  <!-- Left Mobile Device Card -->
+  <rect x="36" y="86" width="410" height="606" rx="22" fill="#0F172A" stroke="#334155" stroke-width="3"/>
+  <text x="62" y="118" fill="#38BDF8" font-family="Segoe UI, Arial, sans-serif" font-size="14" font-weight="bold">FIBERNET CAMPO PWA (v39)</text>
+  <rect x="318" y="100" width="104" height="24" rx="10" fill="#064E3B" stroke="#10B981"/>
+  <text x="370" y="116" fill="#A7F3D0" font-family="Segoe UI, Arial, sans-serif" font-size="10" font-weight="bold" text-anchor="middle">SYNC ONLINE</text>
+
+  <rect x="58" y="138" width="366" height="128" rx="10" fill="#1E293B" stroke="#334155"/>
+  <text x="74" y="162" fill="#38BDF8" font-family="Consolas, monospace" font-size="13" font-weight="bold">Contrato: SUB8490  |  Lead #77528</text>
+  <text x="74" y="186" fill="#F8FAFC" font-family="Segoe UI, Arial, sans-serif" font-size="14" font-weight="bold">Cliente: Juan Carlos Demo</text>
+  <text x="74" y="208" fill="#94A3B8" font-family="Segoe UI, Arial, sans-serif" font-size="12">Zona: Sector Norte FTTH (OLT-04)</text>
+  <text x="74" y="228" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="12">Cuadrilla: Carlos Mendoza / Luis Rojas</text>
+  <text x="74" y="250" fill="#10B981" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="bold">Plan: Fibra Hogar 300 Mbps</text>
+
+  <rect x="58" y="282" width="366" height="190" rx="10" fill="#141E33" stroke="#0284C7"/>
+  <text x="74" y="306" fill="#38BDF8" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold">ZERO-TOUCH GPON PROVISIONING</text>
+  <g font-family="Consolas, monospace" font-size="12">
+    <text x="74" y="332" fill="#F8FAFC">PON S/N:    CDTC5098DEMO (C-Data)</text>
+    <text x="74" y="356" fill="#CBD5E1">OLT Port:   Board 1 / Port 8 / ONU 14</text>
+    <text x="74" y="380" fill="#CBD5E1">Preset ID:  #3 (C-Data Bridge/Route)</text>
+    <text x="74" y="404" fill="#10B981" font-weight="bold">RX Power:   -19.84 dBm (OPTIMAL)</text>
+    <text x="74" y="428" fill="#38BDF8" font-weight="bold">IP Pool:    100.64.10.42 (0 Collisions)</text>
+    <text x="74" y="452" fill="#94A3B8">GPS Coords: 10.4880, -66.8791</text>
+  </g>
+
+  <rect x="58" y="488" width="366" height="110" rx="10" fill="#1E293B" stroke="#334155"/>
+  <text x="74" y="510" fill="#94A3B8" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold">FIRMA DIGITAL DEL ABONADO (CANVAS PDF)</text>
+  <path d="M 96 565 Q 140 520 190 560 T 320 535" fill="none" stroke="#38BDF8" stroke-width="3"/>
+  <text x="74" y="586" fill="#10B981" font-family="Segoe UI, Arial, sans-serif" font-size="11">Evidencias: 4/4 Fotos + Speedtest Adjuntos</text>
+
+  <rect x="58" y="614" width="366" height="48" rx="8" fill="#059669"/>
+  <text x="241" y="643" fill="#FFFFFF" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle">FINALIZAR Y APROVISIONAR EN ODOO</text>
+
+  <!-- Right Panel: Live Dispatch Wallboard -->
+  <rect x="476" y="86" width="780" height="606" rx="12" fill="#0F172A" stroke="#1E293B" stroke-width="2"/>
+  <text x="500" y="118" fill="#F8FAFC" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="bold">LIVE FIELD DISPATCH WALLBOARD &amp; ODOO ERP PIPELINE</text>
+  <line x1="476" y1="138" x2="1256" y2="138" stroke="#1E293B"/>
+
+  <g transform="translate(500, 156)">
+    <rect width="232" height="82" rx="8" fill="#141E33" stroke="#1E293B"/>
+    <text x="16" y="24" fill="#94A3B8" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold">INSTALLED TODAY</text>
+    <text x="16" y="64" fill="#10B981" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="bold">18</text>
+  </g>
+  <g transform="translate(748, 156)">
+    <rect width="232" height="82" rx="8" fill="#141E33" stroke="#1E293B"/>
+    <text x="16" y="24" fill="#94A3B8" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold">IN PROGRESS (ON SITE)</text>
+    <text x="16" y="64" fill="#38BDF8" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="bold">4</text>
+  </g>
+  <g transform="translate(996, 156)">
+    <rect width="232" height="82" rx="8" fill="#141E33" stroke="#1E293B"/>
+    <text x="16" y="24" fill="#94A3B8" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold">IDEMPOTENT SYNC HITS</text>
+    <text x="16" y="64" fill="#A855F7" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="bold">100%</text>
+  </g>
+
+  <text x="500" y="268" fill="#94A3B8" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold">REAL-TIME CREW ACTIVITY &amp; SMARTOLT / ODOO TRANSACTIONS</text>
+
+  <g transform="translate(500, 284)">
+    <rect width="732" height="52" rx="6" fill="#141E33" stroke="#1E293B"/>
+    <text x="16" y="20" fill="#F8FAFC" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="bold">SUB8490  |  Juan Carlos Demo</text>
+    <text x="16" y="40" fill="#94A3B8" font-family="Consolas, monospace" font-size="12">Crew: C. Mendoza / L. Rojas  |  ONU: CDTC5098DEMO  |  IP: 100.64.10.42  |  RX: -19.8 dBm</text>
+    <text x="716" y="30" fill="#10B981" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold" text-anchor="end">INSTALLED (#42801)</text>
+  </g>
+  <g transform="translate(500, 346)">
+    <rect width="732" height="52" rx="6" fill="#141E33" stroke="#1E293B"/>
+    <text x="16" y="20" fill="#F8FAFC" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="bold">SUB8489  |  Ana Maria Demo</text>
+    <text x="16" y="40" fill="#94A3B8" font-family="Consolas, monospace" font-size="12">Crew: A. Silva / D. Vargas   |  ONU: GPON0072DEMO  |  IP: 100.64.10.41  |  RX: -20.4 dBm</text>
+    <text x="716" y="30" fill="#10B981" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold" text-anchor="end">INSTALLED (#42800)</text>
+  </g>
+  <g transform="translate(500, 408)">
+    <rect width="732" height="52" rx="6" fill="#141E33" stroke="#1E293B"/>
+    <text x="16" y="20" fill="#F8FAFC" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="bold">SUB8488  |  Comercial Los Andes</text>
+    <text x="16" y="40" fill="#94A3B8" font-family="Consolas, monospace" font-size="12">Crew: M. Torres / L. Rojas   |  ONU: CDTC5091DEMO  |  IP: 100.64.20.88  |  RX: -18.9 dBm</text>
+    <text x="716" y="30" fill="#10B981" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold" text-anchor="end">INSTALLED (#42799)</text>
+  </g>
+  <g transform="translate(500, 470)">
+    <rect width="732" height="52" rx="6" fill="#141E33" stroke="#1E293B"/>
+    <text x="16" y="20" fill="#F8FAFC" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="bold">SUB8487  |  Residencias El Parque</text>
+    <text x="16" y="40" fill="#94A3B8" font-family="Consolas, monospace" font-size="12">Crew: R. Diaz / D. Vargas    |  ONU: GPON0068DEMO  |  IP: 100.64.20.87  |  RX: -21.2 dBm</text>
+    <text x="716" y="30" fill="#38BDF8" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold" text-anchor="end">ON SITE (PROVISIONING)</text>
+  </g>
+
+  <rect x="500" y="542" width="732" height="126" rx="8" fill="#141E33" stroke="#334155"/>
+  <text x="518" y="566" fill="#38BDF8" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold">ENGINEERING SAFEGUARDS (IDEMPOTENCY &amp; ZERO-COLLISION ARCHITECTURE)</text>
+  <text x="518" y="592" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="12">1. Bidirectional IP Validation: Cross-checks SmartOLT active table + Odoo PostgreSQL (project_task &amp; sale_subscription).</text>
+  <text x="518" y="616" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="12">2. Offline Queue Idempotency: Preserves original timestamps via COALESCE(fecha_instalacion, NOW()) on late retries.</text>
+  <text x="518" y="640" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="12">3. Automated ERP Closure: Attaches signed PDF contract &amp; photos to Odoo Chatter and moves CRM Lead to Stage 5.</text>
+</svg>

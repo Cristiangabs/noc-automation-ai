@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720">
+  <rect width="1280" height="720" fill="#0B1120"/>
+  <rect width="1280" height="64" fill="#0F172A"/>
+  <line x1="0" y1="64" x2="1280" y2="64" stroke="#1E293B" stroke-width="2"/>
+  <rect x="24" y="16" width="114" height="32" rx="6" fill="#4C1D95" stroke="#A855F7"/>
+  <text x="81" y="36" fill="#E9D5FF" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold" text-anchor="middle">SOFIA AI NOC</text>
+  <text x="154" y="28" fill="#F8FAFC" font-family="Segoe UI, Arial, sans-serif" font-size="17" font-weight="bold">SOFIA AI NOC COPILOT — AUTOMATED DIAGNOSTICS &amp; SENTINEL REPORTS</text>
+  <text x="154" y="48" fill="#94A3B8" font-family="Segoe UI, Arial, sans-serif" font-size="12">Local vLLM Inference (agent.fast)  |  Bequant BQN WebSocket DPI  |  SmartOLT LOS Correlator  |  ICMP Power Sentinel</text>
+
+  <!-- Left Card -->
+  <rect x="24" y="86" width="604" height="606" rx="10" fill="#0F172A" stroke="#1E293B" stroke-width="2"/>
+  <text x="44" y="114" fill="#38BDF8" font-family="Segoe UI, Arial, sans-serif" font-size="14" font-weight="bold">AUTOMATED CARRIER WAN &amp; CLUSTER DIAGNOSTIC</text>
+  <text x="44" y="136" fill="#94A3B8" font-family="Segoe UI, Arial, sans-serif" font-size="12">Generated on-demand via WhatsApp command: 'Sofia diagnostico wan'</text>
+  <line x1="24" y1="152" x2="628" y2="152" stroke="#1E293B"/>
+
+  <rect x="44" y="170" width="564" height="140" rx="8" fill="#141E33" stroke="#334155"/>
+  <text x="64" y="194" fill="#38BDF8" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="bold">1. Remote Datacenter Hypervisors (Proxmox VE Cluster)</text>
+  <circle cx="70" cy="222" r="6" fill="#10B981"/>
+  <text x="88" y="226" fill="#E2E8F0" font-family="Segoe UI, Arial, sans-serif" font-size="12">Nodes PVE-DC-01, 02, 03 (10.0.30.80/81/83): ONLINE (Quorum OK)</text>
+  <circle cx="70" cy="252" r="6" fill="#10B981"/>
+  <text x="88" y="256" fill="#E2E8F0" font-family="Segoe UI, Arial, sans-serif" font-size="12">Running Virtual Machines: 28 Active  |  Storage Replication: Healthy</text>
+  <text x="64" y="288" fill="#94A3B8" font-family="Consolas, monospace" font-size="12">GUI: https://10.0.30.80:8006 (Credentials omitted by security policy)</text>
+
+  <rect x="44" y="326" width="564" height="140" rx="8" fill="#141E33" stroke="#334155"/>
+  <text x="64" y="350" fill="#F59E0B" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="bold">2. Carrier WAN &amp; Perimeter Gateway Probes</text>
+  <circle cx="70" cy="378" r="6" fill="#10B981"/>
+  <text x="88" y="382" fill="#E2E8F0" font-family="Segoe UI, Arial, sans-serif" font-size="12">Internal Border Gateway (10.0.30.1): 0% Packet Loss (RTT 4.2 ms)</text>
+  <circle cx="70" cy="408" r="6" fill="#10B981"/>
+  <text x="88" y="412" fill="#10B981" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="bold">Primary Carrier Fiber WAN (198.51.100.10): 0% Packet Loss (RTT 11.8 ms)</text>
+  <text x="64" y="444" fill="#94A3B8" font-family="Consolas, monospace" font-size="12">Probe: ping -c 3 198.51.100.10 -&gt; 3 transmitted, 3 received, 0% loss</text>
+
+  <rect x="44" y="486" width="564" height="182" rx="8" fill="#052E16" stroke="#10B981" stroke-width="2"/>
+  <text x="64" y="516" fill="#A7F3D0" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="bold">VERDICT: CARRIER WAN &amp; CLUSTER 100% OPERATIONAL</text>
+  <text x="64" y="548" fill="#DCFCE7" font-family="Segoe UI, Arial, sans-serif" font-size="13">- Primary fiber carrier link responds with 0% packet loss.</text>
+  <text x="64" y="574" fill="#DCFCE7" font-family="Segoe UI, Arial, sans-serif" font-size="13">- Proxmox VE hypervisor cluster maintains full quorum across all 3 nodes.</text>
+  <text x="64" y="600" fill="#DCFCE7" font-family="Segoe UI, Arial, sans-serif" font-size="13">- Power Outage Sentinel (10.0.50.151): ONLINE (Grid Power Normal).</text>
+  <text x="64" y="638" fill="#86EFAC" font-family="Segoe UI, Arial, sans-serif" font-size="12">Dispatched automatically to authorized NOC Engineering channel.</text>
+
+  <!-- Right Card -->
+  <rect x="652" y="86" width="604" height="606" rx="10" fill="#0F172A" stroke="#1E293B" stroke-width="2"/>
+  <text x="672" y="114" fill="#A855F7" font-family="Segoe UI, Arial, sans-serif" font-size="14" font-weight="bold">BEQUANT BQN DPI AUDITOR &amp; SUBSCRIBER TRIAGE</text>
+  <text x="672" y="136" fill="#94A3B8" font-family="Segoe UI, Arial, sans-serif" font-size="12">Real-time WSS telemetry extraction (FLOWS &gt;= 500) &amp; Optical/ERP lookup</text>
+  <line x1="652" y1="152" x2="1256" y2="152" stroke="#1E293B"/>
+
+  <rect x="672" y="170" width="564" height="240" rx="8" fill="#141E33" stroke="#334155"/>
+  <text x="692" y="194" fill="#38BDF8" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="bold">BEQUANT BQN HIGH-CONCURRENCY AUDIT (WSS 10.0.20.10:443)</text>
+  <g font-family="Consolas, monospace" font-size="12" fill="#E2E8F0">
+    <rect x="692" y="212" width="524" height="36" rx="4" fill="#0F172A" stroke="#1E293B"/>
+    <text x="706" y="235">#1  100.64.10.88   SUB8102 - Inversiones Demo  |  Plan 300M  |  1,420 Flows</text>
+    <rect x="692" y="256" width="524" height="36" rx="4" fill="#0F172A" stroke="#1E293B"/>
+    <text x="706" y="279">#2  100.64.20.14   SUB7944 - Residencia Sur    |  Plan 200M  |    980 Flows</text>
+    <rect x="692" y="300" width="524" height="36" rx="4" fill="#0F172A" stroke="#1E293B"/>
+    <text x="706" y="323">#3  100.64.10.105  SUB8310 - Consultora Alfa   |  Plan 300M  |    745 Flows</text>
+    <rect x="692" y="344" width="524" height="36" rx="4" fill="#0F172A" stroke="#1E293B"/>
+    <text x="706" y="367">#4  100.64.20.62   SUB8019 - Abonado Demo 04   |  Plan 200M  |    612 Flows</text>
+  </g>
+
+  <rect x="672" y="428" width="564" height="240" rx="8" fill="#141E33" stroke="#334155"/>
+  <text x="692" y="454" fill="#10B981" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="bold">LIVE COPILOT SUBSCRIBER LOOKUP (ODOO + SMARTOLT + BQN)</text>
+  <text x="692" y="482" fill="#93C5FD" font-family="Consolas, monospace" font-size="13" font-weight="bold">Query: "Sofia revisa el abonado SUB8490"</text>
+  <text x="692" y="512" fill="#F8FAFC" font-family="Segoe UI, Arial, sans-serif" font-size="12">- Subscriber: Juan Carlos Demo (ID: 10000002)  |  Contract: SUB8490</text>
+  <text x="692" y="536" fill="#10B981" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="bold">- Odoo ERP Billing: ACTIVE / NO DEBT ($0.00 pending)</text>
+  <text x="692" y="560" fill="#10B981" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="bold">- SmartOLT Status: ONLINE  |  RX: -19.84 dBm / TX: 2.41 dBm (Optimal)</text>
+  <text x="692" y="584" fill="#E2E8F0" font-family="Segoe UI, Arial, sans-serif" font-size="12">- Bequant Shaper: Rate Policy 300M/300M  |  TCP RTT: 6.4 ms  |  118 Flows</text>
+  <text x="692" y="616" fill="#94A3B8" font-family="Segoe UI, Arial, sans-serif" font-size="12">AI Copilot Diagnosis: Optical levels and billing are healthy. No LOS alarms</text>
+  <text x="692" y="636" fill="#94A3B8" font-family="Segoe UI, Arial, sans-serif" font-size="12">in Sector Norte FTTH. Recommend checking local Wi-Fi channel saturation.</text>
+</svg>

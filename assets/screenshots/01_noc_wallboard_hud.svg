@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720">
+  <rect width="1280" height="720" fill="#070B14"/>
+  <!-- Top Header -->
+  <rect width="1280" height="64" fill="#0F172A"/>
+  <line x1="0" y1="64" x2="1280" y2="64" stroke="#1E293B" stroke-width="2"/>
+  <rect x="24" y="16" width="90" height="32" rx="6" fill="#1E3A8A" stroke="#3B82F6"/>
+  <text x="69" y="36" fill="#93C5FD" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold" text-anchor="middle">NOC CORE</text>
+  <text x="130" y="28" fill="#F8FAFC" font-family="Segoe UI, Arial, sans-serif" font-size="17" font-weight="bold">NOC REAL-TIME COMMAND CENTER &amp; AI VOICE TELEMETRY</text>
+  <text x="130" y="48" fill="#94A3B8" font-family="Segoe UI, Arial, sans-serif" font-size="12">Zabbix 7.0 JSON-RPC  |  Proxmox VE Cluster  |  GPON OLT Telemetry  |  SSE Event Stream</text>
+  <rect x="1050" y="18" width="206" height="28" rx="14" fill="#064E3B" stroke="#10B981"/>
+  <circle cx="1070" cy="32" r="5" fill="#10B981"/>
+  <text x="1084" y="36" fill="#A7F3D0" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold">SSE STREAM: ONLINE</text>
+
+  <!-- 4 Top KPI Cards -->
+  <g transform="translate(24, 84)">
+    <rect width="290" height="108" rx="8" fill="#0F172A" stroke="#1E293B" stroke-width="2"/>
+    <line x1="0" y1="0" x2="290" y2="0" stroke="#10B981" stroke-width="3"/>
+    <text x="18" y="26" fill="#94A3B8" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold">CORE ROUTERS &amp; BGP</text>
+    <text x="18" y="64" fill="#F8FAFC" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="bold">12 / 12</text>
+    <text x="18" y="90" fill="#10B981" font-family="Segoe UI, Arial, sans-serif" font-size="12">100% UP  |  8.4 Gbps RX</text>
+  </g>
+  <g transform="translate(338, 84)">
+    <rect width="290" height="108" rx="8" fill="#0F172A" stroke="#1E293B" stroke-width="2"/>
+    <line x1="0" y1="0" x2="290" y2="0" stroke="#38BDF8" stroke-width="3"/>
+    <text x="18" y="26" fill="#94A3B8" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold">GPON OLT CLUSTERS</text>
+    <text x="18" y="64" fill="#F8FAFC" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="bold">4 OLTs</text>
+    <text x="18" y="90" fill="#38BDF8" font-family="Segoe UI, Arial, sans-serif" font-size="12">1,842 ONUs Active  |  0 Cut</text>
+  </g>
+  <g transform="translate(652, 84)">
+    <rect width="290" height="108" rx="8" fill="#0F172A" stroke="#1E293B" stroke-width="2"/>
+    <line x1="0" y1="0" x2="290" y2="0" stroke="#A855F7" stroke-width="3"/>
+    <text x="18" y="26" fill="#94A3B8" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold">PROXMOX HYPERVISORS</text>
+    <text x="18" y="64" fill="#F8FAFC" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="bold">6 NODES</text>
+    <text x="18" y="90" fill="#A855F7" font-family="Segoe UI, Arial, sans-serif" font-size="12">Quorum OK  |  54 VMs / LXCs</text>
+  </g>
+  <g transform="translate(966, 84)">
+    <rect width="290" height="108" rx="8" fill="#0F172A" stroke="#1E293B" stroke-width="2"/>
+    <line x1="0" y1="0" x2="290" y2="0" stroke="#F59E0B" stroke-width="3"/>
+    <text x="18" y="26" fill="#94A3B8" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold">ANTI-FLAPPING BUFFER</text>
+    <text x="18" y="64" fill="#F8FAFC" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="bold">3 HELD</text>
+    <text x="18" y="90" fill="#F59E0B" font-family="Segoe UI, Arial, sans-serif" font-size="12">5-Min Grace Window Active</text>
+  </g>
+
+  <!-- Left Panel: Active Monitoring Stations -->
+  <rect x="24" y="212" width="796" height="348" rx="10" fill="#0F172A" stroke="#1E293B" stroke-width="2"/>
+  <text x="44" y="240" fill="#E2E8F0" font-family="Segoe UI, Arial, sans-serif" font-size="14" font-weight="bold">ACTIVE MONITORING STATIONS &amp; WORKFLOW DISPATCH</text>
+  <line x1="24" y1="256" x2="820" y2="256" stroke="#1E293B"/>
+
+  <g transform="translate(44, 272)">
+    <rect width="756" height="44" rx="6" fill="#141E33" stroke="#1E293B"/>
+    <circle cx="22" cy="22" r="6" fill="#10B981"/>
+    <text x="40" y="18" fill="#F8FAFC" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="bold">STATION 01: ZABBIX SNMP/ICMP TELEMETRY</text>
+    <text x="40" y="35" fill="#94A3B8" font-family="Consolas, monospace" font-size="12">Polling 340 Network Hosts  |  Avg RTT: 2.1 ms  |  0 Packet Loss</text>
+    <rect x="656" y="10" width="84" height="24" rx="4" fill="#0F172A" stroke="#10B981"/>
+    <text x="698" y="26" fill="#10B981" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold" text-anchor="middle">ONLINE</text>
+  </g>
+  <g transform="translate(44, 326)">
+    <rect width="756" height="44" rx="6" fill="#141E33" stroke="#1E293B"/>
+    <circle cx="22" cy="22" r="6" fill="#38BDF8"/>
+    <text x="40" y="18" fill="#F8FAFC" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="bold">STATION 02: PROXMOX VE HYPERVISOR CLUSTER</text>
+    <text x="40" y="35" fill="#94A3B8" font-family="Consolas, monospace" font-size="12">Nodes PVE-01..03 (10.0.10.10-12)  |  CPU: 28%  |  RAM: 61%  |  PBS Backup OK</text>
+    <rect x="656" y="10" width="84" height="24" rx="4" fill="#0F172A" stroke="#38BDF8"/>
+    <text x="698" y="26" fill="#38BDF8" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold" text-anchor="middle">ONLINE</text>
+  </g>
+  <g transform="translate(44, 380)">
+    <rect width="756" height="44" rx="6" fill="#141E33" stroke="#1E293B"/>
+    <circle cx="22" cy="22" r="6" fill="#10B981"/>
+    <text x="40" y="18" fill="#F8FAFC" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="bold">STATION 03: GPON OLT OPTICAL HEALTH</text>
+    <text x="40" y="35" fill="#94A3B8" font-family="Consolas, monospace" font-size="12">OLT-North (-19.4 dBm avg)  |  OLT-South (-20.1 dBm avg)  |  Power Sentinel OK</text>
+    <rect x="656" y="10" width="84" height="24" rx="4" fill="#0F172A" stroke="#10B981"/>
+    <text x="698" y="26" fill="#10B981" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold" text-anchor="middle">ONLINE</text>
+  </g>
+  <g transform="translate(44, 434)">
+    <rect width="756" height="44" rx="6" fill="#141E33" stroke="#1E293B"/>
+    <circle cx="22" cy="22" r="6" fill="#10B981"/>
+    <text x="40" y="18" fill="#F8FAFC" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="bold">STATION 04: WAN CARRIER LINKS &amp; VPN TUNNELS</text>
+    <text x="40" y="35" fill="#94A3B8" font-family="Consolas, monospace" font-size="12">Primary Fiber (198.51.100.10): 0% Loss  |  Backup (203.0.113.10): Standby</text>
+    <rect x="656" y="10" width="84" height="24" rx="4" fill="#0F172A" stroke="#10B981"/>
+    <text x="698" y="26" fill="#10B981" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold" text-anchor="middle">ONLINE</text>
+  </g>
+  <g transform="translate(44, 488)">
+    <rect width="756" height="44" rx="6" fill="#141E33" stroke="#1E293B"/>
+    <circle cx="22" cy="22" r="6" fill="#F59E0B"/>
+    <text x="40" y="18" fill="#F8FAFC" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="bold">STATION 05: N8N ANTI-FLAPPING PIPELINE</text>
+    <text x="40" y="35" fill="#94A3B8" font-family="Consolas, monospace" font-size="12">Holding CPE-Access-14 in 5-min damping buffer (preventing alert storm)</text>
+    <rect x="656" y="10" width="84" height="24" rx="4" fill="#0F172A" stroke="#F59E0B"/>
+    <text x="698" y="26" fill="#F59E0B" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold" text-anchor="middle">FILTERING</text>
+  </g>
+
+  <!-- Right Panel: Live Event Stream -->
+  <rect x="840" y="212" width="416" height="348" rx="10" fill="#0F172A" stroke="#1E293B" stroke-width="2"/>
+  <text x="860" y="240" fill="#E2E8F0" font-family="Segoe UI, Arial, sans-serif" font-size="14" font-weight="bold">REAL-TIME EVENT HUB LOG</text>
+  <line x1="840" y1="256" x2="1256" y2="256" stroke="#1E293B"/>
+
+  <g font-family="Consolas, monospace" font-size="12">
+    <text x="860" y="286" fill="#64748B">10:28:14</text><text x="926" y="286" fill="#38BDF8" font-weight="bold">[INFO]</text><text x="980" y="286" fill="#CBD5E1">BGP Peer AS65001 Established</text>
+    <text x="860" y="324" fill="#64748B">10:26:02</text><text x="926" y="324" fill="#F59E0B" font-weight="bold">[HOLD]</text><text x="980" y="324" fill="#CBD5E1">Access-SW-08 held (5m window)</text>
+    <text x="860" y="362" fill="#64748B">10:24:19</text><text x="926" y="362" fill="#10B981" font-weight="bold">[RECV]</text><text x="980" y="362" fill="#CBD5E1">Suppressed micro-cut (&lt;90s)</text>
+    <text x="860" y="400" fill="#64748B">10:20:00</text><text x="926" y="400" fill="#94A3B8" font-weight="bold">[SYNC]</text><text x="980" y="400" fill="#CBD5E1">Proxmox PDM ticket renewed</text>
+    <text x="860" y="438" fill="#64748B">10:15:42</text><text x="926" y="438" fill="#A855F7" font-weight="bold">[TTS]</text><text x="980" y="438" fill="#CBD5E1">Voice synthesis dispatched</text>
+    <text x="860" y="476" fill="#64748B">10:12:11</text><text x="926" y="476" fill="#10B981" font-weight="bold">[OK]</text><text x="980" y="476" fill="#CBD5E1">SSL Sentinel: 36/36 verified</text>
+    <text x="860" y="514" fill="#64748B">10:08:05</text><text x="926" y="514" fill="#38BDF8" font-weight="bold">[BOT]</text><text x="980" y="514" fill="#CBD5E1">Telegram /status executed</text>
+  </g>
+
+  <!-- Bottom Voice Synthesizer Banner -->
+  <rect x="24" y="580" width="1232" height="116" rx="10" fill="#111827" stroke="#3B82F6" stroke-width="2"/>
+  <text x="48" y="608" fill="#60A5FA" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold">NEURAL VOICE SYNTHESIS COORDINATOR (18s AGGREGATION WINDOW)</text>
+  <text x="48" y="640" fill="#F8FAFC" font-family="Segoe UI, Arial, sans-serif" font-size="17" font-weight="bold">"Atencion Centro de Control: Todos los enlaces troncales BGP y nodos de virtualizacion Proxmox</text>
+  <text x="48" y="668" fill="#93C5FD" font-family="Segoe UI, Arial, sans-serif" font-size="15">operan sin perdida de paquetes. Se suprimieron 2 microcortes de acceso en la ventana de amortiguacion."</text>
+</svg>

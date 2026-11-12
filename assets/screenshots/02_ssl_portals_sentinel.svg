@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720">
+  <rect width="1280" height="720" fill="#070A13"/>
+  <rect width="1280" height="64" fill="#0F172A"/>
+  <line x1="0" y1="64" x2="1280" y2="64" stroke="#1E293B" stroke-width="2"/>
+  <rect x="24" y="16" width="104" height="32" rx="6" fill="#1E3A8A" stroke="#2563EB"/>
+  <text x="76" y="36" fill="#93C5FD" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold" text-anchor="middle">SSL SENTINEL</text>
+  <text x="144" y="28" fill="#F8FAFC" font-family="Segoe UI, Arial, sans-serif" font-size="17" font-weight="bold">WEB PORTALS &amp; X.509 SSL/SAN CERTIFICATE SENTINEL</text>
+  <text x="144" y="48" fill="#94A3B8" font-family="Segoe UI, Arial, sans-serif" font-size="12">Concurrent ThreadPool Inspector  |  Strict Subject Alternative Name (SAN) Verification  |  HTTP Latency</text>
+
+  <!-- KPIs -->
+  <g transform="translate(24, 84)">
+    <rect width="290" height="100" rx="8" fill="#141E33" stroke="#1E293B" stroke-width="2"/>
+    <text x="18" y="26" fill="#94A3B8" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold">MONITORED PORTALS</text>
+    <text x="18" y="62" fill="#38BDF8" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="bold">36</text>
+    <text x="18" y="84" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="12">Concurrent Check: 1.42s</text>
+  </g>
+  <g transform="translate(338, 84)">
+    <rect width="290" height="100" rx="8" fill="#141E33" stroke="#1E293B" stroke-width="2"/>
+    <text x="18" y="26" fill="#94A3B8" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold">ONLINE &amp; VALID SSL</text>
+    <text x="18" y="62" fill="#10B981" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="bold">34</text>
+    <text x="18" y="84" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="12">HTTP 200 OK + Matching SAN</text>
+  </g>
+  <g transform="translate(652, 84)">
+    <rect width="290" height="100" rx="8" fill="#141E33" stroke="#1E293B" stroke-width="2"/>
+    <text x="18" y="26" fill="#94A3B8" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold">EXPIRING SOON (&lt;20d)</text>
+    <text x="18" y="62" fill="#F59E0B" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="bold">1</text>
+    <text x="18" y="84" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="12">Automated Renewal Alert</text>
+  </g>
+  <g transform="translate(966, 84)">
+    <rect width="290" height="100" rx="8" fill="#141E33" stroke="#1E293B" stroke-width="2"/>
+    <text x="18" y="26" fill="#94A3B8" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold">SSL SAN MISMATCH</text>
+    <text x="18" y="62" fill="#F43F5E" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="bold">1</text>
+    <text x="18" y="84" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="12">ERR_CERT_COMMON_NAME_INVALID</text>
+  </g>
+
+  <!-- Portal Cards Grid -->
+  <g transform="translate(24, 206)">
+    <rect width="604" height="148" rx="8" fill="#141E33" stroke="#F43F5E" stroke-width="2"/>
+    <text x="20" y="28" fill="#F8FAFC" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="bold">Portal Tributario Gamma</text>
+    <text x="20" y="48" fill="#38BDF8" font-family="Consolas, monospace" font-size="13">https://portal-gamma.example.gov</text>
+    <rect x="490" y="14" width="94" height="24" rx="12" fill="#0F172A" stroke="#F43F5E"/>
+    <text x="537" y="30" fill="#F43F5E" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold" text-anchor="middle">CRITICAL</text>
+    <line x1="20" y1="64" x2="584" y2="64" stroke="#1E293B"/>
+    <text x="20" y="88" fill="#94A3B8" font-family="Consolas, monospace" font-size="12">Resolved IP: 203.0.113.13</text>
+    <text x="310" y="88" fill="#E2E8F0" font-family="Consolas, monospace" font-size="12">Probe: HTTP 200 (48 ms)</text>
+    <text x="20" y="118" fill="#F43F5E" font-family="Consolas, monospace" font-size="13" font-weight="bold">X.509 SAN: MISMATCH (CN: *.example.org)</text>
+    <text x="430" y="118" fill="#CBD5E1" font-family="Consolas, monospace" font-size="12">Expiry: 63 days</text>
+  </g>
+
+  <g transform="translate(652, 206)">
+    <rect width="604" height="148" rx="8" fill="#141E33" stroke="#F59E0B" stroke-width="2"/>
+    <text x="20" y="28" fill="#F8FAFC" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="bold">Portal Municipal Alpha</text>
+    <text x="20" y="48" fill="#38BDF8" font-family="Consolas, monospace" font-size="13">https://portal-alpha.example.gov</text>
+    <rect x="490" y="14" width="94" height="24" rx="12" fill="#0F172A" stroke="#F59E0B"/>
+    <text x="537" y="30" fill="#F59E0B" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold" text-anchor="middle">WARNING</text>
+    <line x1="20" y1="64" x2="584" y2="64" stroke="#1E293B"/>
+    <text x="20" y="88" fill="#94A3B8" font-family="Consolas, monospace" font-size="12">Resolved IP: 203.0.113.11</text>
+    <text x="310" y="88" fill="#E2E8F0" font-family="Consolas, monospace" font-size="12">Probe: HTTP 200 (32 ms)</text>
+    <text x="20" y="118" fill="#F59E0B" font-family="Consolas, monospace" font-size="13" font-weight="bold">X.509 SAN: VALID (Let's Encrypt R3)</text>
+    <text x="430" y="118" fill="#F59E0B" font-family="Consolas, monospace" font-size="12" font-weight="bold">Expiry: 14 days</text>
+  </g>
+
+  <g transform="translate(24, 372)">
+    <rect width="604" height="148" rx="8" fill="#141E33" stroke="#1E293B" stroke-width="2"/>
+    <text x="20" y="28" fill="#F8FAFC" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="bold">Oficina Virtual Beta</text>
+    <text x="20" y="48" fill="#38BDF8" font-family="Consolas, monospace" font-size="13">https://portal-beta.example.gov</text>
+    <rect x="490" y="14" width="94" height="24" rx="12" fill="#0F172A" stroke="#10B981"/>
+    <text x="537" y="30" fill="#10B981" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold" text-anchor="middle">ONLINE</text>
+    <line x1="20" y1="64" x2="584" y2="64" stroke="#1E293B"/>
+    <text x="20" y="88" fill="#94A3B8" font-family="Consolas, monospace" font-size="12">Resolved IP: 203.0.113.12</text>
+    <text x="310" y="88" fill="#E2E8F0" font-family="Consolas, monospace" font-size="12">Probe: HTTP 200 (19 ms)</text>
+    <text x="20" y="118" fill="#A7F3D0" font-family="Consolas, monospace" font-size="13" font-weight="bold">X.509 SAN: VALID (Cloudflare Inc ECC)</text>
+    <text x="430" y="118" fill="#CBD5E1" font-family="Consolas, monospace" font-size="12">Expiry: 84 days</text>
+  </g>
+
+  <g transform="translate(652, 372)">
+    <rect width="604" height="148" rx="8" fill="#141E33" stroke="#1E293B" stroke-width="2"/>
+    <text x="20" y="28" fill="#F8FAFC" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="bold">Portal Ciudadano Delta</text>
+    <text x="20" y="48" fill="#38BDF8" font-family="Consolas, monospace" font-size="13">https://portal-delta.example.gov</text>
+    <rect x="490" y="14" width="94" height="24" rx="12" fill="#0F172A" stroke="#10B981"/>
+    <text x="537" y="30" fill="#10B981" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold" text-anchor="middle">ONLINE</text>
+    <line x1="20" y1="64" x2="584" y2="64" stroke="#1E293B"/>
+    <text x="20" y="88" fill="#94A3B8" font-family="Consolas, monospace" font-size="12">Resolved IP: 203.0.113.14</text>
+    <text x="310" y="88" fill="#E2E8F0" font-family="Consolas, monospace" font-size="12">Probe: HTTP 200 (41 ms)</text>
+    <text x="20" y="118" fill="#A7F3D0" font-family="Consolas, monospace" font-size="13" font-weight="bold">X.509 SAN: VALID (Let's Encrypt E1)</text>
+    <text x="430" y="118" fill="#CBD5E1" font-family="Consolas, monospace" font-size="12">Expiry: 71 days</text>
+  </g>
+
+  <g transform="translate(24, 538)">
+    <rect width="604" height="148" rx="8" fill="#141E33" stroke="#1E293B" stroke-width="2"/>
+    <text x="20" y="28" fill="#F8FAFC" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="bold">ERP Corporativo &amp; Facturacion</text>
+    <text x="20" y="48" fill="#38BDF8" font-family="Consolas, monospace" font-size="13">https://erp.fibernet-demo.local</text>
+    <rect x="490" y="14" width="94" height="24" rx="12" fill="#0F172A" stroke="#10B981"/>
+    <text x="537" y="30" fill="#10B981" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold" text-anchor="middle">ONLINE</text>
+    <line x1="20" y1="64" x2="584" y2="64" stroke="#1E293B"/>
+    <text x="20" y="88" fill="#94A3B8" font-family="Consolas, monospace" font-size="12">Resolved IP: 10.0.10.50</text>
+    <text x="310" y="88" fill="#E2E8F0" font-family="Consolas, monospace" font-size="12">Probe: HTTP 200 (8 ms)</text>
+    <text x="20" y="118" fill="#A7F3D0" font-family="Consolas, monospace" font-size="13" font-weight="bold">X.509 SAN: VALID (Internal Enterprise CA)</text>
+    <text x="430" y="118" fill="#CBD5E1" font-family="Consolas, monospace" font-size="12">Expiry: 312 days</text>
+  </g>
+
+  <g transform="translate(652, 538)">
+    <rect width="604" height="148" rx="8" fill="#141E33" stroke="#1E293B" stroke-width="2"/>
+    <text x="20" y="28" fill="#F8FAFC" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="bold">Zabbix Core Monitoring</text>
+    <text x="20" y="48" fill="#38BDF8" font-family="Consolas, monospace" font-size="13">https://zabbix.fibernet-demo.local</text>
+    <rect x="490" y="14" width="94" height="24" rx="12" fill="#0F172A" stroke="#10B981"/>
+    <text x="537" y="30" fill="#10B981" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold" text-anchor="middle">ONLINE</text>
+    <line x1="20" y1="64" x2="584" y2="64" stroke="#1E293B"/>
+    <text x="20" y="88" fill="#94A3B8" font-family="Consolas, monospace" font-size="12">Resolved IP: 10.0.10.35</text>
+    <text x="310" y="88" fill="#E2E8F0" font-family="Consolas, monospace" font-size="12">Probe: HTTP 200 (6 ms)</text>
+    <text x="20" y="118" fill="#A7F3D0" font-family="Consolas, monospace" font-size="13" font-weight="bold">X.509 SAN: VALID (Internal Enterprise CA)</text>
+    <text x="430" y="118" fill="#CBD5E1" font-family="Consolas, monospace" font-size="12">Expiry: 290 days</text>
+  </g>
+</svg>
