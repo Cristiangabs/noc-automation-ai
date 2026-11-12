@@ -1,11 +1,38 @@
+# Environment variables and secrets
 .env
-*.log
-*.sqlite
-*.sqlite3
+*.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
 __pycache__/
-*.pyc
-*.mp3
-*.xlsx
-*.png
-.cache/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+
+# Certificates and keys
+*.crt
+*.key
+*.pem
+*.p12
+
+# Runtime data & logs
+*/data/drafts/
+*/data/completed/
+*/data/*.jsonl
+*/data/*.json
+subscribers.json
+monitor_state.json
+sentinel_state.json
+group_state.json
+web_ssl_status.json
+installations_log.json
+*.log
+
+# OS and Editor files
 .DS_Store
+Thumbs.db
+.vscode/
+.idea/

@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>NOC CoreNet - Centinela Web & Certificados SSL</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --bg: #070a13;
+      --surface: #0f172a;
+      --surface-card: #141e33;
+      --surface-hover: #1e2942;
+      --border: #1e293b;
+      --border-light: #334155;
+      
+      --text: #f8fafc;
+      --text-sub: #94a3b8;
+      --text-muted: #64748b;
+      
+      --green: #10b981;
+      --green-bg: rgba(16, 185, 129, 0.12);
+      --green-border: rgba(16, 185, 129, 0.3);
+      
+      --red: #f43f5e;
+      --red-bg: rgba(244, 63, 94, 0.14);
+      --red-border: rgba(244, 63, 94, 0.35);
+      
+      --yellow: #f59e0b;
+      --yellow-bg: rgba(245, 158, 11, 0.14);
+      --yellow-border: rgba(245, 158, 11, 0.35);
+      
+      --blue: #38bdf8;
+      --blue-bg: rgba(56, 189, 248, 0.12);
+      --purple: #c084fc;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .container {
+      max-width: 1440px;
+      width: 100%;
+    }
+
+    /* TOP HEADER */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-badge {
+      padding: 6px 10px;
+      border-radius: 6px;
+      background: #1e3a8a;
+      color: #93c5fd;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      border: 1px solid #2563eb;
+    }
+    .brand-text h1 {
+      font-size: 19px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      color: #fff;
+    }
+    .brand-text p {
+      font-size: 12px;
+      color: var(--text-sub);
+    }
+
+    .header-status {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .live-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      background: var(--green-bg);
+      color: var(--green);
+      border: 1px solid var(--green-border);
+    }
+    .live-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse 1.6s infinite;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+      70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+    .clock-display {
+      font-variant-numeric: tabular-nums;
+      text-align: right;
+    }
+    .clock-time {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .clock-next {
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    /* KPI METRICS ROW */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 900px) {
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    .kpi-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      position: relative;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .kpi-box:hover {
+      border-color: var(--border-light);
+      transform: translateY(-1px);
+    }
+    .kpi-box.active-filter {
+      border-color: var(--kpi-color, var(--blue));
+      box-shadow: 0 0 0 1px var(--kpi-color, var(--blue));
+      background: var(--surface-card);
+    }
+    .kpi-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-sub);
+    }
+    .kpi-value {
+      font-size: 26px;
+      font-weight: 800;
+      color: #fff;
+      margin-top: 4px;
+      line-height: 1.1;
+    }
+
+    /* PROPORTIONAL HEALTH BAR */
+    .health-bar-container {
+      margin-bottom: 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .health-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-sub);
+      white-space: nowrap;
+    }
+    .health-bar-track {
+      flex: 1;
+      height: 8px;
+      background: #1e293b;
+      border-radius: 4px;
+      overflow: hidden;
+      display: flex;
+    }
+    .bar-seg {
+      height: 100%;
+      transition: width 0.3s ease;
+    }
+    .bar-online { background: var(--green); }
+    .bar-warn { background: var(--yellow); }
+    .bar-crit { background: var(--red); }
+    .health-pct {
+      font-size: 12px;
+      font-weight: 800;
+      color: #fff;
+      white-space: nowrap;
+    }
+
+    /* CONTROLS (TABS, SEARCH & VIEW SWITCHER) */
+    .controls-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .tab-pills {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .tab-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-sub);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .tab-btn:hover {
+      background: var(--surface-hover);
+      color: #fff;
+    }
+    .tab-btn.active {
+      background: #2563eb;
+      color: #fff;
+      border-color: #2563eb;
+      font-weight: 700;
+    }
+    .tab-btn.active-crit {
+      background: var(--red);
+      color: #fff;
+      border-color: var(--red);
+      font-weight: 700;
+    }
+    .tab-counter {
+      background: rgba(0, 0, 0, 0.25);
+      padding: 1px 6px;
+      border-radius: 10px;
+      font-size: 10px;
+    }
+
+    .tools-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .search-box {
+      position: relative;
+    }
+    .search-box input {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 10px 6px 10px;
+      color: #fff;
+      font-size: 12px;
+      width: 220px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .search-box input:focus {
+      border-color: var(--blue);
+    }
+
+    .view-switch {
+      display: flex;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .view-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 6px 12px;
+      cursor: pointer;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s;
+    }
+    .view-btn.active {
+      background: var(--surface-hover);
+      color: #fff;
+      font-weight: 700;
+    }
+
+    /* GRID VIEW (UNIFORM COMPACT TILES) */
+    .grid-view {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+      gap: 12px;
+    }
+
+    .clean-card {
+      background: var(--surface-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 180px; /* UNIFORM FIXED HEIGHT */
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.15s;
+    }
+    .clean-card:hover {
+      border-color: var(--border-light);
+    }
+    .clean-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; bottom: 0;
+      width: 4px;
+      background: var(--card-accent, #64748b);
+    }
+
+    .clean-card.card-ONLINE { --card-accent: var(--green); }
+    .clean-card.card-WARNING { --card-accent: var(--yellow); }
+    .clean-card.card-CRITICAL { --card-accent: var(--red); }
+    .clean-card.card-DOWN { --card-accent: #64748b; }
+
+    .card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+      padding-left: 2px;
+    }
+    .card-cat {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: var(--text-muted);
+    }
+    .card-badge {
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.02em;
+    }
+    .badge-ONLINE { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+    .badge-WARNING { background: var(--yellow-bg); color: var(--yellow); border: 1px solid var(--yellow-border); }
+    .badge-CRITICAL { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-border); }
+    .badge-DOWN { background: rgba(100, 116, 139, 0.2); color: #94a3b8; border: 1px solid rgba(100, 116, 139, 0.3); }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 2px;
+      padding-left: 2px;
+    }
+    .card-url {
+      font-size: 11px;
+      color: var(--blue);
+      text-decoration: none;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: block;
+      margin-bottom: 8px;
+      padding-left: 2px;
+    }
+    .card-url:hover { text-decoration: underline; }
+
+    .card-metrics {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 8px;
+      padding-left: 2px;
+    }
+    .mini-pill {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-sub);
+    }
+    .mini-pill-ok { color: var(--green); border-color: var(--green-border); }
+    .mini-pill-err { color: var(--red); border-color: var(--red-border); }
+
+    .card-bottom {
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding-top: 6px;
+      padding-left: 2px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .ssl-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+    }
+    .ssl-tag {
+      font-weight: 700;
+    }
+    .ssl-issuer-tag {
+      font-size: 10px;
+      color: var(--text-muted);
+      max-width: 140px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .issue-banner {
+      font-size: 10px;
+      font-weight: 600;
+      color: #fda4af;
+      background: rgba(244, 63, 94, 0.12);
+      border-radius: 4px;
+      padding: 3px 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* TABLE VIEW (HIGH-DENSITY NOC MATRIX) */
+    .table-view {
+      display: none;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 12px;
+    }
+    th {
+      background: #090e1a;
+      color: var(--text-muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 10px;
+      letter-spacing: 0.04em;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    td {
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: var(--text-sub);
+    }
+    tr:hover td {
+      background: var(--surface-card);
+    }
+    .table-service-name {
+      font-weight: 700;
+      color: #fff;
+    }
+    .table-url {
+      color: var(--blue);
+      text-decoration: none;
+      font-size: 11px;
+    }
+    .table-url:hover { text-decoration: underline; }
+
+    /* FOOTER */
+    footer {
+      margin-top: 24px;
+      text-align: center;
+      font-size: 11px;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+      padding-top: 14px;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="brand-badge">NOC</div>
+        <div class="brand-text">
+          <h1>Tecnored • Centinela Web & SSL</h1>
+          <p>Supervisión Continua de Disponibilidad Web, Expiración SSL y Coincidencia de Dominios (SAN)</p>
+        </div>
+      </div>
+      <div class="header-status">
+        <div class="live-pill">
+          <div class="live-dot"></div>
+          EN VIVO
+        </div>
+        <div class="clock-display">
+          <div class="clock-time" id="clock">--:--:--</div>
+          <div class="clock-next" id="countdown">Refresco en 20s</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- KPI ROW (CLICKABLE QUICK FILTERS) -->
+    <div class="kpi-grid">
+      <div class="kpi-box active-filter" onclick="applyQuickFilter('ALL')" id="kpi-box-all" style="--kpi-color: var(--blue);">
+        <div class="kpi-label">Total Servicios</div>
+        <div class="kpi-value" id="val-total">--</div>
+      </div>
+
+      <div class="kpi-box" onclick="applyQuickFilter('ONLINE')" id="kpi-box-online" style="--kpi-color: var(--green);">
+        <div class="kpi-label" style="color: var(--green);">100% Operativos</div>
+        <div class="kpi-value" id="val-online" style="color: var(--green);">--</div>
+      </div>
+
+      <div class="kpi-box" onclick="applyQuickFilter('WARNING')" id="kpi-box-warn" style="--kpi-color: var(--yellow);">
+        <div class="kpi-label" style="color: var(--yellow);">Por Vencer (&le; 20d)</div>
+        <div class="kpi-value" id="val-warn" style="color: var(--yellow);">--</div>
+      </div>
+
+      <div class="kpi-box" onclick="applyQuickFilter('CRITICAL')" id="kpi-box-crit" style="--kpi-color: var(--red);">
+        <div class="kpi-label" style="color: var(--red);">Requieren Atención</div>
+        <div class="kpi-value" id="val-crit" style="color: var(--red);">--</div>
+      </div>
+    </div>
+
+    <!-- PROPORTIONAL HEALTH BAR -->
+    <div class="health-bar-container">
+      <span class="health-label">Salud del Ecosistema Web:</span>
+      <div class="health-bar-track">
+        <div class="bar-seg bar-online" id="bar-online" style="width: 0%;"></div>
+        <div class="bar-seg bar-warn" id="bar-warn" style="width: 0%;"></div>
+        <div class="bar-seg bar-crit" id="bar-crit" style="width: 0%;"></div>
+      </div>
+      <span class="health-pct" id="health-pct">--% Operativo</span>
+    </div>
+
+    <!-- CONTROLS & VIEWS -->
+    <div class="controls-bar">
+      <div class="tab-pills">
+        <button class="tab-btn active" onclick="setCategoryFilter('ALL', this)" id="tab-all">
+          Todos <span class="tab-counter" id="cnt-all">0</span>
+        </button>
+        <button class="tab-btn" onclick="setCategoryFilter('CRITICAL', this)" id="tab-crit">
+          Con Incidencias <span class="tab-counter" id="cnt-crit">0</span>
+        </button>
+        <button class="tab-btn" onclick="setCategoryFilter('Alcaldías', this)">
+          Alcaldías <span class="tab-counter" id="cnt-alc">0</span>
+        </button>
+        <button class="tab-btn" onclick="setCategoryFilter('Corporativo', this)">
+          Corporativos <span class="tab-counter" id="cnt-corp">0</span>
+        </button>
+        <button class="tab-btn" onclick="setCategoryFilter('Tecnored', this)">
+          Tecnored <span class="tab-counter" id="cnt-tred">0</span>
+        </button>
+      </div>
+
+      <div class="tools-group">
+        <div class="search-box">
+          <input type="text" id="searchInput" placeholder="Filtrar por portal, IP o error..." onkeyup="renderView()">
+        </div>
+        <div class="view-switch">
+          <button class="view-btn active" id="btn-view-grid" onclick="setViewMode('grid')">Cuadrícula</button>
+          <button class="view-btn" id="btn-view-table" onclick="setViewMode('table')">Tabla NOC</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN VIEW CONTAINER -->
+    <div id="gridContainer" class="grid-view">
+      <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);">
+        Cargando telemetría de portales y certificados SSL...
+      </div>
+    </div>
+
+    <div id="tableContainer" class="table-view">
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 120px;">Estado</th>
+            <th>Servicio / Entidad</th>
+            <th>URL / Dominio</th>
+            <th>Respuesta HTTP</th>
+            <th>Resolución DNS / IP</th>
+            <th>Certificado SSL</th>
+            <th>Incidencia / Diagnóstico</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+        </tbody>
+      </table>
+    </div>
+
+    <footer>
+      CoreNet Telecom • Centro de Control de Operaciones (NOC) • Monitoreo Web Continuo
+    </footer>
+  </div>
+
+  <script>
+    let services = [];
+    let currentCategory = 'ALL';
+    let currentStatusFilter = 'ALL';
+    let currentViewMode = 'grid';
+    let countdownSecs = 20;
+
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('clock').textContent = now.toTimeString().split(' ')[0];
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    function setViewMode(mode) {
+      currentViewMode = mode;
+      document.getElementById('btn-view-grid').classList.toggle('active', mode === 'grid');
+      document.getElementById('btn-view-table').classList.toggle('active', mode === 'table');
+      document.getElementById('gridContainer').style.display = mode === 'grid' ? 'grid' : 'none';
+      document.getElementById('tableContainer').style.display = mode === 'table' ? 'block' : 'none';
+      renderView();
+    }
+
+    function setCategoryFilter(cat, btn) {
+      currentCategory = cat;
+      currentStatusFilter = 'ALL';
+      
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active', 'active-crit'));
+      document.querySelectorAll('.kpi-box').forEach(b => b.classList.remove('active-filter'));
+      document.getElementById('kpi-box-all').classList.add('active-filter');
+
+      if (cat === 'CRITICAL') {
+        btn.classList.add('active-crit');
+      } else {
+        btn.classList.add('active');
+      }
+      renderView();
+    }
+
+    function applyQuickFilter(status) {
+      currentStatusFilter = status;
+      currentCategory = (status === 'CRITICAL') ? 'CRITICAL' : 'ALL';
+
+      document.querySelectorAll('.kpi-box').forEach(b => b.classList.remove('active-filter'));
+      if (status === 'ALL') document.getElementById('kpi-box-all').classList.add('active-filter');
+      if (status === 'ONLINE') document.getElementById('kpi-box-online').classList.add('active-filter');
+      if (status === 'WARNING') document.getElementById('kpi-box-warn').classList.add('active-filter');
+      if (status === 'CRITICAL') document.getElementById('kpi-box-crit').classList.add('active-filter');
+
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active', 'active-crit'));
+      if (status === 'CRITICAL') {
+        document.getElementById('tab-crit').classList.add('active-crit');
+      } else {
+        document.getElementById('tab-all').classList.add('active');
+      }
+      renderView();
+    }
+
+    async function fetchData() {
+      try {
+        const res = await fetch('/api/web-status?t=' + Date.now());
+        const data = await res.json();
+        if (data.ok && data.services) {
+          services = data.services;
+
+          // KPIs
+          document.getElementById('val-total').textContent = data.total_targets;
+          document.getElementById('val-online').textContent = data.online_count;
+          document.getElementById('val-warn').textContent = data.warning_count;
+          document.getElementById('val-crit').textContent = data.critical_count;
+
+          // Health Bar Proportions
+          const tot = Math.max(1, data.total_targets);
+          const pOn = (data.online_count / tot) * 100;
+          const pWn = (data.warning_count / tot) * 100;
+          const pCr = (data.critical_count / tot) * 100;
+          document.getElementById('bar-online').style.width = pOn + '%';
+          document.getElementById('bar-warn').style.width = pWn + '%';
+          document.getElementById('bar-crit').style.width = pCr + '%';
+          document.getElementById('health-pct').textContent = Math.round(pOn) + '% Operativo';
+
+          // Tab Counters
+          document.getElementById('cnt-all').textContent = services.length;
+          document.getElementById('cnt-crit').textContent = data.critical_count;
+          document.getElementById('cnt-alc').textContent = services.filter(s => s.category === 'Alcaldías').length;
+          document.getElementById('cnt-corp').textContent = services.filter(s => s.category === 'Corporativo').length;
+          document.getElementById('cnt-tred').textContent = services.filter(s => s.category === 'Tecnored').length;
+
+          renderView();
+        }
+      } catch (err) {
+        console.error("Fetch error:", err);
+      }
+      countdownSecs = 20;
+    }
+
+    function getFilteredList() {
+      const q = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+      return services.filter(s => {
+        // Quick KPI filter
+        if (currentStatusFilter === 'ONLINE' && s.overall_status !== 'ONLINE') return false;
+        if (currentStatusFilter === 'WARNING' && s.overall_status !== 'WARNING') return false;
+        if (currentStatusFilter === 'CRITICAL' && (s.overall_status !== 'CRITICAL' && s.overall_status !== 'DOWN')) return false;
+
+        // Category filter
+        if (currentCategory === 'CRITICAL') {
+          if (s.overall_status !== 'CRITICAL' && s.overall_status !== 'DOWN') return false;
+        } else if (currentCategory !== 'ALL') {
+          if (s.category !== currentCategory) return false;
+        }
+
+        // Search text
+        if (q) {
+          const matchName = (s.name || '').toLowerCase().includes(q);
+          const matchUrl = (s.url || '').toLowerCase().includes(q);
+          const matchHost = (s.hostname || '').toLowerCase().includes(q);
+          const matchIp = (s.ip || '').toLowerCase().includes(q);
+          const matchErr = (s.error_msg || '').toLowerCase().includes(q);
+          if (!matchName && !matchUrl && !matchHost && !matchIp && !matchErr) return false;
+        }
+        return true;
+      });
+    }
+
+    function renderView() {
+      const list = getFilteredList();
+
+      if (currentViewMode === 'grid') {
+        renderGrid(list);
+      } else {
+        renderTable(list);
+      }
+    }
+
+    function getFriendlyError(s) {
+      if (s.ssl_status === 'MISMATCH') {
+        return 'Certificado emitido para otro dominio';
+      }
+      if (s.ssl_status === 'EXPIRED') {
+        return `Certificado vencido hace ${Math.abs(s.ssl_days)} días`;
+      }
+      if (!s.dns_ok) {
+        return 'Dominio no resuelve en servidores DNS';
+      }
+      if (!s.http_ok && s.http_code === 0) {
+        return 'Servidor web no responde (Timeout / Caído)';
+      }
+      if (s.error_msg) {
+        return s.error_msg.replace('Error DNS: ', '').replace('Fallo SSL: ', '');
+      }
+      return 'Incidencia detectada';
+    }
+
+    function renderGrid(list) {
+      const container = document.getElementById('gridContainer');
+      if (list.length === 0) {
+        container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);">
+          No se encontraron portales con los filtros seleccionados.
+        </div>`;
+        return;
+      }
+
+      container.innerHTML = list.map(s => {
+        let badgeText = s.overall_status;
+        let badgeClass = s.overall_status;
+
+        if (s.ssl_status === 'MISMATCH') {
+          badgeText = 'MISMATCH SSL';
+          badgeClass = 'CRITICAL';
+        } else if (s.ssl_status === 'EXPIRED') {
+          badgeText = 'SSL VENCIDO';
+          badgeClass = 'CRITICAL';
+        } else if (s.overall_status === 'DOWN') {
+          badgeText = 'CAÍDO';
+        } else if (s.overall_status === 'ONLINE') {
+          badgeText = 'OPERATIVO';
+        }
+
+        // HTTP status pill
+        let httpPill = s.http_ok 
+          ? `<span class="mini-pill mini-pill-ok">HTTP ${s.http_code} • ${s.latency_ms}ms</span>`
+          : (s.http_code > 0 
+              ? `<span class="mini-pill mini-pill-err">HTTP ${s.http_code}</span>` 
+              : `<span class="mini-pill mini-pill-err">Sin respuesta HTTP</span>`);
+
+        // DNS pill
+        let dnsPill = s.dns_ok 
+          ? `<span class="mini-pill">${s.ip}</span>` 
+          : `<span class="mini-pill mini-pill-err">Fallo DNS</span>`;
+
+        // SSL row
+        let sslText = '';
+        let sslColor = 'var(--text-muted)';
+        if (s.ssl_status === 'MISMATCH') {
+          sslText = 'Mismatch Dominio';
+          sslColor = 'var(--red)';
+        } else if (s.ssl_days < 0) {
+          sslText = `Vencido (${Math.abs(s.ssl_days)}d)`;
+          sslColor = 'var(--red)';
+        } else if (s.ssl_ok) {
+          sslText = `${s.ssl_days} días restantes`;
+          sslColor = s.ssl_days <= 20 ? 'var(--yellow)' : 'var(--green)';
+        } else {
+          sslText = 'Sin SSL';
+        }
+
+        let bottomContent = '';
+        if (s.overall_status === 'CRITICAL' || s.overall_status === 'DOWN') {
+          bottomContent = `
+            <div class="issue-banner" title="${s.error_msg || ''}">
+              [Aviso] ${getFriendlyError(s)}
+            </div>
+          `;
+        } else {
+          bottomContent = `
+            <div class="ssl-row">
+              <span class="ssl-tag" style="color: ${sslColor};">${sslText}</span>
+              <span class="ssl-issuer-tag" title="Emisor: ${s.ssl_issuer}">Emisor: ${s.ssl_issuer}</span>
+            </div>
+          `;
+        }
+
+        return `
+          <div class="clean-card card-${s.overall_status}">
+            <div>
+              <div class="card-head">
+                <span class="card-cat">${s.category}</span>
+                <span class="card-badge badge-${badgeClass}">${badgeText}</span>
+              </div>
+              <div class="card-title" title="${s.name}">${s.name}</div>
+              <a href="${s.url}" target="_blank" rel="noopener noreferrer" class="card-url" title="${s.url}">
+                ${s.url.replace('https://', '').replace('http://', '')}
+              </a>
+              <div class="card-metrics">
+                ${httpPill}
+                ${dnsPill}
+              </div>
+            </div>
+
+            <div class="card-bottom">
+              ${bottomContent}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderTable(list) {
+      const tbody = document.getElementById('tableBody');
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 30px; color: var(--text-muted);">No hay resultados para este filtro.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = list.map(s => {
+        let stClass = s.overall_status;
+        let stLabel = s.overall_status === 'ONLINE' ? 'OPERATIVO' : (s.ssl_status === 'MISMATCH' ? 'MISMATCH SSL' : s.overall_status);
+        
+        let sslInfo = s.ssl_ok ? `${s.ssl_days} días (${s.ssl_expiry})` : (s.ssl_status === 'MISMATCH' ? 'Mismatch de Dominio' : (s.ssl_days < 0 ? 'Expirado' : 'Fallo SSL'));
+        let sslColor = s.ssl_status === 'MISMATCH' || s.ssl_days < 0 ? 'var(--red)' : (s.ssl_days <= 20 ? 'var(--yellow)' : 'var(--green)');
+
+        let errDesc = (s.overall_status === 'CRITICAL' || s.overall_status === 'DOWN') 
+          ? `<span style="color: #fda4af; font-weight: 600;">[Aviso] ${getFriendlyError(s)}</span>` 
+          : `<span style="color: var(--green);">Sin incidentes reportados</span>`;
+
+        return `
+          <tr>
+            <td><span class="card-badge badge-${stClass}">${stLabel}</span></td>
+            <td class="table-service-name">${s.name}</td>
+            <td><a href="${s.url}" target="_blank" rel="noopener noreferrer" class="table-url">${s.url}</a></td>
+            <td>${s.http_code > 0 ? `HTTP ${s.http_code} (${s.latency_ms}ms)` : '<span style="color: var(--red);">Sin respuesta</span>'}</td>
+            <td>${s.dns_ok ? s.ip : '<span style="color: var(--red);">Fallo DNS</span>'}</td>
+            <td style="color: ${sslColor}; font-weight: 700;">${sslInfo} <span style="font-size: 10px; color: var(--text-muted); font-weight: 400;">(${s.ssl_issuer})</span></td>
+            <td>${errDesc}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // Interval ticker for auto-refresh countdown
+    setInterval(() => {
+      countdownSecs--;
+      if (countdownSecs <= 0) {
+        fetchData();
+      } else {
+        document.getElementById('countdown').textContent = `Refresco en ${countdownSecs}s`;
+      }
+    }, 1000);
+
+    // Initial fetch
+    fetchData();
+  </script>
+</body>
+</html>

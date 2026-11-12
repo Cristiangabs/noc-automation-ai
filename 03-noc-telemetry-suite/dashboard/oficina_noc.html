@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Company NOC – Centro de Operaciones</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-deep: #06090e;
+  --bg-surface: rgba(13, 19, 32, 0.85);
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-accent: rgba(56, 189, 248, 0.3);
+  --text-main: #f1f5f9;
+  --text-muted: #64748b;
+  --text-dim: #94a3b8;
+  --cyan: #22d3ee;
+  --cyan-glow: rgba(34, 211, 238, 0.25);
+  --emerald: #10b981;
+  --emerald-glow: rgba(16, 185, 129, 0.35);
+  --rose: #f43f5e;
+  --rose-glow: rgba(244, 63, 94, 0.3);
+  --amber: #fbbf24;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background-color: var(--bg-deep);
+  background-image: 
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(34, 211, 238, 0.08), transparent),
+    radial-gradient(circle at 100% 100%, rgba(99, 102, 241, 0.05), transparent);
+  color: var(--text-main);
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  line-height: 1.5;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px 16px;
+}
+
+/* Header Tech Minimal */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.brand-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-icon {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, rgba(34, 211, 238, 0.2), rgba(99, 102, 241, 0.2));
+  border: 1px solid var(--border-accent);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  box-shadow: 0 0 20px var(--cyan-glow);
+}
+
+.brand-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-badge {
+  font-size: 0.68rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 500;
+  color: var(--cyan);
+  background: rgba(34, 211, 238, 0.1);
+  border: 1px solid rgba(34, 211, 238, 0.25);
+  padding: 2px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.header-status {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.live-pill {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: rgba(17, 24, 39, 0.85);
+  backdrop-filter: blur(8px);
+  color: var(--text-main);
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  transition: all 0.3s ease;
+}
+
+.live-dot.connected {
+  background: var(--emerald);
+  box-shadow: 0 0 12px var(--emerald), 0 0 4px var(--emerald);
+}
+
+.live-dot.error {
+  background: var(--rose);
+  box-shadow: 0 0 12px var(--rose);
+}
+
+/* Stage / Viewport */
+.stage {
+  position: relative;
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #05080f;
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(34, 211, 238, 0.12);
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Toolbar */
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin: 10px 0 14px;
+  padding: 0 2px;
+}
+
+.tech-btn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  padding: 5px 12px;
+  border: 1px solid var(--border-subtle);
+  background: rgba(17, 24, 39, 0.6);
+  color: var(--text-dim);
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.tech-btn:hover {
+  border-color: var(--border-accent);
+  color: var(--cyan);
+  background: rgba(34, 211, 238, 0.05);
+}
+
+.tech-btn[aria-pressed="true"] {
+  border-color: var(--cyan);
+  background: rgba(34, 211, 238, 0.12);
+  color: var(--cyan);
+  box-shadow: 0 0 12px var(--cyan-glow);
+}
+
+/* Panels Grid */
+.panels {
+  display: grid;
+  grid-template-columns: 1fr 310px;
+  gap: 16px;
+}
+
+@media (max-width: 860px) {
+  .panels { grid-template-columns: 1fr; }
+}
+
+.card {
+  background: var(--bg-surface);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.card-header h2 {
+  font-size: 0.78rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.counter-badge {
+  font-size: 0.68rem;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 2px 7px;
+  border-radius: 4px;
+  border: 1px solid var(--border-subtle);
+}
+
+/* Terminal Feed */
+.terminal-window {
+  position: relative;
+  background: #06090e;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+
+.log {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  height: 180px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+}
+
+.log::-webkit-scrollbar { width: 5px; }
+.log::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.log li {
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  line-height: 1.45;
+}
+
+.log li:last-child { border: 0; }
+
+.log time {
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  flex-shrink: 0;
+  padding-top: 1px;
+}
+
+.log .msg { word-break: break-word; }
+.log .a { color: #fda4af; } /* alert */
+.log .s { color: #6ee7b7; } /* success */
+.log .c { color: #7dd3fc; } /* query */
+
+/* KPI Grid */
+.kpis {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.kpi {
+  background: #080c14;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 12px 14px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.kpi:hover { border-color: rgba(255, 255, 255, 0.12); }
+
+.kpi .val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--text-main);
+  letter-spacing: -0.03em;
+}
+
+.kpi .lbl {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 6px;
+  font-weight: 500;
+}
+
+.kpi.bad .val { color: var(--rose); text-shadow: 0 0 15px var(--rose-glow); }
+.kpi.good .val { color: var(--emerald); text-shadow: 0 0 15px var(--emerald-glow); }
+.kpi.info .val { color: var(--cyan); text-shadow: 0 0 15px var(--cyan-glow); }
+</style>
+</head>
+<body>
+<main>
+<header>
+  <div class="brand-section">
+    <div class="brand-icon">🛰️</div>
+    <div>
+      <h1 class="brand-title">
+        Company NOC
+        <span class="brand-badge">Engine IA v2</span>
+      </h1>
+    </div>
+  </div>
+  <div class="header-status">
+    <div class="live-pill">
+      <div class="live-dot" id="dot"></div>
+      <span id="status-text">CONECTANDO</span>
+    </div>
+  </div>
+</header>
+
+<div class="stage">
+  <canvas id="c" width="1920" height="1080" role="img" aria-label="Oficina NOC Sentry IA"></canvas>
+</div>
+
+<div class="toolbar" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+  <button class="tech-btn" id="sound-btn" aria-pressed="false">
+    <span>🔊</span>
+    <span id="sound-text">Audio HUD</span>
+  </button>
+  <button class="tech-btn" id="qa-voice-btn" style="border-color: #22d3ee; background: rgba(34,211,238,0.15); box-shadow: 0 0 12px rgba(34,211,238,0.25); color: #fff; cursor: pointer;">
+    <span>🎙️</span>
+    <span>Probar Voz Jarvis</span>
+  </button>
+  <div style="display: inline-flex; align-items: center; gap: 6px; background: rgba(15,23,42,0.8); border: 1px solid rgba(51,65,85,0.6); border-radius: 6px; padding: 4px 10px;">
+    <span style="font-size: 11px; color: #94a3b8; text-transform: uppercase; font-family: monospace;">Voz:</span>
+    <select id="voice-select" style="background: transparent; color: #38bdf8; border: none; font-family: inherit; font-size: 12px; outline: none; cursor: pointer; max-width: 260px;">
+      <option value="">Cargando voces...</option>
+    </select>
+  </div>
+</div>
+
+<div class="panels">
+  <div class="card">
+    <div class="card-header">
+      <h2>Terminal de Operaciones</h2>
+      <span class="counter-badge" id="event-count">0 eventos</span>
+    </div>
+    <div class="terminal-window">
+      <ul class="log" id="log"></ul>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <h2>Telemetría NOC</h2>
+    </div>
+    <div class="kpis">
+      <div class="kpi info" id="kpi-consultas">
+        <div class="val" id="val-consultas">0</div>
+        <div class="lbl">Consultas Hoy</div>
+      </div>
+      <div class="kpi bad" id="kpi-alertas">
+        <div class="val" id="val-alertas">0</div>
+        <div class="lbl">Alertas Activas</div>
+      </div>
+      <div class="kpi good">
+        <div class="val">100%</div>
+        <div class="lbl">Autonomía L1</div>
+      </div>
+      <div class="kpi">
+        <div class="val" id="val-users">3</div>
+        <div class="lbl">Operadores NOC</div>
+      </div>
+    </div>
+  </div>
+</div>
+</main>
+
+<script>
+(function(){
+var cv=document.getElementById('c'),ctx=cv.getContext('2d'),W=960,H=540;
+ctx.scale(2,2);
+
+function A(n,x,y,c,o){var a={n:n,x:x,y:y,c:c,w:false,b:null,siren:false,h:'#2a1d16',sk:'#f0c8a0',g:0};for(var k in o)a[k]=o[k];return a}
+
+var tools={
+  historial:A('Historial',110,175,'#c084fc',{h:'#1e1b2e',sk:'#e8bd94',ic:'clock'}),
+  alertas:A('Zabbix',295,175,'#fb7185',{h:'#3b1d1d',sk:'#f0c8a0',ic:'warn'}),
+  proxmox:A('Proxmox',480,175,'#38bdf8',{h:'#0c2d3d',sk:'#f0c8a0',ic:'server'}),
+  ping:A('Ping',665,175,'#4ade80',{h:'#10261c',sk:'#c99a74',ic:'radar'}),
+  trafico:A('Tráfico',850,175,'#fbbf24',{h:'#33260a',sk:'#f5d2b0',ic:'bars'})
+};
+
+// Sentry AI (Agente Central)
+var agent=A('Sentry AI',480,330,'#22d3ee',{});
+
+// Usuarios de Telegram: 3 puestos operativos etiquetados como Admin con colores tech diferenciados
+var users=[
+  A('Admin',200,478,'#38bdf8',{h:'#164e63',sk:'#e2e8f0'}),  // Cyan tech
+  A('Admin',480,478,'#a855f7',{h:'#581c87',sk:'#f1f5f9'}),  // Purple tech
+  A('Admin',760,478,'#10b981',{h:'#064e3b',sk:'#f8fafc'})   // Emerald tech
+];
+
+var keys=Object.keys(tools);
+var pk=[],fx=[],links={},t0=performance.now(),last=t0;
+var totalEvents=0, totalConsultas=0, totalAlertas=0;
+var dust=[];for(var i=0;i<40;i++)dust.push({x:Math.random()*W,y:Math.random()*H,v:4+Math.random()*10,r:.6+Math.random()*1.4});
+
+function sleep(ms){return new Promise(function(r){setTimeout(r,ms)})}
+function anc(a){
+  if(a===agent)return{x:a.x,y:a.y-34};
+  if(a.ic)return{x:a.x,y:a.y-72};
+  return{x:a.x,y:a.y-52};
+}
+
+function bz(p,f){
+  var cx=(p.f.x+p.t.x)/2,cy=(p.f.y+p.t.y)/2-26,u=1-f;
+  return{x:u*u*p.f.x+2*u*f*cx+f*f*p.t.x,y:u*u*p.f.y+2*u*f*cy+f*f*p.t.y};
+}
+
+function packet(f,to,col,ms){
+  return new Promise(function(r){
+    var k=(f.ic?f.n:to.ic?to.n:f.n+to.n);
+    links[k]=1;
+    pk.push({f:anc(f),t:anc(to),col:col,s:performance.now(),ms:ms,r:r,tr:[],k:k,to:to});
+  });
+}
+
+function burst(x,y,col){
+  for(var i=0;i<12;i++){
+    var an=Math.random()*6.283,sp=20+Math.random()*50;
+    fx.push({x:x,y:y,vx:Math.cos(an)*sp,vy:Math.sin(an)*sp,l:1,col:col});
+  }
+}
+
+var logEl=document.getElementById('log');
+var countEl=document.getElementById('event-count');
+
+function log(msg,cls){
+  totalEvents++;
+  countEl.textContent=totalEvents+' evento'+(totalEvents>1?'s':'');
+  var li=document.createElement('li');
+  var tm=new Date().toLocaleTimeString('es-VE',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  li.innerHTML='<time>'+tm+'</time><span class="msg'+(cls?' '+cls:'')+'">'+msg+'</span>';
+  logEl.insertBefore(li,logEl.firstChild);
+  while(logEl.children.length>35)logEl.removeChild(logEl.lastChild);
+}
+
+// Mapeo persistente de usuarios a puestos físicos (Admin 1, 2, 3)
+var userStationMap = {};
+var nextStationIdx = 0;
+
+function getUserStation(name){
+  var key = (name || 'Admin').trim().toLowerCase();
+  if(userStationMap[key] === undefined){
+    userStationMap[key] = nextStationIdx % users.length;
+    nextStationIdx++;
+  }
+  return users[userStationMap[key]];
+}
+
+// Búsqueda inteligente de herramienta
+function findTool(tname){
+  if(!tname) return null;
+  var s=tname.toLowerCase();
+  if(s.includes('proxmox')||s.includes('vm')||s.includes('qemu')||s.includes('lxc')||s.includes('pmx')) return tools.proxmox;
+  if(s.includes('trafic')||s.includes('tráfic')||s.includes('consumo')||s.includes('interface')||s.includes('ancho')||s.includes('listar_interfaces')) return tools.trafico;
+  if(s.includes('alert')||s.includes('problem')||s.includes('zabbix')||s.includes('dude')||s.includes('topolog')||s.includes('equipo')) return tools.alertas;
+  if(s.includes('ping')||s.includes('latencia')||s.includes('icmp')) return tools.ping;
+  if(s.includes('historial')||s.includes('event')||s.includes('report')) return tools.historial;
+  return null;
+}
+
+// Sincronizar suscriptores autorizados reales desde el proxy periódicamente
+function syncSubscribers(){
+  var host = (window.location.hostname && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') ? window.location.hostname : 'localhost';
+  fetch('http://'+host+':11440/subscribers')
+    .then(function(r){return r.json()})
+    .then(function(subList){
+      if(Array.isArray(subList)){
+        document.getElementById('val-users').textContent = subList.length;
+        // Asignar cada suscriptor a una de las terminales operativas
+        subList.forEach(function(sub){
+          var raw = (sub.name || sub.chat_id || '').toLowerCase();
+          if(raw && userStationMap[raw] === undefined){
+            userStationMap[raw] = nextStationIdx % users.length;
+            nextStationIdx++;
+          }
+        });
+      }
+    }).catch(function(){});
+}
+syncSubscribers();
+setInterval(syncSubscribers, 15000);
+
+// Animación de consultas reales (Telegram -> Sentry AI -> Tool -> Sentry AI -> Telegram)
+var busy=0;
+async function animarConsulta(data){
+  busy++;
+  totalConsultas++;
+  document.getElementById('val-consultas').textContent=totalConsultas;
+
+  var rawSender = data.usuario||data.from||'Admin';
+  var u=getUserStation(rawSender);
+  var tl=findTool(data.herramienta||data.tool||'');
+  var target=data.target||data.objetivo||'';
+  var detalle=data.detalle||data.pregunta||(data.herramienta?('Consulta '+data.herramienta):'Consulta al bot');
+
+  u.b='…';
+  log('💬 <b>'+rawSender+'</b>: '+detalle,'c');
+  if(soundEnabled) playBeep(700, 0.08);
+  await packet(u,agent,'#f8fafc',800);
+
+  agent.w=true;
+  if(tl){
+    log('🧠 <b>Sentry AI</b> procesa con '+tl.n+(target?' ('+target+')':''));
+    await sleep(600);
+    await packet(agent,tl,tl.c,800);
+
+    tl.w=true;
+    await sleep(1100);
+    tl.w=false;
+    await packet(tl,agent,'#4ade80',800);
+  } else {
+    log('🧠 <b>Sentry AI</b> procesa consulta internamente...');
+    await sleep(900);
+  }
+
+  agent.w=false;
+  await sleep(400);
+  await packet(agent,u,'#f8fafc',800);
+
+  u.b='✓';
+  var respMsg=data.respuesta||'Operación completada';
+  log('✅ Respuesta a '+rawSender+': '+respMsg,'s');
+  if(soundEnabled) playBeep(1000, 0.12);
+  await sleep(1500);
+  u.b=null;
+  busy--;
+}
+
+// Animación de alertas reales (Zabbix -> Sentry AI -> Broadcast a operadores)
+async function animarAlerta(data){
+  busy++;
+  totalAlertas++;
+  document.getElementById('val-alertas').textContent=totalAlertas;
+
+  var z=tools.alertas;
+  var host=data.host||data.equipo||'Equipo Red';
+  var msg=data.problema||data.mensaje||'Falla detectada';
+  var sev=data.severidad||data.severity||'Alta';
+
+  z.siren=true; z.b='!';
+  log('🚨 <b>ALERTA '+sev.toUpperCase()+':</b> '+host+' — '+msg,'a');
+  if(soundEnabled){
+    playBeep(440, 0.2);
+    setTimeout(function(){ playBeep(880, 0.2); }, 220);
+  }
+
+  await packet(z,agent,'#fb7185',900);
+  agent.w=true;
+  log('🧠 Sentry AI evalúa impacto y notifica operadores');
+  await sleep(1100);
+  agent.w=false;
+
+  await Promise.all(users.map(function(u){return packet(agent,u,'#fb7185',1000)}));
+  users.forEach(function(u){u.b='🔔'});
+  log('📢 Alerta despachada a '+users.length+' operadores NOC','a');
+
+  await sleep(2000);
+  users.forEach(function(u){u.b=null});
+  z.siren=false; z.b=null;
+  busy--;
+}
+
+// Dispatcher de eventos reales
+function procesarEvento(ev){
+  var tipo=(ev.tipo||ev.type||'').toLowerCase();
+  if(ev.texto_voz || tipo==='soporte' || tipo==='speak'){
+    var locucion = ev.texto_voz || ('Atención: El usuario ' + (ev.usuario||'Operador') + ' solicita soporte en ' + (ev.ubicacion||ev.piso||'sede') + '. ' + (ev.detalle||ev.motivo||''));
+    log('🎙️ <b>JARVIS NOC:</b> ' + locucion, 'c');
+    if(soundEnabled) hablarJarvis(locucion);
+    return;
+  }
+  if(tipo==='alerta'||tipo==='alert'||tipo==='down'||tipo==='problem'||tipo==='zabbix'||tipo==='dude'){
+    animarAlerta(ev);
+  } else if(tipo==='consulta'||tipo==='tool'||tipo==='query'||tipo==='ping'||tipo==='trafico'){
+    animarConsulta(ev);
+  } else if(tipo==='recuperacion'||tipo==='up'){
+    log('🟢 <b>RECUPERADO:</b> '+(ev.equipo||ev.host||'Equipo')+' Online','s');
+  } else {
+    log('ℹ️ '+(ev.mensaje||JSON.stringify(ev)));
+  }
+}
+
+// Conexión Server-Sent Events (SSE) al proxy
+var dot=document.getElementById('dot');
+var statusText=document.getElementById('status-text');
+var evtSource=null;
+
+function connectSSE(){
+  var host = (window.location.hostname && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') ? window.location.hostname : 'localhost';
+  var sseUrl='http://'+host+':11440/events';
+
+  statusText.textContent='CONECTANDO';
+  dot.className='live-dot';
+
+  evtSource=new EventSource(sseUrl);
+
+  evtSource.onopen=function(){
+    dot.className='live-dot connected';
+    statusText.textContent='ONLINE';
+    log('🟢 Conectado al bus de eventos de Company NOC','s');
+  };
+
+  evtSource.onmessage=function(e){
+    try{
+      var data=JSON.parse(e.data);
+      if(data.tipo==='sistema') return;
+      procesarEvento(data);
+    }catch(err){
+      console.warn('Error parseando evento SSE:', err, e.data);
+    }
+  };
+
+  evtSource.onerror=function(){
+    dot.className='live-dot error';
+    statusText.textContent='DESCONECTADO';
+    evtSource.close();
+    setTimeout(connectSSE, 5000);
+  };
+}
+
+connectSSE();
+
+// Cargar historial previo de eventos
+(function loadHistory(){
+  var host = (window.location.hostname && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') ? window.location.hostname : 'localhost';
+  fetch('http://'+host+':11440/events-history')
+    .then(function(r){return r.json()})
+    .then(function(hist){
+      if(Array.isArray(hist)&&hist.length>0){
+        hist.forEach(function(h){
+          if(h.tipo!=='test') log(h.mensaje||h.problema||'Evento: '+h.tipo);
+        });
+      }
+    }).catch(function(){});
+})();
+
+// Audio HUD
+var soundEnabled=false;
+var soundBtn=document.getElementById('sound-btn');
+soundBtn.onclick=function(){
+  soundEnabled=!soundEnabled;
+  soundBtn.setAttribute('aria-pressed',String(soundEnabled));
+  if(soundEnabled) playBeep(880,0.1);
+};
+function playBeep(freq,dur){
+  try{
+    var ac=new (window.AudioContext||window.webkitAudioContext)();
+    var o=ac.createOscillator(),g=ac.createGain();
+    o.frequency.value=freq||880;
+    o.type='sine';
+    o.connect(g);g.connect(ac.destination);
+    g.gain.setValueAtTime(0.08,ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+(dur||0.15));
+    o.start();o.stop(ac.currentTime+(dur||0.15));
+  }catch(e){}
+}
+
+
+// ==================== MOTOR DE VOZ JARVIS ====================
+var selectedVoice = null;
+var voiceSelect = document.getElementById('voice-select');
+
+function playJarvisChime(){
+  try{
+    var ac = new (window.AudioContext || window.webkitAudioContext)();
+    var now = ac.currentTime;
+    
+    // Chime futurista de doble tono sutil
+    var o1 = ac.createOscillator(), g1 = ac.createGain();
+    o1.type = 'sine';
+    o1.frequency.setValueAtTime(523.25, now); // C5
+    o1.frequency.exponentialRampToValueAtTime(783.99, now + 0.12); // G5
+    g1.gain.setValueAtTime(0.09, now);
+    g1.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+    o1.connect(g1); g1.connect(ac.destination);
+    o1.start(); o1.stop(now + 0.22);
+
+    setTimeout(function(){
+      try{
+        var now2 = ac.currentTime;
+        var o2 = ac.createOscillator(), g2 = ac.createGain();
+        o2.type = 'triangle';
+        o2.frequency.setValueAtTime(1046.50, now2); // C6
+        g2.gain.setValueAtTime(0.06, now2);
+        g2.gain.exponentialRampToValueAtTime(0.001, now2 + 0.18);
+        o2.connect(g2); g2.connect(ac.destination);
+        o2.start(); o2.stop(now2 + 0.18);
+      }catch(e){}
+    }, 85);
+  }catch(e){}
+}
+
+function scoreVoice(v){
+  var s = 0;
+  var name = (v.name || '').toLowerCase();
+  var lang = (v.lang || '').toLowerCase();
+
+  // Descartar o penalizar fuertemente acento de España si buscamos español latino / neutral
+  if(lang === 'es-es') s -= 50;
+
+  // Gran preferencia por voces Natural / Neural (suenan ultra humanas y cinematográficas)
+  if(name.includes('natural') || name.includes('neural') || name.includes('online')) s += 100;
+
+  // Preferencia por Español Latinoamericano / Neutral
+  if(lang.includes('es-mx') || lang.includes('es-419') || lang.includes('es-us') || lang.includes('es-co') || lang.includes('es-ve')) s += 50;
+  else if(lang.startsWith('es')) s += 20;
+
+  // Voces masculinas reconocidas de alta calidad
+  if(name.includes('jorge') || name.includes('raul') || name.includes('raúl') || name.includes('gonzalo') || name.includes('alonso') || name.includes('gerardo')) s += 40;
+  if(name.includes('male') || name.includes('hombre')) s += 15;
+
+  return s;
+}
+
+function updateVoiceList(){
+  if(!('speechSynthesis' in window)) return;
+  var voices = window.speechSynthesis.getVoices() || [];
+  if(voices.length === 0) return;
+
+  var esVoices = voices.filter(function(v){ return v.lang && v.lang.toLowerCase().startsWith('es'); });
+  if(esVoices.length === 0) esVoices = voices;
+
+  // Ordenar por calidad y acento latino
+  esVoices.sort(function(a, b){ return scoreVoice(b) - scoreVoice(a); });
+
+  if(voiceSelect){
+    voiceSelect.innerHTML = '';
+    var savedVoiceName = localStorage.getItem('noc_jarvis_voice') || '';
+
+    esVoices.forEach(function(v){
+      var opt = document.createElement('option');
+      opt.value = v.name;
+      var cleanName = v.name.replace('Microsoft ', '').replace(' Online (Natural)', ' 🌟').replace(' - Spanish', '');
+      opt.textContent = cleanName + ' (' + v.lang + ')';
+      if(v.name === savedVoiceName) opt.selected = true;
+      voiceSelect.appendChild(opt);
+    });
+
+    // Seleccionar la mejor por defecto
+    var matched = esVoices.find(function(v){ return v.name === savedVoiceName; }) || esVoices[0];
+    selectedVoice = matched;
+  }
+}
+
+if('speechSynthesis' in window){
+  window.speechSynthesis.onvoiceschanged = updateVoiceList;
+  updateVoiceList();
+}
+
+if(voiceSelect){
+  voiceSelect.onchange = function(){
+    var voices = window.speechSynthesis.getVoices() || [];
+    selectedVoice = voices.find(function(v){ return v.name === voiceSelect.value; }) || selectedVoice;
+    if(selectedVoice){
+      localStorage.setItem('noc_jarvis_voice', selectedVoice.name);
+      log('🎙️ <b>Voz seleccionada:</b> ' + selectedVoice.name, 'c');
+      hablarJarvis('Sistema de voz actualizado. Operando con acento neutro.');
+    }
+  };
+}
+
+function hablarJarvis(texto, onFinish){
+  if(!('speechSynthesis' in window)) return;
+
+  try{
+    window.speechSynthesis.cancel();
+    playJarvisChime();
+
+    setTimeout(function(){
+      var u = new SpeechSynthesisUtterance(texto);
+      
+      // Si el usuario eligió una voz, usarla
+      if(!selectedVoice){
+        var voices = window.speechSynthesis.getVoices() || [];
+        var esVoices = voices.filter(function(v){ return v.lang && v.lang.toLowerCase().startsWith('es'); });
+        esVoices.sort(function(a, b){ return scoreVoice(b) - scoreVoice(a); });
+        selectedVoice = esVoices[0] || null;
+      }
+
+      if(selectedVoice){
+        u.voice = selectedVoice;
+        u.lang = selectedVoice.lang || 'es-MX';
+      } else {
+        u.lang = 'es-MX';
+      }
+
+      // Parámetros firmes, sobrios y elegantes (sin tonos agudos ni cómicos)
+      u.rate = 0.98;   // Ritmo firme y natural
+      u.pitch = 0.98;  // Tono elegante sin distorsión
+      u.volume = 1.0;
+
+      agent.w = true;
+      u.onend = function(){
+        agent.w = false;
+        if(onFinish) onFinish();
+      };
+      u.onerror = function(){
+        agent.w = false;
+      };
+
+      window.speechSynthesis.speak(u);
+    }, 320);
+  }catch(err){
+    console.warn('Error en síntesis de voz:', err);
+  }
+}
+
+// Botón de prueba QA de voz
+var qaVoiceBtn = document.getElementById('qa-voice-btn');
+if(qaVoiceBtn){
+  qaVoiceBtn.onclick = function(){
+    soundEnabled = true;
+    soundBtn.setAttribute('aria-pressed', 'true');
+    log('🎙️ <b>TEST QA ACTIVADO:</b> Aviso de soporte con locución firme...','c');
+    
+    var demoTexto = 'Atención equipo de soporte. El usuario Carlos Mendoza solicita asistencia técnica en el Piso 4 por caída de enlace de fibra óptica y lentitud en el servicio.';
+    
+    hablarJarvis(demoTexto, function(){
+      log('✅ <b>Aviso de voz completado.</b>','s');
+    });
+  };
+}
+
+/* ---------- DIBUJO Y MOTOR VISUAL ---------- */
+function rr(x,y,w,h,r,fill,stroke,lw){
+  ctx.beginPath();ctx.roundRect(x,y,w,h,r);
+  if(fill){ctx.fillStyle=fill;ctx.fill()}
+  if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lw||1;ctx.stroke()}
+}
+function circ(x,y,r,fill){
+  ctx.beginPath();ctx.arc(x,y,r,0,6.2832);
+  ctx.fillStyle=fill;ctx.fill();
+}
+function T(s,x,y,sz,col,al,wt){
+  ctx.font=(wt||'600')+' '+sz+'px "JetBrains Mono","Space Grotesk","Segoe UI",system-ui,sans-serif';
+  ctx.fillStyle=col;ctx.textAlign=al||'center';ctx.fillText(s,x,y);
+}
+function glow(c,b,fn){ctx.save();ctx.shadowColor=c;ctx.shadowBlur=b;fn();ctx.restore()}
+
+function bg(t){
+  var g=ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,'#0a1220');g.addColorStop(1,'#05080f');
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+
+  // Pared con paneles tech animados
+  ctx.fillStyle='#0c1626';ctx.fillRect(0,0,W,96);
+  for(var i=0;i<8;i++){
+    rr(24+i*118,14,104,62,6,'#0b1a2c','rgba(34,211,238,.18)',1);
+    ctx.fillStyle='rgba(34,211,238,.35)';
+    for(var j=0;j<5;j++){
+      var bh=6+((Math.sin(t*1.3+i*2+j*1.7)+1)*14);
+      ctx.fillRect(36+i*118+j*17,70-bh,9,bh);
+    }
+  }
+  ctx.fillStyle='rgba(34,211,238,.5)';ctx.fillRect(0,96,W,1.5);
+
+  // Suelo en perspectiva
+  ctx.save();ctx.beginPath();ctx.rect(0,97,W,H);ctx.clip();
+  ctx.strokeStyle='rgba(34,211,238,.09)';ctx.lineWidth=1;
+  for(var k=-12;k<=12;k++){
+    ctx.beginPath();ctx.moveTo(W/2+k*34,97);ctx.lineTo(W/2+k*110,H);ctx.stroke();
+  }
+  for(var r=0;r<12;r++){
+    var y=97+Math.pow(r/11,1.8)*(H-97);
+    ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();
+  }
+  ctx.restore();
+
+  var sw=(t*60)%(H-97)+97;
+  var sg=ctx.createLinearGradient(0,sw-30,0,sw);
+  sg.addColorStop(0,'rgba(34,211,238,0)');sg.addColorStop(1,'rgba(34,211,238,.06)');
+  ctx.fillStyle=sg;ctx.fillRect(0,sw-30,W,30);
+
+  dust.forEach(function(d){
+    d.y-=d.v*.016;if(d.y<0)d.y=H;
+    ctx.fillStyle='rgba(120,220,240,.25)';ctx.fillRect(d.x,d.y,d.r,d.r);
+  });
+}
+
+function linkLines(t){
+  function ln(a,b,k,col){
+    var p={f:anc(a),t:anc(b)},g=links[k]||0;
+    ctx.beginPath();
+    for(var i=0;i<=24;i++){
+      var q=bz(p,i/24);i?ctx.lineTo(q.x,q.y):ctx.moveTo(q.x,q.y);
+    }
+    ctx.setLineDash([4,7]);ctx.lineDashOffset=-t*14;
+    ctx.strokeStyle=col;ctx.globalAlpha=.16+g*.7;ctx.lineWidth=1+g*1.5;ctx.stroke();
+    ctx.setLineDash([]);ctx.globalAlpha=1;
+  }
+  keys.forEach(function(k){ln(agent,tools[k],tools[k].n,tools[k].c)});
+  users.forEach(function(u){
+    ln(agent,u,u.n+agent.n,'#94a3b8');
+    ln(agent,u,agent.n+u.n,'#94a3b8');
+  });
+}
+
+function person(x,y,a,t,typing,phone){
+  var bob=typing?Math.sin(t*14)*.8:Math.sin(t*1.8+x)*.8;y+=bob;
+  glow(a.c,typing?10:0,function(){rr(x-17,y-27,34,34,11,a.c)});
+  ctx.fillStyle='rgba(0,0,0,.18)';ctx.fillRect(x-17,y-3,34,10);
+  rr(x-6,y-29,12,6,3,'#f1f5f9');
+  ctx.fillStyle=a.sk;ctx.fillRect(x-3.5,y-33,7,6);
+  circ(x,y-42,11,a.sk);
+  ctx.beginPath();ctx.arc(x,y-43,11.5,Math.PI*1.02,Math.PI*1.98);ctx.fillStyle=a.h;ctx.fill();
+  ctx.fillStyle=a.h;ctx.fillRect(x-11.5,y-44,3,8);
+  circ(x-4,y-41,1.3,'#1a1a1a');circ(x+4,y-41,1.3,'#1a1a1a');
+  ctx.beginPath();ctx.arc(x,y-38,3,.2,2.9);ctx.strokeStyle='rgba(60,30,20,.55)';ctx.lineWidth=1;ctx.stroke();
+
+  if(a.ic){
+    ctx.beginPath();ctx.arc(x,y-44,13,Math.PI*1.05,Math.PI*1.95);ctx.strokeStyle='#cbd5e1';ctx.lineWidth=2;ctx.stroke();
+    rr(x-15,y-46,4,8,2,'#cbd5e1');rr(x+11,y-46,4,8,2,'#cbd5e1');
+    ctx.beginPath();ctx.moveTo(x-12,y-38);ctx.quadraticCurveTo(x-10,y-31,x-3,y-32);ctx.strokeStyle='#94a3b8';ctx.lineWidth=1.2;ctx.stroke();
+  }
+  if(typing){
+    var o=Math.sin(t*20)*2;
+    rr(x-16,y-2+o,10,5,2.5,a.sk);rr(x+6,y-2-o,10,5,2.5,a.sk);
+  }
+  if(phone){
+    var on=a.b;
+    glow(on?'#38bdf8':'#000',on?12:0,function(){
+      rr(x+14,y-20,8,13,2,on?'#7dd3fc':'#1e293b','#475569',1);
+    });
+  }
+}
+
+function icon(a,x,y,t,on){
+  var c=a.c;ctx.save();ctx.translate(x,y);ctx.strokeStyle=c;ctx.fillStyle=c;ctx.lineWidth=2;ctx.globalAlpha=on?1:.55;
+  if(a.ic==='radar'){
+    for(var i=1;i<=3;i++){ctx.beginPath();ctx.arc(0,4,i*8,0,6.28);ctx.globalAlpha=(on?.5:.25);ctx.stroke()}
+    ctx.globalAlpha=1;var an=t*(on?5:1.5);ctx.beginPath();ctx.moveTo(0,4);ctx.lineTo(Math.cos(an)*24,4+Math.sin(an)*24);ctx.stroke();
+    if(on)circ(Math.cos(an+.6)*14,4+Math.sin(an+.6)*14,2.5,c);
+  } else if(a.ic==='warn'){
+    ctx.beginPath();ctx.moveTo(0,-16);ctx.lineTo(18,14);ctx.lineTo(-18,14);ctx.closePath();ctx.stroke();
+    ctx.fillRect(-1.5,-5,3,10);ctx.fillRect(-1.5,9,3,3);
+  } else if(a.ic==='bars'){
+    for(var j=0;j<5;j++){
+      var h=8+(on?(Math.sin(t*6+j*1.4)+1)*11:(Math.sin(j*1.4)+1)*7);
+      ctx.fillRect(-22+j*9,16-h,6,h);
+    }
+  } else if(a.ic==='server'){
+    for(var k=0;k<3;k++){
+      var ry=-14+k*10;
+      rr(-18,ry,36,8,2,null,c,1.5);
+      ctx.fillRect(-14,ry+2,14,4);
+      var ledOn=on?((Math.floor(t*8+k)%2)===0):((k%2)===0);
+      circ(8,ry+4,1.8,ledOn?c:'#0369a1');
+      circ(13,ry+4,1.8,on?'#4ade80':'#1e293b');
+    }
+  } else {
+    ctx.beginPath();ctx.arc(0,2,17,0,6.28);ctx.stroke();
+    var an2=t*(on?6:.4);ctx.beginPath();ctx.moveTo(0,2);ctx.lineTo(0,-10);
+    ctx.moveTo(0,2);ctx.lineTo(Math.cos(an2)*10,2+Math.sin(an2)*10);ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function station(a,t){
+  var x=a.x,y=a.y,on=a.w||a.siren,c=a.siren?((t*6|0)%2?'#fb7185':'#f43f5e'):a.c;
+  person(x,y+18,a,t,on,false);
+
+  // Pantalla holográfica
+  var sx=x-52,sy=y-120;
+  glow(c,on?22:6,function(){rr(sx,sy,104,66,8,'rgba(10,20,34,.85)',c,1.5)});
+  ctx.save();ctx.beginPath();ctx.roundRect(sx,sy,104,66,8);ctx.clip();
+  if(on){
+    var ly=sy+((t*50)%66);ctx.fillStyle=c;ctx.globalAlpha=.18;ctx.fillRect(sx,ly,104,6);ctx.globalAlpha=1;
+  }
+  ctx.restore();
+  icon(a,x,y-87,t,on);
+
+  ctx.beginPath();ctx.moveTo(x-26,y-54);ctx.lineTo(x-34,y+6);ctx.lineTo(x+34,y+6);ctx.lineTo(x+26,y-54);
+  ctx.fillStyle=c;ctx.globalAlpha=on?.09:.04;ctx.fill();ctx.globalAlpha=1;
+
+  // Escritorio
+  rr(x-62,y+8,124,34,7,'#142033','#26364d',1);
+  ctx.fillStyle=c;ctx.globalAlpha=.9;ctx.fillRect(x-56,y+9,112,2);ctx.globalAlpha=1;
+  rr(x-34,y+14,68,14,3,'#0a121d');
+  for(var i=0;i<6;i++)if(on?(Math.sin(t*9+i*2)>0):false){
+    ctx.fillStyle=c;ctx.fillRect(x-30+i*10,y+18,6,2.5);
+  }
+  T(a.n,x,y+60,13,'#cbd5e1');
+}
+
+function agentDraw(t){
+  var a=agent,x=a.x,y=a.y,on=a.w;
+  // Plataforma flotante
+  var pg=ctx.createRadialGradient(x,y+40,4,x,y+40,90);
+  pg.addColorStop(0,on?'rgba(34,211,238,.45)':'rgba(34,211,238,.22)');
+  pg.addColorStop(1,'rgba(34,211,238,0)');
+  ctx.fillStyle=pg;ctx.beginPath();ctx.ellipse(x,y+40,90,24,0,0,6.28);ctx.fill();
+
+  for(var i=0;i<3;i++){
+    ctx.beginPath();ctx.ellipse(x,y+40,38+i*20,10+i*5.5,0,0,6.28);
+    ctx.setLineDash([6,8]);ctx.lineDashOffset=-t*(on?60:16)*(i%2?-1:1);
+    ctx.strokeStyle='rgba(34,211,238,'+(.55-i*.12)+')';ctx.lineWidth=1.5;ctx.stroke();ctx.setLineDash([]);
+  }
+
+  // Cuerpo robot Sentry AI
+  var bob=Math.sin(t*(on?9:2))*(on?1.6:1.2);y+=bob;
+  glow('#22d3ee',on?18:8,function(){rr(x-22,y-24,44,44,14,'#0f2a3d','#22d3ee',1.8)});
+  rr(x-12,y-14,24,22,6,'#07141f');
+  var core=.55+.45*Math.sin(t*(on?12:3));
+  glow('#22d3ee',14*core,function(){circ(x,y-3,5+core*1.5,'rgba(103,232,249,'+(.6+core*.4)+')')});
+  rr(x-5,y-34,10,10,3,'#12374d');
+  glow('#22d3ee',on?16:6,function(){rr(x-17,y-60,34,28,10,'#0f2a3d','#22d3ee',1.8)});
+  rr(x-12,y-54,24,12,6,'#04121c');
+  var ey=on?((t*8|0)%2?2.5:4):4;
+  circ(x-5,y-48,ey*.8,'#67e8f9');circ(x+5,y-48,ey*.8,'#67e8f9');
+  ctx.beginPath();ctx.moveTo(x,y-60);ctx.lineTo(x,y-70);ctx.strokeStyle='#22d3ee';ctx.lineWidth=1.5;ctx.stroke();
+  glow('#22d3ee',10,function(){circ(x,y-72,3.2,(t*4|0)%2||on?'#67e8f9':'#0e7490')});
+  rr(x-34,y-18,10,22,5,'#12374d','#22d3ee',1);
+  rr(x+24,y-18,10,22,5,'#12374d','#22d3ee',1);
+
+  // Badge y Nombre estilizado de Sentry AI (elevado para no solapar con los puestos inferiores)
+  var by=a.y+55;
+  glow('#22d3ee',on?14:4,function(){
+    rr(x-50,by-13,100,28,7,'rgba(10,24,37,.92)','#22d3ee',1.2);
+  });
+  T('Sentry AI',x,by+1,13,'#67e8f9','center','700');
+  T('Engine L1',x,by+12,9,'#94a3b8','center','500');
+}
+
+function userDraw(u,t){
+  var x=u.x,y=u.y;
+  person(x,y,u,t,false,true);
+  rr(x-46,y+2,92,26,6,'#142033','#26364d',1);
+  rr(x-20,y+6,40,11,3,'#0a121d');
+  if(u.b==='🔔'){
+    ctx.beginPath();ctx.arc(x,y-18,30+((t*40)%24),0,6.28);
+    ctx.strokeStyle='rgba(251,113,133,'+(1-((t*40)%24)/24)*.6+')';ctx.lineWidth=2;ctx.stroke();
+  }
+  T(u.n,x,y+48,13,'#cbd5e1');
+  T('Operador NOC',x,y+62,10,'#64748b','center','500');
+}
+
+function bubble(a,t){
+  if(!a.b)return;
+  var p=a.ic?{x:a.x,y:a.y-132}:a===agent?{x:a.x,y:a.y-96}:{x:a.x,y:a.y-72};
+  var y=p.y-Math.sin(t*5)*2,al=a.b==='!'||a.b==='🔔';
+  glow(al?'#fb7185':'#22d3ee',10,function(){rr(p.x-16,y-18,32,22,8,al?'#fff1f2':'#f8fafc')});
+  ctx.beginPath();ctx.moveTo(p.x-4,y+3.5);ctx.lineTo(p.x,y+9);ctx.lineTo(p.x+4,y+3.5);
+  ctx.fillStyle=al?'#fff1f2':'#f8fafc';ctx.fill();
+  T(a.b,p.x,y-3,13,al?'#be123c':'#0f172a','center','700');
+}
+
+function frame(now){
+  var t=(now-t0)/1000,dt=Math.min(.05,(now-last)/1000);last=now;
+  bg(t);
+  for(var k in links)links[k]=Math.max(0,links[k]-dt*.9);
+  linkLines(t);
+
+  keys.forEach(function(k){
+    var a=tools[k];
+    if(a.siren){
+      var g=ctx.createRadialGradient(a.x,a.y-40,10,a.x,a.y-40,130);
+      g.addColorStop(0,'rgba(251,113,133,'+((t*6|0)%2?.28:.12)+')');
+      g.addColorStop(1,'rgba(251,113,133,0)');
+      ctx.fillStyle=g;ctx.fillRect(a.x-140,a.y-170,280,260);
+    }
+  });
+
+  keys.forEach(function(k){station(tools[k],t)});
+  agentDraw(t);
+  users.forEach(function(u){userDraw(u,t)});
+
+  // Partículas y trayectorias curvas con estela
+  pk=pk.filter(function(p){
+    var f=(now-p.s)/p.ms;
+    if(f>=1){burst(p.t.x,p.t.y,p.col);p.r();return false}
+    var e=f<.5?2*f*f:1-Math.pow(-2*f+2,2)/2,q=bz(p,e);
+    p.tr.push(q);
+    if(p.tr.length>14)p.tr.shift();
+    p.tr.forEach(function(s,i){
+      ctx.globalAlpha=i/p.tr.length*.5;
+      circ(s.x,s.y,1.5+i*.25,p.col);
+    });
+    ctx.globalAlpha=1;
+    glow(p.col,16,function(){circ(q.x,q.y,5.5,p.col)});
+    circ(q.x,q.y,2.3,'#fff');
+    return true;
+  });
+
+  fx=fx.filter(function(s){
+    s.l-=dt*2;
+    if(s.l<=0)return false;
+    s.x+=s.vx*dt;s.y+=s.vy*dt;
+    ctx.globalAlpha=s.l;
+    circ(s.x,s.y,2*s.l+.5,s.col);
+    ctx.globalAlpha=1;
+    return true;
+  });
+
+  var all=[agent].concat(users,keys.map(function(k){return tools[k]}));
+  all.forEach(function(a){bubble(a,t)});
+
+  var v=ctx.createRadialGradient(W/2,H/2,H*.45,W/2,H/2,H*.95);
+  v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,'rgba(0,0,0,.45)');
+  ctx.fillStyle=v;ctx.fillRect(0,0,W,H);
+
+  requestAnimationFrame(frame);
+}
+
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

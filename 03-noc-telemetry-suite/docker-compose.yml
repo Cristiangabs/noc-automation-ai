@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:latest
+    container_name: noc-n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_HOST=localhost
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - NODE_ENV=production
+      - WEBHOOK_URL=http://localhost:5678/
+      - GENERIC_TIMEZONE=America/Caracas
+    volumes:
+      - n8n_data:/home/node/.n8n
+
+  noc-proxy:
+    build:
+      context: ./proxy
+      dockerfile: Dockerfile
+    container_name: noc-proxy
+    restart: unless-stopped
+    ports:
+      - "11440:11440"
+    env_file:
+      - .env
+    volumes:
+      - ./dashboard/oficina_noc.html:/app/oficina_noc.html:ro
+      - ./subscribers.json:/app/subscribers.json
+
+volumes:
+  n8n_data:

@@ -1,0 +1,37 @@
+[
+  {
+    "id": "portal-01",
+    "name": "Portal Pagos Municipal Alpha",
+    "url": "https://portal-alpha.example.gov",
+    "category": "Alcaldías",
+    "enabled": true
+  },
+  {
+    "id": "portal-02",
+    "name": "Oficina Virtual Beta",
+    "url": "https://portal-beta.example.gov",
+    "category": "Alcaldías",
+    "enabled": true
+  },
+  {
+    "id": "portal-03",
+    "name": "Portal Tributario Gamma",
+    "url": "https://portal-gamma.example.gov",
+    "category": "Alcaldías",
+    "enabled": true
+  },
+  {
+    "id": "corp-01",
+    "name": "ERP Corporativo & Facturación",
+    "url": "https://erp.fibernet-demo.local",
+    "category": "Corporativo",
+    "enabled": true
+  },
+  {
+    "id": "noc-01",
+    "name": "Zabbix Core Monitoring",
+    "url": "https://zabbix.fibernet-demo.local",
+    "category": "Infraestructura",
+    "enabled": true
+  }
+]
